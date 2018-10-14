@@ -1,0 +1,9 @@
+int func () {
+	if (cond) {
+		a = 5;
+		System.out.println(a);
+	} else {
+		b = 6;
+		System.out.println(b);
+	}
+}
