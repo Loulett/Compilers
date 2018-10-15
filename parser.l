@@ -3,58 +3,67 @@
 
 %{
 #include <iostream>
+#include <string>
 using namespace std;
 extern int yylex();
+
+size_t line_index = 0;
+size_t char_index = 0;
+
+void print_token(string token_name) {
+	cout << token_name << " " << line_index << " " << char_index << " " << char_index + yyleng -1 << " ";
+	char_index += yyleng;
+}
 %}
 
 %%
 [ \t\n]; // Ignore whitespace, tabs
-[\n] {cout << endl;}
+[\n] {cout << endl; line_index++; char_index = 0;}
 
-"+" {cout << "T_PLUS";}
-"-" {cout << "T_MINUS";}
-"*" {cout << "T_MULT";}
-"\\" {cout << "T_DIVIDE";}
-"%" {cout << "T_REMAIN";}
-"&&" {cout << "T_AND";}
-"||" {cout << "T_OR";}
-"<" {cout << "T_LESS";}
-"!" {cout << "T_NOT";}
+"+" {print_token("T_PLUS");}
+"-" {print_token("T_MINUS");}
+"*" {print_token("T_MULT");}
+"\\" {print_token("T_DIVIDE");}
+"%" {print_token("T_REMAIN");}
+"&&" {print_token("T_AND");}
+"||" {print_token("T_OR");}
+"<" {print_token("T_LESS");}
+"!" {print_token("T_NOT");}
 
-"(" {cout << "T_R_LEFT";}
-")" {cout << "T_R_RIGHT";}
-"{" {cout << "T_F_LEFT";}
-"}" {cout << "T_F_RIGHT";}
-"[" {cout << "T_Q_LEFT";}
-"]" {cout << "T_Q_RIGHT";}
-"." {cout << "T_DOT";}
-"," {cout << "T_COMMA";}
-";" {cout << "T_SCOLON";}
-"=" {cout << "T_EQ";}
+"(" {print_token("T_R_LEFT");}
+")" {print_token("T_R_RIGHT");}
+"{" {print_token("T_F_LEFT");}
+"}" {print_token("T_F_RIGHT");}
+"[" {print_token("T_Q_LEFT");}
+"]" {print_token("T_Q_RIGHT");}
+"." {print_token("T_DOT");}
+"," {print_token("T_COMMA");}
+";" {print_token("T_SCOLON");}
+"=" {print_token("T_EQ");}
 
-"int" {cout << "T_INT";}
-"boolean" {cout << "T_BOOL";}
+"int" {print_token("T_INT");}
+"boolean" {print_token("T_BOOL");}
 
-"true" {cout << "T_TRUE";}
-"false" {cout << "T_FALSE";}
+"true" {print_token("T_TRUE");}
+"false" {print_token("T_FALSE");}
 
-"this" {cout << "T_THIS";}
-"new" {cout << "T_NEW";}
-"class" {cout << "T_CLASS";}
-"public" {cout << "T_PUBLIC";}
-"private" {cout << "T_PRIVATE";}
-"static" {cout << "T_STATIC";}
-"void" {cout << "T_VOID";}
-"extends" {cout << "T_EXTENDS";}
+"this" {print_token("T_THIS");}
+"new" {print_token("T_NEW");}
+"class" {print_token("T_CLASS");}
+"public" {print_token("T_PUBLIC");}
+"private" {print_token("T_PRIVATE");}
+"static" {print_token("T_STATIC");}
+"void" {print_token("T_VOID");}
+"extends" {print_token("T_EXTENDS");}
 
-"if" {cout << "T_IF";}
-"else" {cout << "T_ELSE";}
-"while" {cout << "T_WHILE";}
+"if" {print_token("T_IF");}
+"else" {print_token("T_ELSE");}
+"while" {print_token("T_WHILE");}
 
-"System.out.println" {cout << "T_PRINT";}
+"System.out.println" {print_token("T_PRINT");}
 
-[0-9]+ {cout << "T_INT: " << atoi(yytext);}
-[a-zA-Z0-9]+ {cout << "T_STRING: " << yytext;}
+[0-9]+ {cout << "T_INT: " << atoi(yytext); char_index += yyleng;}
+[a-zA-Z0-9]+ {cout << "T_STRING: " << yytext; char_index += yyleng;}
 
 %%
 
