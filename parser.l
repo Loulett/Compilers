@@ -1,74 +1,61 @@
 %option noyywrap
-%option outfile="minijava.lexer.cpp" header-file="minijava.lexer.h"
+%option outfile="parser.lexer.c" header-file="parser.lexer.h"
 
 %{
-#include <iostream>
 #include <string>
+#include <iostream>
+#include "parser.tab.h"
 using namespace std;
-extern int yylex();
-
-size_t line_index = 0;
-size_t char_index = 0;
-
-void print_token(string token_name) {
-	cout << token_name << " " << line_index << " " << char_index << " " << char_index + yyleng -1 << " ";
-	char_index += yyleng;
-}
 %}
 
 %%
-[ \t\n]; // Ignore whitespace, tabs
-[\n] {cout << endl; line_index++; char_index = 0;}
+[ \t]; // Ignore whitespace, tabs
+[\n] {return T_NEWLINE;}
 
-"+" {print_token("T_PLUS");}
-"-" {print_token("T_MINUS");}
-"*" {print_token("T_MULT");}
-"\\" {print_token("T_DIVIDE");}
-"%" {print_token("T_REMAIN");}
-"&&" {print_token("T_AND");}
-"||" {print_token("T_OR");}
-"<" {print_token("T_LESS");}
-"!" {print_token("T_NOT");}
 
-"(" {print_token("T_R_LEFT");}
-")" {print_token("T_R_RIGHT");}
-"{" {print_token("T_F_LEFT");}
-"}" {print_token("T_F_RIGHT");}
-"[" {print_token("T_Q_LEFT");}
-"]" {print_token("T_Q_RIGHT");}
-"." {print_token("T_DOT");}
-"," {print_token("T_COMMA");}
-";" {print_token("T_SCOLON");}
-"=" {print_token("T_EQ");}
+"+" {return T_PLUS;}
+"-" {return T_MINUS;}
+"*" {return T_MULT;}
+"\\" {return T_DIVIDE;}
+"%" {return T_REMAIN;}
+"&&" {return T_ADD;}
+"||" {return T_OR;}
+"<" {return T_LESS;}
+"!" {return T_NOT;}
 
-"int" {print_token("T_INT");}
-"boolean" {print_token("T_BOOL");}
+"(" {return T_R_LEFT;}
+")" {return T_R_RIGHT;}
+"{" {return T_F_LEFT;}
+"}" {return T_F_RIGHT;}
+"[" {return T_Q_LEFT;}
+"]" {return T_Q_RIGHT;}
+"." {return T_DOT;}
+"," {return T_COMMA;}
+";" {return T_SCOLON;}
+"=" {return T_EQ;}
 
-"true" {print_token("T_TRUE");}
-"false" {print_token("T_FALSE");}
+"int" {return T_INT;}
+"boolean" {return T_BOOL;}
 
-"this" {print_token("T_THIS");}
-"new" {print_token("T_NEW");}
-"class" {print_token("T_CLASS");}
-"public" {print_token("T_PUBLIC");}
-"private" {print_token("T_PRIVATE");}
-"static" {print_token("T_STATIC");}
-"void" {print_token("T_VOID");}
-"extends" {print_token("T_EXTENDS");}
+"true" {return T_TRUE;}
+"false" {return T_FALSE;}
 
-"if" {print_token("T_IF");}
-"else" {print_token("T_ELSE");}
-"while" {print_token("T_WHILE");}
+"this" {return T_THIS;}
+"new" {return T_NEW;}
+"class" {return T_CLASS;}
+"public" {return T_PUBLIC;}
+"private" {return T_PRIVATE;}
+"static" {return T_STATIC;}
+"void" {return T_VOID;}
+"extends" {return T_EXTENDS;}
 
-"System.out.println" {print_token("T_PRINT");}
+"if" {return T_IF;}
+"else" {return T_ELSE;}
+"while" {return T_WHILE;}
 
-[0-9]+ {cout << "T_INT: " << atoi(yytext); char_index += yyleng;}
-[a-zA-Z0-9]+ {cout << "T_STRING: " << yytext; char_index += yyleng;}
+"System.out.println" {return T_PRINT;}
+
+[0-9]+ {yylval.ival = atoi(yytext); return T_NUM;}
+[a-zA-Z0-9]+ {yylval.sval = strdup(yytext); return T_STRING;}
 
 %%
-
-int main(int, char**) {
-	FILE *myfile = fopen("input.txt", "r");
-	yyin = myfile;
-	yylex();
-}
