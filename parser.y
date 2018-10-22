@@ -15,26 +15,25 @@ void yyerror(const string s);
 	int ival;
 	char* sval;	
 }
-%token T_NEWLINE
-%token T_PLUS
-%token T_MINUS
-%token T_MULT
-%token T_REMAIN
-%token T_AND
-%token T_OR
-%token T_LESS
-%token T_NOT
+%left T_PLUS
+%left T_MINUS
+%left T_MULT
+%left T_REMAIN
+%left T_AND
+%left T_OR
+%left T_LESS
+%left T_NOT
 
-%token T_R_LEFT
+%left T_R_LEFT
 %token T_R_RIGHT
-%token T_F_LEFT
+%left T_F_LEFT
 %token T_F_RIGHT
-%token T_Q_LEFT
+%left T_Q_LEFT
 %token T_Q_RIGHT
-%token T_DOT
+%left T_DOT
 %token T_COMMA
 %token T_SCOLON
-%token T_EQ
+%right T_EQ
 
 %token T_INT
 %token T_BOOL
@@ -61,14 +60,12 @@ void yyerror(const string s);
 %token T_PRINT
 %token T_LENGTH
 
-%token T_EOF
-
 %token <ival> T_NUM
 %token <sval> T_IDENT
 
 %%
 parser:
-	mainClass classesDeclaration T_EOF {cout << "Start ";}
+	mainClass classesDeclaration {cout << "Start ";}
 	;
 
 mainClass:
@@ -76,8 +73,8 @@ mainClass:
 	;
 
 classesDeclaration:
-	classDeclaration classesDeclaration {cout << "Class ";}
-	| %empty
+	%empty
+	| classesDeclaration classDeclaration {cout << "Class ";}
 	;
 
 classDeclaration:
@@ -85,13 +82,13 @@ classDeclaration:
 	;
 
 extends:
-	T_EXTENDS identifier {cout << "Extends ";}
-	| %empty
+	%empty
+	| T_EXTENDS identifier {cout << "Extends ";}
 	;
 
 varsDeclaration:
-	varDeclaration varsDeclaration
-	| %empty
+	%empty
+	| varsDeclaration varDeclaration {cout << "Var ";}
 	;
 
 varDeclaration:
@@ -99,8 +96,8 @@ varDeclaration:
 	;
 
 methodsDeclaration:
-	methodDeclaration methodsDeclaration
-	| %empty
+	%empty
+	| methodsDeclaration methodDeclaration {cout << "Method ";}
 	;
 
 methodDeclaration:
@@ -113,18 +110,18 @@ methodType:
 	;
 
 methodParams:
-	type identifier otherParams {cout << "Param ";}
-	| %empty
+	%empty
+	| type identifier otherParams {cout << "Param ";}
 	;
 
 otherParams:
-	T_COMMA type identifier otherParams {cout << "Param ";}
-	| %empty
+	%empty
+	| T_COMMA type identifier otherParams {cout << "Param ";}
 	;
 
 statements:
-	statement statements
-	| %empty
+	%empty
+	| statement statements
 	;
 
 type:
@@ -143,9 +140,21 @@ statement:
 	| identifier T_Q_LEFT expression T_Q_RIGHT T_EQ expression T_SCOLON {cout << "Array Assignment ";}
 	;
 
+expressions:
+	%empty
+	| expression
+	| expressions T_COMMA expression
+	;
+
 expression:
-	expression operator expression
-	| expression T_Q_LEFT expression T_Q_RIGHT
+	expression T_AND expression {cout << "And ";}
+	| expression T_LESS expression {cout << "Less ";}
+	| expression T_PLUS expression {cout << "Plus ";}
+	| expression T_MINUS expression {cout << "Minus ";}
+	| expression T_MULT expression {cout << "Mult ";}
+	| expression T_REMAIN expression {cout << "Remain ";}
+	| expression T_OR expression {cout << "Or ";}
+	| expression T_Q_LEFT expression T_Q_RIGHT {}
 	| expression T_DOT T_LENGTH {cout << "Length ";}
 	| expression T_DOT identifier T_R_LEFT expressions T_R_RIGHT
 	| T_NUM {cout << "Int " << $1 << " ";}
@@ -157,26 +166,6 @@ expression:
 	| T_NEW identifier T_R_LEFT expression T_R_RIGHT {cout << "New ";}
 	| T_NOT expression {cout << "Not ";}
 	| T_R_LEFT expression T_R_RIGHT
-	;
-
-operator:
-	T_AND {cout << "And ";}
-	| T_LESS {cout << "Less ";}
-	| T_PLUS {cout << "Plus ";}
-	| T_MINUS {cout << "Minus ";}
-	| T_MULT {cout << "Mult ";}
-	| T_REMAIN {cout << "Remain ";}
-	| T_OR {cout << "Or ";}
-	;
-
-expressions:
-	expression otherExpressions
-	| %empty
-	;
-
-otherExpressions:
-	T_COMMA expression otherExpressions
-	| %empty
 	;
 
 identifier:

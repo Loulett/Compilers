@@ -58,8 +58,6 @@ using namespace std;
 "System.out.println" {return T_PRINT;}
 "length" {return T_LENGTH;}
 
-"EOF" {return T_EOF;}
-
 [0-9]+ {yylval.ival = atoi(yytext); return T_NUM;}
 [a-zA-Z0-9]+ {yylval.sval = strdup(yytext); return T_IDENT;}
 
