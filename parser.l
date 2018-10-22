@@ -8,8 +8,14 @@
 using namespace std;
 %}
 
+DIGIT [0-9]
+NUM ({DIGIT})+
+CHAR [a-zA-Z_]
+STRING ({CHAR})+
+IDENT {STRING}({STRING}|{NUM})*
+
 %%
-[ \t]; // Ignore whitespace, tabs
+[ \t]+ ; // Ignore whitespace, tabs
 [\n] {cout << '\n';}
 
 
@@ -56,9 +62,11 @@ using namespace std;
 "while" {return T_WHILE;}
 
 "System.out.println" {return T_PRINT;}
-"length" {return T_LENGTH;}
+".length" {return T_LENGTH;}
 
-[0-9]+ {yylval.ival = atoi(yytext); return T_NUM;}
-[a-zA-Z0-9]+ {yylval.sval = strdup(yytext); return T_IDENT;}
+{IDENT} {yylval.sval = strdup(yytext); return T_IDENT;}
+{NUM} {yylval.ival = atoi(yytext); return T_NUM;}
+
+. {cout << "ERROR" << yytext;}
 
 %%

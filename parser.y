@@ -57,8 +57,8 @@ void yyerror(const string s);
 %token T_ELSE
 %token T_WHILE
 
-%token T_PRINT
-%token T_LENGTH
+%left T_PRINT
+%left T_LENGTH
 
 %token <ival> T_NUM
 %token <sval> T_IDENT
@@ -74,7 +74,7 @@ mainClass:
 
 classesDeclaration:
 	%empty
-	| classesDeclaration classDeclaration {cout << "Class ";}
+	| classesDeclaration classDeclaration
 	;
 
 classDeclaration:
@@ -88,7 +88,7 @@ extends:
 
 varsDeclaration:
 	%empty
-	| varsDeclaration varDeclaration {cout << "Var ";}
+	| varsDeclaration varDeclaration
 	;
 
 varDeclaration:
@@ -97,7 +97,7 @@ varDeclaration:
 
 methodsDeclaration:
 	%empty
-	| methodsDeclaration methodDeclaration {cout << "Method ";}
+	| methodsDeclaration methodDeclaration
 	;
 
 methodDeclaration:
@@ -142,8 +142,8 @@ statement:
 
 expressions:
 	%empty
-	| expression
-	| expressions T_COMMA expression
+	| expression {cout << "expression ";}
+	| expressions T_COMMA expression {cout << "expression ";}
 	;
 
 expression:
@@ -155,17 +155,17 @@ expression:
 	| expression T_REMAIN expression {cout << "Remain ";}
 	| expression T_OR expression {cout << "Or ";}
 	| expression T_Q_LEFT expression T_Q_RIGHT {}
-	| expression T_DOT T_LENGTH {cout << "Length ";}
-	| expression T_DOT identifier T_R_LEFT expressions T_R_RIGHT
+	| expression T_LENGTH {cout << "Length ";}
+	| expression T_DOT identifier T_R_LEFT expressions T_R_RIGHT {}
 	| T_NUM {cout << "Int " << $1 << " ";}
 	| T_TRUE {cout << "True ";}
 	| T_FALSE {cout << "False ";}
-	| identifier
+	| identifier {}
 	| T_THIS {cout << "This ";}
 	| T_NEW T_INT T_Q_LEFT expression T_Q_RIGHT {cout << "New int array ";}
-	| T_NEW identifier T_R_LEFT expression T_R_RIGHT {cout << "New ";}
+	| T_NEW identifier T_R_LEFT T_R_RIGHT {cout << "New ";}
 	| T_NOT expression {cout << "Not ";}
-	| T_R_LEFT expression T_R_RIGHT
+	| T_R_LEFT expression T_R_RIGHT {}
 	;
 
 identifier:
