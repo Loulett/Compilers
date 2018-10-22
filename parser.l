@@ -10,15 +10,14 @@ using namespace std;
 
 %%
 [ \t]; // Ignore whitespace, tabs
-[\n] {return T_NEWLINE;}
+[\n] {cout << '\n';}
 
 
 "+" {return T_PLUS;}
 "-" {return T_MINUS;}
 "*" {return T_MULT;}
-"\\" {return T_DIVIDE;}
 "%" {return T_REMAIN;}
-"&&" {return T_ADD;}
+"&&" {return T_AND;}
 "||" {return T_OR;}
 "<" {return T_LESS;}
 "!" {return T_NOT;}
@@ -36,6 +35,7 @@ using namespace std;
 
 "int" {return T_INT;}
 "boolean" {return T_BOOL;}
+"String" {return T_STRING;}
 
 "true" {return T_TRUE;}
 "false" {return T_FALSE;}
@@ -48,14 +48,19 @@ using namespace std;
 "static" {return T_STATIC;}
 "void" {return T_VOID;}
 "extends" {return T_EXTENDS;}
+"main" {return T_MAIN;}
+"return" {return T_RETURN;}
 
 "if" {return T_IF;}
 "else" {return T_ELSE;}
 "while" {return T_WHILE;}
 
 "System.out.println" {return T_PRINT;}
+"length" {return T_LENGTH;}
+
+"EOF" {return T_EOF;}
 
 [0-9]+ {yylval.ival = atoi(yytext); return T_NUM;}
-[a-zA-Z0-9]+ {yylval.sval = strdup(yytext); return T_STRING;}
+[a-zA-Z0-9]+ {yylval.sval = strdup(yytext); return T_IDENT;}
 
 %%
