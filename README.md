@@ -21,3 +21,8 @@ Currently it just reads `input.txt`, parse it through final-state machine and pr
 
 # TODO
 * Add autotests
+* Add AST
+* Add visitor
+* Add printer
+* Add AST visualization
+* Add errors
