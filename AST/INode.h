@@ -12,6 +12,11 @@ class IMainClass: public INode {
  	virtual ~IMainClass() = default;
 };
 
+class IClassDeclaration: public INode {
+ public:
+	virtual ~IClassDeclaration() = default;
+};
+
 class IVarDeclaration: public INode {
  public:
  	virtual ~IVarDeclaration() = default;
@@ -39,8 +44,8 @@ class IExpression: public INode {
 	
 };
 
-class IIndetifier: public INode {
+class IIdentifier: public INode {
 public:
-	virtual ~IIndetifier() = default;
+	virtual ~IIdentifier() = default;
 	
 };
