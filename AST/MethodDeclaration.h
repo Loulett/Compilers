@@ -11,6 +11,6 @@ public:
  	IIdentifier* name;
  	std::vector<std::pair<IType*, IIdentifier*>> args;
  	std::vector<IVarDeclaration*> vars;
- 	std::vector<IStatement> statements;
+ 	std::vector<IStatement*> statements;
  	IExpression* return_expression;
 };

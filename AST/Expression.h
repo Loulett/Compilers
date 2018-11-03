@@ -1,15 +1,62 @@
 #include "INode.h"
 #include <vector>
 
-class OperationsExpression: public IExpression {
+class AndExpression: public IExpression {
  public:
- 	enum class Operation {AND, LESS, PLUS, MINUS, MULT, REMAIN, OR};
- 	OperationsExpression(IExpression* expr1, Operation opr, IExpression* expr2);
+ 	AndExpression(IExpression* expr1, IExpression* expr2);
  private:
  	IExpression* expr1;
- 	Operation opr;
  	IExpression* expr2;
 };
+
+class LessExpression: public IExpression {
+ public:
+ 	LessExpression(IExpression* expr1, IExpression* expr2);
+ private:
+ 	IExpression* expr1;
+ 	IExpression* expr2;
+};
+
+class PlusExpression: public IExpression {
+ public:
+ 	PlusExpression(IExpression* expr1, IExpression* expr2);
+ private:
+ 	IExpression* expr1;
+ 	IExpression* expr2;
+};
+
+class MinusExpression: public IExpression {
+ public:
+ 	MinusExpression(IExpression* expr1, IExpression* expr2);
+ private:
+ 	IExpression* expr1;
+ 	IExpression* expr2;
+};
+
+class MultExpression: public IExpression {
+ public:
+ 	MultExpression(IExpression* expr1, IExpression* expr2);
+ private:
+ 	IExpression* expr1;
+ 	IExpression* expr2;
+};
+
+class RemainExpression: public IExpression {
+ public:
+ 	RemainExpression(IExpression* expr1, IExpression* expr2);
+ private:
+ 	IExpression* expr1;
+ 	IExpression* expr2;
+};
+
+class OrExpression: public IExpression {
+ public:
+ 	OrExpression(IExpression* expr1, IExpression* expr2);
+ private:
+ 	IExpression* expr1;
+ 	IExpression* expr2;
+};
+
 
 class ArrayExpression: public IExpression {
  public:
@@ -54,7 +101,7 @@ class NewArrExpression: public IExpression {
  public:
  	NewArrExpression(IExpression* expr);
  private:
- 	IExpression expr;
+ 	IExpression* expr;
 };
 
 class NewExpression: public IExpression {
