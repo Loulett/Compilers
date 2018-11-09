@@ -73,6 +73,15 @@ class LengthExpression: public IExpression {
  	IExpression* expr;
 };
 
+class MethodExpression: public IExpression {
+ public:
+ 	MethodExpression(IExpression* class_name, IIdentifier* method, std::vector<IExpression*>* params);
+ private:
+ 	IExpression* class_name;
+ 	IIdentifier* method;
+ 	std::vector<IExpression*>* params;
+};
+
 class Integer: public IExpression {
  public:
  	Integer(int num);

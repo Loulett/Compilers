@@ -11,10 +11,20 @@ extern FILE *yyin;
 void yyerror(const string s);
 %}
 
+%code requires {
+#include "AST/INode.h"
+#include "AST/Identifier.h"
+#include "AST/Expression.h"
+}
+
 %union {
 	int ival;
-	char* sval;	
+	char* sval;
+	IIdentifier* ident;
+	IExpression* expr;
+	std::vector<IExpression*>* exprs;	
 }
+
 %left T_PLUS
 %left T_MINUS
 %left T_MULT
@@ -62,6 +72,10 @@ void yyerror(const string s);
 
 %token <ival> T_NUM
 %token <sval> T_IDENT
+
+%type <ident> identifier
+%type <expr> expression
+%type <exprs> expressions
 
 %%
 parser:
@@ -141,35 +155,98 @@ statement:
 	;
 
 expressions:
-	%empty
-	| expression {cout << "expression ";}
-	| expressions T_COMMA expression {cout << "expression ";}
+	%empty {
+		$$ = new std::vector<IExpression*>();
+		}
+	| expression {
+		$$ = new std::vector<IExpression*>();
+		$$->push_back($1);
+		cout << "expression ";
+		}
+	| expressions T_COMMA expression {
+		$$->push_back($3);
+		$$ = $1;
+		cout << "expression ";
+		}
 	;
 
 expression:
-	expression T_AND expression {cout << "And ";}
-	| expression T_LESS expression {cout << "Less ";}
-	| expression T_PLUS expression {cout << "Plus ";}
-	| expression T_MINUS expression {cout << "Minus ";}
-	| expression T_MULT expression {cout << "Mult ";}
-	| expression T_REMAIN expression {cout << "Remain ";}
-	| expression T_OR expression {cout << "Or ";}
-	| expression T_Q_LEFT expression T_Q_RIGHT {}
-	| expression T_LENGTH {cout << "Length ";}
-	| expression T_DOT identifier T_R_LEFT expressions T_R_RIGHT {}
-	| T_NUM {cout << "Int " << $1 << " ";}
-	| T_TRUE {cout << "True ";}
-	| T_FALSE {cout << "False ";}
+	expression T_AND expression {
+		$$ = new AndExpression($1, $3);
+		cout << "And ";
+		}
+	| expression T_LESS expression {
+		$$ = new LessExpression($1, $3);
+		cout << "Less ";
+		}
+	| expression T_PLUS expression {
+		$$ = new PlusExpression($1, $3);
+		cout << "Plus ";
+		}
+	| expression T_MINUS expression {
+		$$ = new MinusExpression($1, $3);
+		cout << "Minus ";
+		}
+	| expression T_MULT expression {
+		$$ = new MultExpression($1, $3);
+		cout << "Mult ";
+		}
+	| expression T_REMAIN expression {
+		$$ = new RemainExpression($1, $3);
+		cout << "Remain ";
+		}
+	| expression T_OR expression {
+		$$ = new OrExpression($1, $3);
+		cout << "Or ";
+		}
+	| expression T_Q_LEFT expression T_Q_RIGHT {
+		$$ = new ArrayExpression($1, $3);
+		}
+	| expression T_LENGTH {
+		$$ = new LengthExpression($1);
+		cout << "Length ";
+		}
+	| expression T_DOT identifier T_R_LEFT expressions T_R_RIGHT {
+		$$ = new MethodExpression($1, $3, $5);
+		}
+	| T_NUM {
+		$$ = new Integer($1);
+		cout << "Int " << $1 << " ";
+		}
+	| T_TRUE {
+		$$ = new Bool(true);
+		cout << "True ";
+		}
+	| T_FALSE {
+		$$ = new Bool(false);
+		cout << "False ";
+		}
 	| identifier {}
-	| T_THIS {cout << "This ";}
-	| T_NEW T_INT T_Q_LEFT expression T_Q_RIGHT {cout << "New int array ";}
-	| T_NEW identifier T_R_LEFT T_R_RIGHT {cout << "New ";}
-	| T_NOT expression {cout << "Not ";}
-	| T_R_LEFT expression T_R_RIGHT {}
+	| T_THIS {
+		$$ = new This();
+		cout << "This ";
+		}
+	| T_NEW T_INT T_Q_LEFT expression T_Q_RIGHT {
+		$$ = new NewArrExpression($4);
+		cout << "New int array ";
+		}
+	| T_NEW identifier T_R_LEFT T_R_RIGHT {
+		$$ = new NewExpression($2);
+		cout << "New ";
+		}
+	| T_NOT expression {
+		$$ = new NotExpression($2);
+		cout << "Not ";
+		}
+	| T_R_LEFT expression T_R_RIGHT {
+		$$ = new Expression($2);
+		}
 	;
 
 identifier:
-	T_IDENT {cout << "String " << $1 << " ";}
+	T_IDENT {
+		$$ = new Identifier($1);
+		cout << "String " << $1 << " ";}
 	;
 %%
 

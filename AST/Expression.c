@@ -27,6 +27,9 @@ ArrayExpression::ArrayExpression(IExpression* expr1, IExpression* expr2):
 LengthExpression::LengthExpression(IExpression* expr):
 	expr(expr) {}
 
+MethodExpression::MethodExpression(IExpression* class_name, IIdentifier* method, std::vector<IExpression*>* params):
+	class_name(class_name), method(method), params(params) {}
+
 Integer::Integer(int num): num(num) {}
 
 Bool::Bool(bool b): b(b) {}
@@ -45,6 +48,4 @@ NotExpression::NotExpression(IExpression* expr):
 
 Expression::Expression(IExpression* expr):
 	expr(expr) {}
-
-int main() {return 0;}
 
