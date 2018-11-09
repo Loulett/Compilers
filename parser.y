@@ -22,6 +22,7 @@ void yyerror(const string s);
 #include "AST/MethodDeclaration.h"
 #include "AST/ClassDeclaration.h"
 #include "AST/MainClass.h"
+#include "AST/Goal.h"
 }
 
 %union {
@@ -41,6 +42,8 @@ void yyerror(const string s);
 	IIdentifier* extends;
 	std::vector<IMethodDeclaration*>* methods;
 	IMainClass* main;
+	IGoal* goal;
+	std::vector<IClassDeclaration*>* classes;
 }
 
 %left T_PLUS
@@ -105,10 +108,15 @@ void yyerror(const string s);
 %type <extends> extends
 %type <methods> methodsDeclaration
 %type <main> mainClass
+%type <goal> parser
+%type <classes> classesDeclaration
 
 %%
 parser:
-	mainClass classesDeclaration {cout << "Start ";}
+	mainClass classesDeclaration {
+		$$ = new Goal($1, $2);
+		cout << "Start ";
+	}
 	;
 
 mainClass:
@@ -119,8 +127,13 @@ mainClass:
 	;
 
 classesDeclaration:
-	%empty
-	| classesDeclaration classDeclaration
+	%empty {
+		$$ = new std::vector<IClassDeclaration*>();
+	}
+	| classesDeclaration classDeclaration {
+		$$->push_back($2);
+		$$ = $1;
+	}
 	;
 
 classDeclaration:
