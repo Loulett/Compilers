@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <iostream>
 #include <string>
+#include <utility>
 using namespace std;
 
 extern int yylex();
@@ -18,6 +19,7 @@ void yyerror(const string s);
 #include "AST/Statement.h"
 #include "AST/Type.h"
 #include "AST/VarDeclaration.h"
+#include "AST/MethodDeclaration.h"
 }
 
 %union {
@@ -30,6 +32,9 @@ void yyerror(const string s);
 	std::vector<IStatement*>* states;
 	IType* type;
 	IVarDeclaration* varDecl;
+	IMethodDeclaration* methodDecl;
+	std::vector<IVarDeclaration*>* vars;
+	std::vector<std::pair<IType*, IIdentifier*>>* params;
 }
 
 %left T_PLUS
@@ -87,6 +92,9 @@ void yyerror(const string s);
 %type <states> statements
 %type <type> type
 %type <varDecl> varDeclaration
+%type <methodDecl> methodDeclaration
+%type <vars> varsDeclaration
+%type <params> methodParams
 
 %%
 parser:
@@ -112,8 +120,13 @@ extends:
 	;
 
 varsDeclaration:
-	%empty
-	| varsDeclaration varDeclaration
+	%empty {
+		$$ = new std::vector<IVarDeclaration*>();
+	}
+	| varsDeclaration varDeclaration {
+		$$->push_back($2);
+		$$ = $1;
+	}
 	;
 
 varDeclaration:
@@ -129,7 +142,10 @@ methodsDeclaration:
 	;
 
 methodDeclaration:
-	methodType type identifier T_R_LEFT methodParams T_R_RIGHT T_F_LEFT varsDeclaration statements T_RETURN expression T_SCOLON T_F_RIGHT {cout << "Method ";}
+	methodType type identifier T_R_LEFT methodParams T_R_RIGHT T_F_LEFT varsDeclaration statements T_RETURN expression T_SCOLON T_F_RIGHT {
+		$$ = new MethodDeclaration($2, $3, $5, $8, $9, $11);
+		cout << "Method ";
+	}
 	;
 
 methodType:
@@ -138,13 +154,19 @@ methodType:
 	;
 
 methodParams:
-	%empty
-	| type identifier otherParams {cout << "Param ";}
-	;
-
-otherParams:
-	%empty
-	| T_COMMA type identifier otherParams {cout << "Param ";}
+	%empty {
+		$$ = new std::vector<std::pair<IType*, IIdentifier*>>();
+	}
+	| type identifier {
+		$$ = new std::vector<std::pair<IType*, IIdentifier*>>();
+		$$->push_back(std::make_pair($1, $2));
+		cout << "Param ";
+	}
+	| methodParams T_COMMA type identifier {
+		$$->push_back(std::make_pair($3, $4));
+		$$ = $1;
+		cout << "Param ";
+	}
 	;
 
 statements:
