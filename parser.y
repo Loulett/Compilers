@@ -16,6 +16,7 @@ void yyerror(const string s);
 #include "AST/Identifier.h"
 #include "AST/Expression.h"
 #include "AST/Statement.h"
+#include "AST/Type.h"
 }
 
 %union {
@@ -26,6 +27,7 @@ void yyerror(const string s);
 	std::vector<IExpression*>* exprs;	
 	IStatement* state;
 	std::vector<IStatement*>* states;
+	IType* type;
 }
 
 %left T_PLUS
@@ -81,6 +83,7 @@ void yyerror(const string s);
 %type <exprs> expressions
 %type <state> statement
 %type <states> statements
+%type <type> type
 
 %%
 parser:
@@ -149,10 +152,21 @@ statements:
 	;
 
 type:
-	T_INT T_Q_LEFT T_Q_RIGHT {cout << "Array int ";}
-	| T_BOOL {cout << "Bool ";}
-	| T_INT {cout << "Int ";}
-	| identifier
+	T_INT T_Q_LEFT T_Q_RIGHT {
+		$$ = new IntArrayType();
+		cout << "Array int ";
+		}
+	| T_BOOL {
+		$$ = new BoolType();
+		cout << "Bool ";
+		}
+	| T_INT {
+		$$ = new IntType();
+		cout << "Int ";
+		}
+	| identifier {
+		$$ = new Type($1);
+		}
 	;
 
 statement:
