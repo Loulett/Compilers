@@ -20,6 +20,7 @@ void yyerror(const string s);
 #include "AST/Type.h"
 #include "AST/VarDeclaration.h"
 #include "AST/MethodDeclaration.h"
+#include "AST/ClassDeclaration.h"
 }
 
 %union {
@@ -35,6 +36,9 @@ void yyerror(const string s);
 	IMethodDeclaration* methodDecl;
 	std::vector<IVarDeclaration*>* vars;
 	std::vector<std::pair<IType*, IIdentifier*>>* params;
+	IClassDeclaration* classDecl;
+	IIdentifier* extends;
+	std::vector<IMethodDeclaration*>* methods;
 }
 
 %left T_PLUS
@@ -95,6 +99,9 @@ void yyerror(const string s);
 %type <methodDecl> methodDeclaration
 %type <vars> varsDeclaration
 %type <params> methodParams
+%type <classDecl> classDeclaration
+%type <extends> extends
+%type <methods> methodsDeclaration
 
 %%
 parser:
@@ -111,12 +118,20 @@ classesDeclaration:
 	;
 
 classDeclaration:
-	T_CLASS identifier extends T_F_LEFT varsDeclaration methodsDeclaration T_F_RIGHT {cout << "Class ";}
+	T_CLASS identifier extends T_F_LEFT varsDeclaration methodsDeclaration T_F_RIGHT {
+		$$ = new ClassDeclaration($2, $3, $5, $6);
+		cout << "Class ";
+	}
 	;
 
 extends:
-	%empty
-	| T_EXTENDS identifier {cout << "Extends ";}
+	%empty {
+		$$ = nullptr;
+	}
+	| T_EXTENDS identifier {
+		$$ = $2;
+		cout << "Extends ";
+	}
 	;
 
 varsDeclaration:
@@ -137,8 +152,13 @@ varDeclaration:
 	;
 
 methodsDeclaration:
-	%empty
-	| methodsDeclaration methodDeclaration
+	%empty {
+		$$ = new std::vector<IMethodDeclaration*>();
+	}
+	| methodsDeclaration methodDeclaration {
+		$$->push_back($2);
+		$$ = $1;
+	}
 	;
 
 methodDeclaration:
