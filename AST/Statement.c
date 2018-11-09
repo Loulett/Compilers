@@ -1,6 +1,6 @@
 #include "Statement.h"
 
-Statement::Statement(std::vector<IStatement*> statements): statements(statements) {}
+Statement::Statement(std::vector<IStatement*>* statements): statements(statements) {}
 
 IfStatement::IfStatement(IExpression* clause, IStatement* true_statement, IStatement* false_statement):
 	clause(clause), true_statement(true_statement), false_statement(false_statement) {}
@@ -16,5 +16,3 @@ AssignmentStatement::AssignmentStatement(IIdentifier* var, IExpression* expr):
 
 ArrAssignmentStatement::ArrAssignmentStatement(IIdentifier* var, IExpression* num, IExpression* expr):
 	var(var), num(num), expr(expr) {}
-
-int main() {return 0;}

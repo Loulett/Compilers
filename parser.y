@@ -15,6 +15,7 @@ void yyerror(const string s);
 #include "AST/INode.h"
 #include "AST/Identifier.h"
 #include "AST/Expression.h"
+#include "AST/Statement.h"
 }
 
 %union {
@@ -23,6 +24,8 @@ void yyerror(const string s);
 	IIdentifier* ident;
 	IExpression* expr;
 	std::vector<IExpression*>* exprs;	
+	IStatement* state;
+	std::vector<IStatement*>* states;
 }
 
 %left T_PLUS
@@ -76,6 +79,8 @@ void yyerror(const string s);
 %type <ident> identifier
 %type <expr> expression
 %type <exprs> expressions
+%type <state> statement
+%type <states> statements
 
 %%
 parser:
@@ -134,8 +139,13 @@ otherParams:
 	;
 
 statements:
-	%empty
-	| statement statements
+	%empty {
+		$$ = new std::vector<IStatement*>();
+		}
+	| statement statements {
+		$$->push_back($1);
+		$$ = $2;
+		}
 	;
 
 type:
@@ -146,12 +156,29 @@ type:
 	;
 
 statement:
-	T_F_LEFT statements T_F_RIGHT
-	| T_IF T_R_LEFT expression T_R_RIGHT statement T_ELSE statement {cout << "If ";}
-	| T_WHILE T_R_LEFT expression T_R_RIGHT statement {cout << "While ";}
-	| T_PRINT T_R_LEFT expression T_R_RIGHT T_SCOLON {cout << "Print ";}
-	| identifier T_EQ expression T_SCOLON {cout << "Assingment ";}
-	| identifier T_Q_LEFT expression T_Q_RIGHT T_EQ expression T_SCOLON {cout << "Array Assignment ";}
+	T_F_LEFT statements T_F_RIGHT {
+		$$ = new Statement($2);
+		}
+	| T_IF T_R_LEFT expression T_R_RIGHT statement T_ELSE statement {
+		$$ = new IfStatement($3, $5, $7);
+		cout << "If ";
+		}
+	| T_WHILE T_R_LEFT expression T_R_RIGHT statement {
+		$$ = new WhileStatement($3, $5);
+		cout << "While ";
+		}
+	| T_PRINT T_R_LEFT expression T_R_RIGHT T_SCOLON {
+		$$ = new PrintStatement($3);
+		cout << "Print ";
+		}
+	| identifier T_EQ expression T_SCOLON {
+		$$ = new AssignmentStatement($1, $3);
+		cout << "Assignment ";
+		}
+	| identifier T_Q_LEFT expression T_Q_RIGHT T_EQ expression T_SCOLON {
+		$$ = new ArrAssignmentStatement($1, $3, $6);
+		cout << "Array Assignment ";
+		}
 	;
 
 expressions:
@@ -221,7 +248,9 @@ expression:
 		$$ = new Bool(false);
 		cout << "False ";
 		}
-	| identifier {}
+	| identifier {
+		$$ = new IdentExpression($1);
+		}
 	| T_THIS {
 		$$ = new This();
 		cout << "This ";

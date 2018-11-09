@@ -3,9 +3,9 @@
 
 class Statement: public IStatement {
  public:
- 	Statement(std::vector<IStatement*> statements);
+ 	Statement(std::vector<IStatement*>* statements);
  private:
- 	std::vector<IStatement*> statements;
+ 	std::vector<IStatement*>* statements;
 };
 
 class IfStatement: public IStatement {
