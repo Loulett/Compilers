@@ -21,6 +21,7 @@ void yyerror(const string s);
 #include "AST/VarDeclaration.h"
 #include "AST/MethodDeclaration.h"
 #include "AST/ClassDeclaration.h"
+#include "AST/MainClass.h"
 }
 
 %union {
@@ -39,6 +40,7 @@ void yyerror(const string s);
 	IClassDeclaration* classDecl;
 	IIdentifier* extends;
 	std::vector<IMethodDeclaration*>* methods;
+	IMainClass* main;
 }
 
 %left T_PLUS
@@ -102,6 +104,7 @@ void yyerror(const string s);
 %type <classDecl> classDeclaration
 %type <extends> extends
 %type <methods> methodsDeclaration
+%type <main> mainClass
 
 %%
 parser:
@@ -109,7 +112,10 @@ parser:
 	;
 
 mainClass:
-	T_CLASS identifier T_F_LEFT T_PUBLIC T_STATIC T_VOID T_MAIN T_R_LEFT T_STRING T_Q_LEFT T_Q_RIGHT identifier T_R_RIGHT T_F_LEFT statement T_F_RIGHT T_F_RIGHT {cout << "MainClass ";}
+	T_CLASS identifier T_F_LEFT T_PUBLIC T_STATIC T_VOID T_MAIN T_R_LEFT T_STRING T_Q_LEFT T_Q_RIGHT identifier T_R_RIGHT T_F_LEFT statement T_F_RIGHT T_F_RIGHT {
+		$$ = new MainClass($2, $12, $15);
+		cout << "MainClass ";
+	}
 	;
 
 classesDeclaration:
