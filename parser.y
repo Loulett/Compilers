@@ -17,6 +17,7 @@ void yyerror(const string s);
 #include "AST/Expression.h"
 #include "AST/Statement.h"
 #include "AST/Type.h"
+#include "AST/VarDeclaration.h"
 }
 
 %union {
@@ -28,6 +29,7 @@ void yyerror(const string s);
 	IStatement* state;
 	std::vector<IStatement*>* states;
 	IType* type;
+	IVarDeclaration* varDecl;
 }
 
 %left T_PLUS
@@ -84,6 +86,7 @@ void yyerror(const string s);
 %type <state> statement
 %type <states> statements
 %type <type> type
+%type <varDecl> varDeclaration
 
 %%
 parser:
@@ -114,7 +117,10 @@ varsDeclaration:
 	;
 
 varDeclaration:
-	type identifier T_SCOLON {cout << "Var ";}
+	type identifier T_SCOLON {
+		$$ = new VarDeclaration($1, $2);
+		cout << "Var ";
+		}
 	;
 
 methodsDeclaration:
