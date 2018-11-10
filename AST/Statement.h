@@ -4,6 +4,7 @@
 class Statement: public IStatement {
  public:
  	Statement(std::vector<IStatement*> statements);
+    void Accept(IVisitor* v) const;
  private:
  	std::vector<IStatement*> statements;
 };
@@ -11,6 +12,8 @@ class Statement: public IStatement {
 class IfStatement: public IStatement {
  public:
  	IfStatement(IExpression* clause, IStatement* true_statement, IStatement* false_statement);
+    void Accept(IVisitor* v) const;
+
  private:
  	IExpression* clause;
  	IStatement* true_statement;
@@ -20,6 +23,7 @@ class IfStatement: public IStatement {
 class WhileStatement: public IStatement {
  public:
  	WhileStatement(IExpression* clause, IStatement* body);
+    void Accept(IVisitor* v) const;
  private:
  	IExpression* clause;
  	IStatement* body;
@@ -28,6 +32,7 @@ class WhileStatement: public IStatement {
 class PrintStatement: public IStatement {
  public:
  	PrintStatement(IExpression* print);
+    void Accept(IVisitor* v) const;
  private:
  	IExpression* print;
 };
@@ -35,6 +40,7 @@ class PrintStatement: public IStatement {
 class AssignmentStatement: public IStatement {
  public:
 	AssignmentStatement(IIdentifier* var, IExpression* expr);
+    void Accept(IVisitor* v) const;
  private:
  	IIdentifier* var;
  	IExpression* expr;
@@ -43,6 +49,7 @@ class AssignmentStatement: public IStatement {
 class ArrAssignmentStatement: public IStatement {
  public:
  	ArrAssignmentStatement(IIdentifier* var, IExpression* num, IExpression* expr);
+    void Accept(IVisitor* v) const;
  private:
  	IIdentifier* var;
  	IExpression* num;

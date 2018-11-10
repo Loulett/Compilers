@@ -1,5 +1,9 @@
 
-class INode {	
+
+class INode {
+ public:
+    virtual void Accept(IVisitor* v) const = 0;
+
 };
 
 class IGoal: public INode {

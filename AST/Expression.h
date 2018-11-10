@@ -1,9 +1,13 @@
 #include "INode.h"
+#include "../Visitor.c"
 #include <vector>
 
 class AndExpression: public IExpression {
  public:
  	AndExpression(IExpression* expr1, IExpression* expr2);
+
+ 	void Accept(IVisitor* v) const;
+
  private:
  	IExpression* expr1;
  	IExpression* expr2;
@@ -12,6 +16,9 @@ class AndExpression: public IExpression {
 class LessExpression: public IExpression {
  public:
  	LessExpression(IExpression* expr1, IExpression* expr2);
+
+ 	void Accept(IVisitor* v) const;
+
  private:
  	IExpression* expr1;
  	IExpression* expr2;
@@ -20,6 +27,9 @@ class LessExpression: public IExpression {
 class PlusExpression: public IExpression {
  public:
  	PlusExpression(IExpression* expr1, IExpression* expr2);
+
+ 	void Accept(IVisitor* v) const;
+
  private:
  	IExpression* expr1;
  	IExpression* expr2;
@@ -28,6 +38,9 @@ class PlusExpression: public IExpression {
 class MinusExpression: public IExpression {
  public:
  	MinusExpression(IExpression* expr1, IExpression* expr2);
+
+ 	void Accept(IVisitor* v) const;
+
  private:
  	IExpression* expr1;
  	IExpression* expr2;
@@ -36,6 +49,9 @@ class MinusExpression: public IExpression {
 class MultExpression: public IExpression {
  public:
  	MultExpression(IExpression* expr1, IExpression* expr2);
+
+	void Accept(IVisitor* v) const;
+
  private:
  	IExpression* expr1;
  	IExpression* expr2;
@@ -44,6 +60,9 @@ class MultExpression: public IExpression {
 class RemainExpression: public IExpression {
  public:
  	RemainExpression(IExpression* expr1, IExpression* expr2);
+
+	void Accept(IVisitor* v) const;
+
  private:
  	IExpression* expr1;
  	IExpression* expr2;
@@ -52,6 +71,9 @@ class RemainExpression: public IExpression {
 class OrExpression: public IExpression {
  public:
  	OrExpression(IExpression* expr1, IExpression* expr2);
+
+	void Accept(IVisitor* v) const;
+
  private:
  	IExpression* expr1;
  	IExpression* expr2;
@@ -61,6 +83,9 @@ class OrExpression: public IExpression {
 class ArrayExpression: public IExpression {
  public:
  	ArrayExpression(IExpression* expr1, IExpression* expr2);
+
+	void Accept(IVisitor* v) const;
+
  private:
  	IExpression* expr1;
  	IExpression* expr2;
@@ -69,6 +94,9 @@ class ArrayExpression: public IExpression {
 class LengthExpression: public IExpression {
  public:
  	LengthExpression(IExpression* expr);
+
+	void Accept(IVisitor* v) const;
+
  private:
  	IExpression* expr;
 };
@@ -83,6 +111,9 @@ class Integer: public IExpression {
 class Bool: public IExpression {
  public:
  	Bool(bool b);
+
+	void Accept(IVisitor* v) const;
+
  private:
  	bool b;
 };
@@ -90,16 +121,23 @@ class Bool: public IExpression {
 class IdentExpression: public IExpression {
 public:
 	IdentExpression(IIdentifier* ident);
+
+	void Accept(IVisitor* v) const;
+
 private:
 	IIdentifier* ident;
 };
 
 class This: public IExpression {
+	void Accept(IVisitor* v) const;
 };
 
 class NewArrExpression: public IExpression {
  public:
  	NewArrExpression(IExpression* expr);
+
+	void Accept(IVisitor* v) const;
+
  private:
  	IExpression* expr;
 };
@@ -107,6 +145,9 @@ class NewArrExpression: public IExpression {
 class NewExpression: public IExpression {
  public:
  	NewExpression(IIdentifier* ident);
+
+	void Accept(IVisitor* v) const;
+
  private:
  	IIdentifier* ident;
 };
@@ -114,6 +155,9 @@ class NewExpression: public IExpression {
 class NotExpression: public IExpression {
  public:
  	NotExpression(IExpression* expr);
+
+	void Accept(IVisitor* v) const;
+
  private:
  	IExpression* expr;
 };
@@ -121,6 +165,9 @@ class NotExpression: public IExpression {
 class Expression: public IExpression {
 public:
 	Expression(IExpression* expr);
+
+	void Accept(IVisitor* v) const;
+
 private:
 	IExpression* expr;
 };
