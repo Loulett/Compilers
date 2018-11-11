@@ -1,6 +1,7 @@
 #include "Statement.h"
 
-Statement::Statement(std::vector<IStatement*> statements): statements(statements) {}
+
+Statement::Statement(std::vector<IStatement*>* statements): statements(statements) {}
 void Statement::Accept(IVisitor* v) const
 {
 	v->visit(this);
@@ -41,5 +42,3 @@ void ArrAssignmentStatement::Accept(IVisitor* v) const
 {
 	v->visit(this);
 }
-
-int main() {return 0;}

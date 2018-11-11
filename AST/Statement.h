@@ -3,10 +3,10 @@
 
 class Statement: public IStatement {
  public:
- 	Statement(std::vector<IStatement*> statements);
-    void Accept(IVisitor* v) const;
+ 	Statement(std::vector<IStatement*>* statements);
+  void Accept(IVisitor* v) const;
  private:
- 	std::vector<IStatement*> statements;
+ 	std::vector<IStatement*>* statements;
 };
 
 class IfStatement: public IStatement {

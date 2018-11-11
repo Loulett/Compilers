@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <iostream>
 #include <string>
+#include <utility>
 using namespace std;
 
 extern int yylex();
@@ -15,6 +16,13 @@ void yyerror(const string s);
 #include "AST/INode.h"
 #include "AST/Identifier.h"
 #include "AST/Expression.h"
+#include "AST/Statement.h"
+#include "AST/Type.h"
+#include "AST/VarDeclaration.h"
+#include "AST/MethodDeclaration.h"
+#include "AST/ClassDeclaration.h"
+#include "AST/MainClass.h"
+#include "AST/Goal.h"
 }
 
 %union {
@@ -23,6 +31,19 @@ void yyerror(const string s);
 	IIdentifier* ident;
 	IExpression* expr;
 	std::vector<IExpression*>* exprs;	
+	IStatement* state;
+	std::vector<IStatement*>* states;
+	IType* type;
+	IVarDeclaration* varDecl;
+	IMethodDeclaration* methodDecl;
+	std::vector<IVarDeclaration*>* vars;
+	std::vector<std::pair<IType*, IIdentifier*>>* params;
+	IClassDeclaration* classDecl;
+	IIdentifier* extends;
+	std::vector<IMethodDeclaration*>* methods;
+	IMainClass* main;
+	IGoal* goal;
+	std::vector<IClassDeclaration*>* classes;
 }
 
 %left T_PLUS
@@ -76,46 +97,94 @@ void yyerror(const string s);
 %type <ident> identifier
 %type <expr> expression
 %type <exprs> expressions
+%type <state> statement
+%type <states> statements
+%type <type> type
+%type <varDecl> varDeclaration
+%type <methodDecl> methodDeclaration
+%type <vars> varsDeclaration
+%type <params> methodParams
+%type <classDecl> classDeclaration
+%type <extends> extends
+%type <methods> methodsDeclaration
+%type <main> mainClass
+%type <goal> parser
+%type <classes> classesDeclaration
 
 %%
 parser:
-	mainClass classesDeclaration {cout << "Start ";}
+	mainClass classesDeclaration {
+		$$ = new Goal($1, $2);
+		cout << "Start ";
+	}
 	;
 
 mainClass:
-	T_CLASS identifier T_F_LEFT T_PUBLIC T_STATIC T_VOID T_MAIN T_R_LEFT T_STRING T_Q_LEFT T_Q_RIGHT identifier T_R_RIGHT T_F_LEFT statement T_F_RIGHT T_F_RIGHT {cout << "MainClass ";}
+	T_CLASS identifier T_F_LEFT T_PUBLIC T_STATIC T_VOID T_MAIN T_R_LEFT T_STRING T_Q_LEFT T_Q_RIGHT identifier T_R_RIGHT T_F_LEFT statement T_F_RIGHT T_F_RIGHT {
+		$$ = new MainClass($2, $12, $15);
+		cout << "MainClass ";
+	}
 	;
 
 classesDeclaration:
-	%empty
-	| classesDeclaration classDeclaration
+	%empty {
+		$$ = new std::vector<IClassDeclaration*>();
+	}
+	| classesDeclaration classDeclaration {
+		$$->push_back($2);
+		$$ = $1;
+	}
 	;
 
 classDeclaration:
-	T_CLASS identifier extends T_F_LEFT varsDeclaration methodsDeclaration T_F_RIGHT {cout << "Class ";}
+	T_CLASS identifier extends T_F_LEFT varsDeclaration methodsDeclaration T_F_RIGHT {
+		$$ = new ClassDeclaration($2, $3, $5, $6);
+		cout << "Class ";
+	}
 	;
 
 extends:
-	%empty
-	| T_EXTENDS identifier {cout << "Extends ";}
+	%empty {
+		$$ = nullptr;
+	}
+	| T_EXTENDS identifier {
+		$$ = $2;
+		cout << "Extends ";
+	}
 	;
 
 varsDeclaration:
-	%empty
-	| varsDeclaration varDeclaration
+	%empty {
+		$$ = new std::vector<IVarDeclaration*>();
+	}
+	| varsDeclaration varDeclaration {
+		$$->push_back($2);
+		$$ = $1;
+	}
 	;
 
 varDeclaration:
-	type identifier T_SCOLON {cout << "Var ";}
+	type identifier T_SCOLON {
+		$$ = new VarDeclaration($1, $2);
+		cout << "Var ";
+		}
 	;
 
 methodsDeclaration:
-	%empty
-	| methodsDeclaration methodDeclaration
+	%empty {
+		$$ = new std::vector<IMethodDeclaration*>();
+	}
+	| methodsDeclaration methodDeclaration {
+		$$->push_back($2);
+		$$ = $1;
+	}
 	;
 
 methodDeclaration:
-	methodType type identifier T_R_LEFT methodParams T_R_RIGHT T_F_LEFT varsDeclaration statements T_RETURN expression T_SCOLON T_F_RIGHT {cout << "Method ";}
+	methodType type identifier T_R_LEFT methodParams T_R_RIGHT T_F_LEFT varsDeclaration statements T_RETURN expression T_SCOLON T_F_RIGHT {
+		$$ = new MethodDeclaration($2, $3, $5, $8, $9, $11);
+		cout << "Method ";
+	}
 	;
 
 methodType:
@@ -124,34 +193,73 @@ methodType:
 	;
 
 methodParams:
-	%empty
-	| type identifier otherParams {cout << "Param ";}
-	;
-
-otherParams:
-	%empty
-	| T_COMMA type identifier otherParams {cout << "Param ";}
+	%empty {
+		$$ = new std::vector<std::pair<IType*, IIdentifier*>>();
+	}
+	| type identifier {
+		$$ = new std::vector<std::pair<IType*, IIdentifier*>>();
+		$$->push_back(std::make_pair($1, $2));
+		cout << "Param ";
+	}
+	| methodParams T_COMMA type identifier {
+		$$->push_back(std::make_pair($3, $4));
+		$$ = $1;
+		cout << "Param ";
+	}
 	;
 
 statements:
-	%empty
-	| statement statements
+	%empty {
+		$$ = new std::vector<IStatement*>();
+		}
+	| statement statements {
+		$$->push_back($1);
+		$$ = $2;
+		}
 	;
 
 type:
-	T_INT T_Q_LEFT T_Q_RIGHT {cout << "Array int ";}
-	| T_BOOL {cout << "Bool ";}
-	| T_INT {cout << "Int ";}
-	| identifier
+	T_INT T_Q_LEFT T_Q_RIGHT {
+		$$ = new IntArrayType();
+		cout << "Array int ";
+		}
+	| T_BOOL {
+		$$ = new BoolType();
+		cout << "Bool ";
+		}
+	| T_INT {
+		$$ = new IntType();
+		cout << "Int ";
+		}
+	| identifier {
+		$$ = new Type($1);
+		}
 	;
 
 statement:
-	T_F_LEFT statements T_F_RIGHT
-	| T_IF T_R_LEFT expression T_R_RIGHT statement T_ELSE statement {cout << "If ";}
-	| T_WHILE T_R_LEFT expression T_R_RIGHT statement {cout << "While ";}
-	| T_PRINT T_R_LEFT expression T_R_RIGHT T_SCOLON {cout << "Print ";}
-	| identifier T_EQ expression T_SCOLON {cout << "Assingment ";}
-	| identifier T_Q_LEFT expression T_Q_RIGHT T_EQ expression T_SCOLON {cout << "Array Assignment ";}
+	T_F_LEFT statements T_F_RIGHT {
+		$$ = new Statement($2);
+		}
+	| T_IF T_R_LEFT expression T_R_RIGHT statement T_ELSE statement {
+		$$ = new IfStatement($3, $5, $7);
+		cout << "If ";
+		}
+	| T_WHILE T_R_LEFT expression T_R_RIGHT statement {
+		$$ = new WhileStatement($3, $5);
+		cout << "While ";
+		}
+	| T_PRINT T_R_LEFT expression T_R_RIGHT T_SCOLON {
+		$$ = new PrintStatement($3);
+		cout << "Print ";
+		}
+	| identifier T_EQ expression T_SCOLON {
+		$$ = new AssignmentStatement($1, $3);
+		cout << "Assignment ";
+		}
+	| identifier T_Q_LEFT expression T_Q_RIGHT T_EQ expression T_SCOLON {
+		$$ = new ArrAssignmentStatement($1, $3, $6);
+		cout << "Array Assignment ";
+		}
 	;
 
 expressions:
@@ -221,7 +329,9 @@ expression:
 		$$ = new Bool(false);
 		cout << "False ";
 		}
-	| identifier {}
+	| identifier {
+		$$ = new IdentExpression($1);
+		}
 	| T_THIS {
 		$$ = new This();
 		cout << "This ";
