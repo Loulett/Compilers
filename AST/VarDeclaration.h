@@ -1,9 +1,10 @@
+#pragma once
 #include "INode.h"
 
 class VarDeclaration: public IVarDeclaration {
  public:
 	VarDeclaration(IType* type, IIdentifier* name);
-    void Accept(IVisitor* v) const;
+    void Accept(Visitor* v) const;
  private:
  	IType* type;
  	IIdentifier* name;

@@ -1,9 +1,9 @@
 #include "Identifier.h"
-#include "../IVisitor.h"
+#include "../Visitor.h"
 
 Identifier::Identifier(std::string name): name(name) {}
 
-void Identifier::Accept(IVisitor* v) const
+void Identifier::Accept(Visitor* v) const
 {
     v->visit(this);
 }

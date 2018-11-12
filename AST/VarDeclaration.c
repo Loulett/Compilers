@@ -1,10 +1,10 @@
 #include "VarDeclaration.h"
-#include "../IVisitor.h"
+#include "../Visitor.h"
 
 VarDeclaration::VarDeclaration(IType* type, IIdentifier* name):
 	type(type), name(name) {}
 
-void VarDeclaration::Accept(IVisitor* v) const
+void VarDeclaration::Accept(Visitor* v) const
 {
 	v->visit(this);
 }

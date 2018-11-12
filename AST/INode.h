@@ -1,10 +1,11 @@
 #pragma once
 
 
+struct Visitor;
+
 class INode {
  public:
-    virtual void Accept(IVisitor* v) const = 0;
-
+    virtual void Accept(Visitor* v) const = 0;
 };
 
 class IGoal: public INode {
@@ -44,9 +45,9 @@ class IStatement: public INode {
 };
 
 class IExpression: public INode {
- public:
+public:
 	virtual ~IExpression() = default;
-	
+
 };
 
 class IIdentifier: public INode {

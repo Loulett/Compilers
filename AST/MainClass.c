@@ -1,10 +1,10 @@
 #include "MainClass.h"
-#include "../Visitor.c"
+#include "../Visitor.h"
 
 MainClass::MainClass(IIdentifier* class_name, IIdentifier* arg, IStatement* statement):
 	class_name(class_name), arg(arg), statement(statement) {}
 
-void MainClass::Accept(IVisitor* v) const
+void MainClass::Accept(Visitor* v) const
 {
 	v->visit(this);
 }

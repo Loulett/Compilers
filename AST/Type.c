@@ -1,26 +1,25 @@
 #include "Type.h"
+#include "../Visitor.h"
 
 
 Type::Type(IIdentifier* name): name(name) {}
-void Type::Accept(IVisitor* v) const
+void Type::Accept(Visitor* v) const
 {
     v->visit(this);
 }
 
-IntType::Type(IIdentifier* name): name(name) {}
-void IntType::Accept(IVisitor* v) const
+
+void IntType::Accept(Visitor* v) const
 {
     v->visit(this);
 }
 
-BoolType::Type(IIdentifier* name): name(name) {}
-void BoolType::Accept(IVisitor* v) const
+void BoolType::Accept(Visitor* v) const
 {
     v->visit(this);
 }
 
-IntArrayType::Type(IIdentifier* name): name(name) {}
-void IntArrayType::Accept(IVisitor* v) const
+void IntArrayType::Accept(Visitor* v) const
 {
     v->visit(this);
 }
