@@ -3,13 +3,14 @@
 #include <iostream>
 #include <string>
 #include <utility>
+#include "parser.tab.h"
 using namespace std;
 
 extern int yylex();
-extern int yyparse();
+extern int yyparse(Goal* goal);
 extern FILE *yyin;
 
-void yyerror(const string s);
+void yyerror(Goal* goal, const char* s);
 %}
 
 %code requires {
@@ -24,6 +25,9 @@ void yyerror(const string s);
 #include "AST/MainClass.h"
 #include "AST/Goal.h"
 }
+
+%parse-param {Goal* goal}
+%define parse.error verbose
 
 %union {
 	int ival;
@@ -360,12 +364,6 @@ identifier:
 	;
 %%
 
-int main(int, char**) {
-	FILE *myfile = fopen("input.txt", "r");
-	yyin = myfile;
-	yyparse();
-}
-
-void yyerror(const string s) {
+void yyerror(Goal* goal, const char* s) {
 	cout << "PARSE ERROR " << s << endl;
 }
