@@ -37,7 +37,7 @@ void yyerror(Goal* goal, const char* s);
 	IExpression* expr;
 	std::vector<std::unique_ptr<IExpression>>* exprs;	
 	IStatement* state;
-	std::vector<IStatement*>* states;
+	std::vector<std::unique_ptr<IStatement>>* states;
 	IType* type;
 	IVarDeclaration* varDecl;
 	IMethodDeclaration* methodDecl;
@@ -215,10 +215,10 @@ methodParams:
 
 statements:
 	%empty {
-		$$ = new std::vector<IStatement*>();
+		$$ = new std::vector<std::unique_ptr<IStatement>>();
 		}
 	| statement statements {
-		$$->push_back($1);
+		$$->push_back(std::unique_ptr<IStatement>($1));
 		$$ = $2;
 		}
 	;
