@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <utility>
+#include <memory>
 #include "parser.tab.h"
 using namespace std;
 
@@ -34,20 +35,20 @@ void yyerror(Goal* goal, const char* s);
 	char* sval;
 	IIdentifier* ident;
 	IExpression* expr;
-	std::vector<IExpression*>* exprs;	
+	std::vector<std::unique_ptr<IExpression>>* exprs;	
 	IStatement* state;
-	std::vector<IStatement*>* states;
+	std::vector<std::unique_ptr<IStatement>>* states;
 	IType* type;
 	IVarDeclaration* varDecl;
 	IMethodDeclaration* methodDecl;
-	std::vector<IVarDeclaration*>* vars;
-	std::vector<std::pair<IType*, IIdentifier*>>* params;
+	std::vector<std::unique_ptr<IVarDeclaration>>* vars;
+	std::vector<std::pair<std::unique_ptr<IType>, std::unique_ptr<IIdentifier>>>* params;
 	IClassDeclaration* classDecl;
 	IIdentifier* extends;
-	std::vector<IMethodDeclaration*>* methods;
+	std::vector<std::unique_ptr<IMethodDeclaration>>* methods;
 	IMainClass* main;
 	IGoal* goal;
-	std::vector<IClassDeclaration*>* classes;
+	std::vector<std::unique_ptr<IClassDeclaration>>* classes;
 }
 
 %left T_PLUS
@@ -132,10 +133,10 @@ mainClass:
 
 classesDeclaration:
 	%empty {
-		$$ = new std::vector<IClassDeclaration*>();
+		$$ = new std::vector<std::unique_ptr<IClassDeclaration>>();
 	}
 	| classesDeclaration classDeclaration {
-		$$->push_back($2);
+		$$->push_back(std::unique_ptr<IClassDeclaration>($2));
 		$$ = $1;
 	}
 	;
@@ -159,10 +160,10 @@ extends:
 
 varsDeclaration:
 	%empty {
-		$$ = new std::vector<IVarDeclaration*>();
+		$$ = new std::vector<std::unique_ptr<IVarDeclaration>>();
 	}
 	| varsDeclaration varDeclaration {
-		$$->push_back($2);
+		$$->push_back(std::unique_ptr<IVarDeclaration>($2));
 		$$ = $1;
 	}
 	;
@@ -176,10 +177,10 @@ varDeclaration:
 
 methodsDeclaration:
 	%empty {
-		$$ = new std::vector<IMethodDeclaration*>();
+		$$ = new std::vector<std::unique_ptr<IMethodDeclaration>>();
 	}
 	| methodsDeclaration methodDeclaration {
-		$$->push_back($2);
+		$$->push_back(std::unique_ptr<IMethodDeclaration>($2));
 		$$ = $1;
 	}
 	;
@@ -198,15 +199,15 @@ methodType:
 
 methodParams:
 	%empty {
-		$$ = new std::vector<std::pair<IType*, IIdentifier*>>();
+		$$ = new std::vector<std::pair<std::unique_ptr<IType>, std::unique_ptr<IIdentifier>>>();
 	}
 	| type identifier {
-		$$ = new std::vector<std::pair<IType*, IIdentifier*>>();
-		$$->push_back(std::make_pair($1, $2));
+		$$ = new std::vector<std::pair<std::unique_ptr<IType>, std::unique_ptr<IIdentifier>>>();
+		$$->push_back(std::make_pair(std::unique_ptr<IType>($1), std::unique_ptr<IIdentifier>($2)));
 		cout << "Param ";
 	}
 	| methodParams T_COMMA type identifier {
-		$$->push_back(std::make_pair($3, $4));
+		$$->push_back(std::make_pair(std::unique_ptr<IType>($3), std::unique_ptr<IIdentifier>($4)));
 		$$ = $1;
 		cout << "Param ";
 	}
@@ -214,10 +215,10 @@ methodParams:
 
 statements:
 	%empty {
-		$$ = new std::vector<IStatement*>();
+		$$ = new std::vector<std::unique_ptr<IStatement>>();
 		}
 	| statement statements {
-		$$->push_back($1);
+		$$->push_back(std::unique_ptr<IStatement>($1));
 		$$ = $2;
 		}
 	;
@@ -268,15 +269,15 @@ statement:
 
 expressions:
 	%empty {
-		$$ = new std::vector<IExpression*>();
+		$$ = new std::vector<std::unique_ptr<IExpression>>();
 		}
 	| expression {
-		$$ = new std::vector<IExpression*>();
-		$$->push_back($1);
+		$$ = new std::vector<std::unique_ptr<IExpression>>();
+		$$->push_back(std::unique_ptr<IExpression>($1));
 		cout << "expression ";
 		}
 	| expressions T_COMMA expression {
-		$$->push_back($3);
+		$$->push_back(std::unique_ptr<IExpression>($3));
 		$$ = $1;
 		cout << "expression ";
 		}

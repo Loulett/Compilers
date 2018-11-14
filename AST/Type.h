@@ -1,5 +1,6 @@
 #pragma once
 #include "INode.h"
+#include <memory>
 
 class IntType: public IType {
  public:
@@ -21,5 +22,5 @@ class Type: public IType {
  	Type(IIdentifier* name);
     void Accept(Visitor* v) const;
  private:
- 	IIdentifier* name;
+ 	std::unique_ptr<IIdentifier> name;
 };

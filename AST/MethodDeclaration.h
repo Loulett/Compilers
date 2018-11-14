@@ -2,16 +2,17 @@
 #include "INode.h"
 #include <vector>
 #include <utility>
+#include <memory>
 
 class MethodDeclaration: public IMethodDeclaration{
 public:
-	MethodDeclaration(IType* return_type, IIdentifier* name, std::vector<std::pair<IType*, IIdentifier*>>* args, std::vector<IVarDeclaration*>* vars, std::vector<IStatement*>* statements, IExpression* return_expression);
+	MethodDeclaration(IType* return_type, IIdentifier* name, std::vector<std::pair<std::unique_ptr<IType>, std::unique_ptr<IIdentifier>>>* args, std::vector<std::unique_ptr<IVarDeclaration>>* vars, std::vector<std::unique_ptr<IStatement>>* statements, IExpression* return_expression);
   void Accept(Visitor* v) const;
  private:
- 	IType* return_type;
- 	IIdentifier* name;
- 	std::vector<std::pair<IType*, IIdentifier*>>* args;
- 	std::vector<IVarDeclaration*>* vars;
- 	std::vector<IStatement*>* statements;
- 	IExpression* return_expression;
+ 	std::unique_ptr<IType> return_type;
+ 	std::unique_ptr<IIdentifier> name;
+ 	std::unique_ptr<std::vector<std::pair<std::unique_ptr<IType>, std::unique_ptr<IIdentifier>>>> args;
+ 	std::unique_ptr<std::vector<std::unique_ptr<IVarDeclaration>>> vars;
+ 	std::unique_ptr<std::vector<std::unique_ptr<IStatement>>> statements;
+ 	std::unique_ptr<IExpression> return_expression;
 };

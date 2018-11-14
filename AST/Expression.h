@@ -1,6 +1,7 @@
 #pragma once
 #include "INode.h"
 #include <vector>
+#include <memory>
 
 class AndExpression: public IExpression {
  public:
@@ -9,8 +10,8 @@ class AndExpression: public IExpression {
  	void Accept(Visitor* v) const;
 
  private:
- 	IExpression* expr1;
- 	IExpression* expr2;
+ 	std::unique_ptr<IExpression> expr1;
+ 	std::unique_ptr<IExpression> expr2;
 };
 
 class LessExpression: public IExpression {
@@ -18,8 +19,8 @@ class LessExpression: public IExpression {
  	LessExpression(IExpression* expr1, IExpression* expr2);
  	void Accept(Visitor* v) const;
  private:
- 	IExpression* expr1;
- 	IExpression* expr2;
+ 	std::unique_ptr<IExpression> expr1;
+ 	std::unique_ptr<IExpression> expr2;
 };
 
 class PlusExpression: public IExpression {
@@ -27,8 +28,8 @@ class PlusExpression: public IExpression {
  	void Accept(Visitor* v) const;
 	PlusExpression(IExpression* expr1, IExpression* expr2);
  private:
- 	IExpression* expr1;
- 	IExpression* expr2;
+ 	std::unique_ptr<IExpression> expr1;
+ 	std::unique_ptr<IExpression> expr2;
 };
 
 class MinusExpression: public IExpression {
@@ -36,8 +37,8 @@ class MinusExpression: public IExpression {
 	MinusExpression(IExpression* expr1, IExpression* expr2);
  	void Accept(Visitor* v) const;
  private:
- 	IExpression* expr1;
- 	IExpression* expr2;
+ 	std::unique_ptr<IExpression> expr1;
+ 	std::unique_ptr<IExpression> expr2;
 };
 
 class MultExpression: public IExpression {
@@ -46,8 +47,8 @@ class MultExpression: public IExpression {
 	void Accept(Visitor* v) const;
 
  private:
- 	IExpression* expr1;
- 	IExpression* expr2;
+ 	std::unique_ptr<IExpression> expr1;
+ 	std::unique_ptr<IExpression> expr2;
 };
 
 class RemainExpression: public IExpression {
@@ -55,8 +56,8 @@ class RemainExpression: public IExpression {
  	RemainExpression(IExpression* expr1, IExpression* expr2);
 	void Accept(Visitor* v) const;
  private:
- 	IExpression* expr1;
- 	IExpression* expr2;
+ 	std::unique_ptr<IExpression> expr1;
+ 	std::unique_ptr<IExpression> expr2;
 };
 
 class OrExpression: public IExpression {
@@ -64,8 +65,8 @@ class OrExpression: public IExpression {
  	OrExpression(IExpression* expr1, IExpression* expr2);
 	void Accept(Visitor* v) const;
  private:
- 	IExpression* expr1;
- 	IExpression* expr2;
+ 	std::unique_ptr<IExpression> expr1;
+ 	std::unique_ptr<IExpression> expr2;
 };
 
 
@@ -74,8 +75,8 @@ class ArrayExpression: public IExpression {
  	ArrayExpression(IExpression* expr1, IExpression* expr2);
 	void Accept(Visitor* v) const;
  private:
- 	IExpression* expr1;
- 	IExpression* expr2;
+ 	std::unique_ptr<IExpression> expr1;
+ 	std::unique_ptr<IExpression> expr2;
 };
 
 class LengthExpression: public IExpression {
@@ -83,17 +84,17 @@ class LengthExpression: public IExpression {
  	LengthExpression(IExpression* expr);
 	void Accept(Visitor* v) const;
  private:
- 	IExpression* expr;
+ 	std::unique_ptr<IExpression> expr;
 };
 
 class MethodExpression: public IExpression {
  public:
- 	MethodExpression(IExpression* class_name, IIdentifier* method, std::vector<IExpression*>* params);
+ 	MethodExpression(IExpression* class_name, IIdentifier* method, std::vector<std::unique_ptr<IExpression>>* params);
 	void Accept(Visitor* v) const;
  private:
- 	IExpression* class_name;
- 	IIdentifier* method;
- 	std::vector<IExpression*>* params;
+ 	std::unique_ptr<IExpression> class_name;
+ 	std::unique_ptr<IIdentifier> method;
+ 	std::unique_ptr<std::vector<std::unique_ptr<IExpression>>> params;
 };
 
 class Integer: public IExpression {
@@ -121,7 +122,7 @@ public:
 	void Accept(Visitor* v) const;
 
 private:
-	IIdentifier* ident;
+	std::unique_ptr<IIdentifier> ident;
 };
 
 class This: public IExpression {
@@ -137,7 +138,7 @@ class NewArrExpression: public IExpression {
 	void Accept(Visitor* v) const;
 
  private:
- 	IExpression* expr;
+ 	std::unique_ptr<IExpression> expr;
 };
 
 class NewExpression: public IExpression {
@@ -147,7 +148,7 @@ class NewExpression: public IExpression {
 	void Accept(Visitor* v) const;
 
  private:
- 	IIdentifier* ident;
+ 	std::unique_ptr<IIdentifier> ident;
 };
 
 class NotExpression: public IExpression {
@@ -157,7 +158,7 @@ class NotExpression: public IExpression {
 	void Accept(Visitor* v) const;
 
  private:
- 	IExpression* expr;
+ 	std::unique_ptr<IExpression> expr;
 };
 
 class Expression: public IExpression {
@@ -167,5 +168,5 @@ public:
 	void Accept(Visitor* v) const;
 
 private:
-	IExpression* expr;
+	std::unique_ptr<IExpression> expr;
 };

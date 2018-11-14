@@ -1,13 +1,14 @@
 #pragma once
 #include "INode.h"
 #include <vector>
+#include <memory>
 
 class Statement:public IStatement{
 public:
- 	Statement(std::vector<IStatement*>* statements);
+ 	Statement(std::vector<std::unique_ptr<IStatement>>* statements);
   void Accept(Visitor* v) const;
 private:
- 	std::vector<IStatement*>* statements;
+ 	std::unique_ptr<std::vector<std::unique_ptr<IStatement>>> statements;
 };
 
 class IfStatement: public IStatement {
@@ -16,9 +17,9 @@ class IfStatement: public IStatement {
     void Accept(Visitor* v) const;
 
  private:
- 	IExpression* clause;
- 	IStatement* true_statement;
- 	IStatement* false_statement;
+ 	std::unique_ptr<IExpression> clause;
+ 	std::unique_ptr<IStatement> true_statement;
+ 	std::unique_ptr<IStatement> false_statement;
 };
 
 class WhileStatement: public IStatement {
@@ -26,8 +27,8 @@ class WhileStatement: public IStatement {
  	WhileStatement(IExpression* clause, IStatement* body);
     void Accept(Visitor* v) const;
  private:
- 	IExpression* clause;
- 	IStatement* body;
+ 	std::unique_ptr<IExpression> clause;
+ 	std::unique_ptr<IStatement> body;
 };
 
 class PrintStatement: public IStatement {
@@ -35,7 +36,7 @@ class PrintStatement: public IStatement {
  	PrintStatement(IExpression* print);
     void Accept(Visitor* v) const;
  private:
- 	IExpression* print;
+ 	std::unique_ptr<IExpression> print;
 };
 
 class AssignmentStatement: public IStatement {
