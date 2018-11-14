@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <utility>
+#include <memory>
 #include "parser.tab.h"
 using namespace std;
 
@@ -34,7 +35,7 @@ void yyerror(Goal* goal, const char* s);
 	char* sval;
 	IIdentifier* ident;
 	IExpression* expr;
-	std::vector<IExpression*>* exprs;	
+	std::vector<std::unique_ptr<IExpression>>* exprs;	
 	IStatement* state;
 	std::vector<IStatement*>* states;
 	IType* type;
@@ -268,15 +269,15 @@ statement:
 
 expressions:
 	%empty {
-		$$ = new std::vector<IExpression*>();
+		$$ = new std::vector<std::unique_ptr<IExpression>>();
 		}
 	| expression {
-		$$ = new std::vector<IExpression*>();
-		$$->push_back($1);
+		$$ = new std::vector<std::unique_ptr<IExpression>>();
+		$$->push_back(std::unique_ptr<IExpression>($1));
 		cout << "expression ";
 		}
 	| expressions T_COMMA expression {
-		$$->push_back($3);
+		$$->push_back(std::unique_ptr<IExpression>($3));
 		$$ = $1;
 		cout << "expression ";
 		}
