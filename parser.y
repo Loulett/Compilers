@@ -48,7 +48,7 @@ void yyerror(Goal* goal, const char* s);
 	std::vector<std::unique_ptr<IMethodDeclaration>>* methods;
 	IMainClass* main;
 	IGoal* goal;
-	std::vector<IClassDeclaration*>* classes;
+	std::vector<std::unique_ptr<IClassDeclaration>>* classes;
 }
 
 %left T_PLUS
@@ -133,10 +133,10 @@ mainClass:
 
 classesDeclaration:
 	%empty {
-		$$ = new std::vector<IClassDeclaration*>();
+		$$ = new std::vector<std::unique_ptr<IClassDeclaration>>();
 	}
 	| classesDeclaration classDeclaration {
-		$$->push_back($2);
+		$$->push_back(std::unique_ptr<IClassDeclaration>($2));
 		$$ = $1;
 	}
 	;
