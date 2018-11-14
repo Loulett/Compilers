@@ -41,8 +41,8 @@ void yyerror(Goal* goal, const char* s);
 	IType* type;
 	IVarDeclaration* varDecl;
 	IMethodDeclaration* methodDecl;
-	std::vector<IVarDeclaration*>* vars;
-	std::vector<std::pair<IType*, IIdentifier*>>* params;
+	std::vector<std::unique_ptr<IVarDeclaration>>* vars;
+	std::vector<std::pair<std::unique_ptr<IType>, std::unique_ptr<IIdentifier>>>* params;
 	IClassDeclaration* classDecl;
 	IIdentifier* extends;
 	std::vector<IMethodDeclaration*>* methods;
@@ -160,10 +160,10 @@ extends:
 
 varsDeclaration:
 	%empty {
-		$$ = new std::vector<IVarDeclaration*>();
+		$$ = new std::vector<std::unique_ptr<IVarDeclaration>>();
 	}
 	| varsDeclaration varDeclaration {
-		$$->push_back($2);
+		$$->push_back(std::unique_ptr<IVarDeclaration>($2));
 		$$ = $1;
 	}
 	;
@@ -199,15 +199,15 @@ methodType:
 
 methodParams:
 	%empty {
-		$$ = new std::vector<std::pair<IType*, IIdentifier*>>();
+		$$ = new std::vector<std::pair<std::unique_ptr<IType>, std::unique_ptr<IIdentifier>>>();
 	}
 	| type identifier {
-		$$ = new std::vector<std::pair<IType*, IIdentifier*>>();
-		$$->push_back(std::make_pair($1, $2));
+		$$ = new std::vector<std::pair<std::unique_ptr<IType>, std::unique_ptr<IIdentifier>>>();
+		$$->push_back(std::make_pair(std::unique_ptr<IType>($1), std::unique_ptr<IIdentifier>($2)));
 		cout << "Param ";
 	}
 	| methodParams T_COMMA type identifier {
-		$$->push_back(std::make_pair($3, $4));
+		$$->push_back(std::make_pair(std::unique_ptr<IType>($3), std::unique_ptr<IIdentifier>($4)));
 		$$ = $1;
 		cout << "Param ";
 	}
