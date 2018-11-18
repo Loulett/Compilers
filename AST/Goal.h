@@ -7,7 +7,7 @@ class Goal: public IGoal {
  public:
 	Goal(IMainClass* main_class, std::vector<std::unique_ptr<IClassDeclaration>>* class_declarations);
 	void Accept(Visitor* v) const override;
- private:
+ public:
  	std::unique_ptr<IMainClass> main_class;
  	std::unique_ptr<std::vector<std::unique_ptr<IClassDeclaration>>> class_declarations;
 };
