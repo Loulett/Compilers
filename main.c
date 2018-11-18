@@ -1,5 +1,6 @@
 #include "parser.tab.h"
 #include "AST/Goal.h"
+#include "Printer.h"
 
 extern int yyparse(Goal* goal);
 extern void yyerror(Goal* goal, const char* msg);
@@ -10,4 +11,7 @@ int main(int, char**) {
 	yyin = myfile;
 	Goal* goal = nullptr;
 	yyparse(goal);
+
+	Printer tree_printer(myfile);
+	tree_printer.visit(goal);
 }
