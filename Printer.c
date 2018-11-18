@@ -1,4 +1,5 @@
 #include "Printer.h"
+#include <cstdio>
 
 Printer::Printer(FILE* outFile)
 {
@@ -22,11 +23,11 @@ void Printer::visit(const MainClass* n)
 {
     fprintf(f, "class ");
     n->class_name->Accept(this);
-    fprintf(f, " { public static void main(String[] ");
+    fprintf(f, " { \n public static void main(String[] ");
     n->arg->Accept(this);
-    fprintf(f, ") { ");
+    fprintf(f, ") { \n");
     n->statement->Accept(this);
-    fprintf(f, "} } ");
+    fprintf(f, "} } \n");
 }
 
 void Printer::visit(const ClassDeclaration* n)
@@ -37,21 +38,21 @@ void Printer::visit(const ClassDeclaration* n)
         fprintf(f, " extends ");
         n->extends_class_name->Accept(this);
     }
-    fprintf(f, " { ");
+    fprintf(f, " { \n");
     for (int i = 0; i < n->vars->size(); i++) {
         (*(n->vars))[i]->Accept(this);
     }
     for (int i = 0; i < n->methods->size(); i++) {
         (*(n->methods))[i]->Accept(this);
     }
-    fprintf(f, "} ");
+    fprintf(f, "} \n");
 }
 
 void Printer::visit(const VarDeclaration* n)
 {
     n->type->Accept(this);
     n->name->Accept(this);
-    fprintf(f, "; ");
+    fprintf(f, "; \n");
 }
 
 void Printer::visit(const MethodDeclaration* n)
@@ -67,7 +68,7 @@ void Printer::visit(const MethodDeclaration* n)
             fprintf(f, ", ");
         }
     }
-    fprintf(f, ") { ");
+    fprintf(f, ") { \n");
     for (int i = 0; i < n->vars->size(); i++) {
         (*(n->vars))[i]->Accept(this);
     }
@@ -76,13 +77,13 @@ void Printer::visit(const MethodDeclaration* n)
     }
     fprintf(f, "return ");
     n->return_expression->Accept(this);
-    fprintf(f, "; } ");
+    fprintf(f, "; } \n");
 }
 
 
 void Printer::visit(const IntType* n)
 {
-    fprintf(f, "int" );
+    fprintf(f, "int " );
 }
 void Printer::visit(const BoolType* n)
 {
@@ -105,32 +106,34 @@ void Printer::visit(const Statement* n)
     for (int i = 0; i < n->statements->size(); i++) {
         (*(n->statements))[i]->Accept(this);
     }
-    fprintf(f, "} ");
+    fprintf(f, "} \n");
 }
 
 void Printer::visit(const IfStatement* n)
 {
     fprintf(f, "if(");
     n->clause->Accept(this);
-    fprintf(f, ") ");
+    fprintf(f, ") { \n");
     n->true_statement->Accept(this);
-    fprintf(f, "else ");
+    fprintf(f, "} else { \n");
     n->false_statement->Accept(this);
+    fprintf(f, "} \n");
 }
 
 void Printer::visit(const WhileStatement* n)
 {
     fprintf(f, "while(");
     n->clause->Accept(this);
-    fprintf(f, ") ");
+    fprintf(f, ") { \n");
     n->body->Accept(this);
+    fprintf(f, "} \n");
 }
 
 void Printer::visit(const PrintStatement* n)
 {
     fprintf(f, "System.out.println(");
     n->print->Accept(this);
-    fprintf(f, "); ");
+    fprintf(f, "); \n");
 }
 
 void Printer::visit(const AssignmentStatement* n)
@@ -138,7 +141,7 @@ void Printer::visit(const AssignmentStatement* n)
     n->var->Accept(this);
     fprintf(f, " = ");
     n->expr->Accept(this);
-    fprintf(f, "; ");
+    fprintf(f, "; \n");
 }
 
 void Printer::visit(const ArrAssignmentStatement* n)
@@ -148,7 +151,7 @@ void Printer::visit(const ArrAssignmentStatement* n)
     n->num->Accept(this);
     fprintf(f, "] = ");
     n->expr->Accept(this);
-    fprintf(f, "; ");
+    fprintf(f, "; \n");
 }
 
 
@@ -268,5 +271,5 @@ void Printer::visit(const Expression* n) {
 
 void Printer::visit(const Identifier* n)
 {
-    fprintf(f, "%s", n->name);
+    fprintf(f, "%s", n->name.c_str());
 }

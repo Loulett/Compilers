@@ -1,12 +1,10 @@
 #pragma once
 #include "Visitor.h"
 
-
 class Printer : public Visitor
 {
 private:
     FILE* f;
-    //FILE* f = fopen("input.txt", "r");
 
 public:
     Printer(FILE* outFile);
