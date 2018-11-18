@@ -6,6 +6,6 @@ class Identifier: public IIdentifier {
  public:
  	Identifier(std::string name);
     void Accept(Visitor* v) const;
- private:
+ public:
  	std::string name;
 };

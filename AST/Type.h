@@ -21,6 +21,6 @@ class Type: public IType {
  public:
  	Type(IIdentifier* name);
     void Accept(Visitor* v) const;
- private:
+ public:
  	std::unique_ptr<IIdentifier> name;
 };
