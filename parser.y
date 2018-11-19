@@ -116,6 +116,9 @@ void yyerror(Goal** goal, const char* s);
 %type <goal> parser
 %type <classes> classesDeclaration
 
+%destructor{}<ival>
+%destructor{free($$);}<sval>
+
 %%
 parser:
 	mainClass classesDeclaration {
