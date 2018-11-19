@@ -44,8 +44,8 @@ class AssignmentStatement: public IStatement {
 	AssignmentStatement(IIdentifier* var, IExpression* expr);
     void Accept(Visitor* v) const;
  public:
- 	IIdentifier* var;
- 	IExpression* expr;
+ 	std::unique_ptr<IIdentifier> var;
+ 	std::unique_ptr<IExpression> expr;
 };
 
 class ArrAssignmentStatement: public IStatement {
@@ -53,7 +53,7 @@ class ArrAssignmentStatement: public IStatement {
  	ArrAssignmentStatement(IIdentifier* var, IExpression* num, IExpression* expr);
     void Accept(Visitor* v) const;
  public:
- 	IIdentifier* var;
- 	IExpression* num;
- 	IExpression* expr;
+ 	std::unique_ptr<IIdentifier> var;
+ 	std::unique_ptr<IExpression> num;
+ 	std::unique_ptr<IExpression> expr;
 };

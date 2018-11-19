@@ -116,8 +116,6 @@ void yyerror(Goal** goal, const char* s);
 %type <goal> parser
 %type <classes> classesDeclaration
 
-%destructor{}<ival>
-%destructor{free($$);}<sval>
 
 %%
 parser:
@@ -213,8 +211,8 @@ statements:
 		$$ = new std::vector<std::unique_ptr<IStatement>>();
 		}
 	| statement statements {
-		$$->push_back(std::unique_ptr<IStatement>($1));
 		$$ = $2;
+		$$->push_back(std::unique_ptr<IStatement>($1));
 		}
 	;
 

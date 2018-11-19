@@ -42,22 +42,29 @@ void WhileStatement::Accept(Visitor* v) const
 	v->visit(this);
 }
 
-PrintStatement::PrintStatement(IExpression* print):
-	print(print) {}
+PrintStatement::PrintStatement(IExpression* print) {
+	this->print = std::unique_ptr<IExpression>(print);
+}
+
 void PrintStatement::Accept(Visitor* v) const
 {
 	v->visit(this);
 }
 
-AssignmentStatement::AssignmentStatement(IIdentifier* var, IExpression* expr):
-	var(var), expr(expr) {}
+AssignmentStatement::AssignmentStatement(IIdentifier* var, IExpression* expr) {
+	this->var = std::unique_ptr<IIdentifier>(var);
+	this->expr = std::unique_ptr<IExpression>(expr);
+}
 void AssignmentStatement::Accept(Visitor* v) const
 {
 	v->visit(this);
 }
 
-ArrAssignmentStatement::ArrAssignmentStatement(IIdentifier* var, IExpression* num, IExpression* expr):
-	var(var), num(num), expr(expr) {}
+ArrAssignmentStatement::ArrAssignmentStatement(IIdentifier* var, IExpression* num, IExpression* expr) {
+	this->var = std::unique_ptr<IIdentifier>(var);
+	this->num = std::unique_ptr<IExpression>(num);
+	this->expr = std::unique_ptr<IExpression>(expr);
+}
 void ArrAssignmentStatement::Accept(Visitor* v) const
 {
 	v->visit(this);

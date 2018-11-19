@@ -6,10 +6,12 @@ parser.tab.c parser.tab.h: parser.y
 parser.lexer.c parser.lexer.h: parser.l parser.tab.c parser.tab.h
 	flex parser.l
 
-CXXFLAGS=-std=c++11 -fsanitize=address,undefined -g
+CXXFLAGS=-std=c++11
+
+FLAGS=-fsanitize=address,undefined -g
 
 parser: parser.lexer.c parser.lexer.h parser.tab.c parser.tab.h
-	g++ ${CXXFLAGS} main.c parser.tab.c parser.lexer.c AST/Identifier.c AST/Expression.c AST/Statement.c AST/Type.c AST/VarDeclaration.c AST/MethodDeclaration.c AST/ClassDeclaration.c AST/MainClass.c AST/Goal.c Printer.c -o parser
+	g++ ${CXXFLAGS} main.c parser.tab.c parser.lexer.c AST/Identifier.c AST/Expression.c AST/Statement.c AST/Type.c AST/VarDeclaration.c AST/MethodDeclaration.c AST/ClassDeclaration.c AST/MainClass.c AST/Goal.c Printer_graph.c -o parser
 
 clean:
 	rm -f parser parser.lexer.c parser.lexer.h parser.tab.c parser.tab.h parser.output

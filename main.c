@@ -2,7 +2,6 @@
 #include "AST/Goal.h"
 #include "Printer.h"
 #include "Printer_graph.h"
-#include "Printer_graph.c"
 #include <cstdio>
 
 extern int yyparse(Goal* goal);
