@@ -14,15 +14,20 @@ To run:
 
 Currently it just reads `input.txt`, parse it through final-state machine and prints out some debug information (e.g. finished rules).
 
+To show graph: <br />
+```asm
+sudo apt install xdot
+xdot output.dot
+```
 # Done
 * Add flex
 * Add bison
 * Add grammar
-
-# TODO
-* Add autotests
 * Add AST
 * Add visitor
 * Add printer
 * Add AST visualization
+
+# TODO
+* Add autotests
 * Add errors
