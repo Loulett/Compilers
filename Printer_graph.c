@@ -112,7 +112,7 @@ void Printer_graph::visit(const MethodDeclaration* n)
     for (int i = 0; i < n->args->size(); i++) {
         nodeNumber++;
         fprintf( f, "%d -- %d;\n", cur, nodeNumber );
-        fprintf( f, "%d [label=\"Argument\"];\n", cur);
+        fprintf( f, "%d [label=\"Argument\"];\n", nodeNumber);
         nodeNumber++;
         fprintf( f, "%d -- %d;\n", cur, nodeNumber );
         ((*(n->args))[i]).first->Accept(this);      //type
@@ -426,8 +426,6 @@ void Printer_graph::visit(const This* n) {
     nodeNumber++;
     fprintf( f, "%d -- %d;\n", cur, nodeNumber );
     fprintf( f, "%d [label=\"this\"];\n", nodeNumber);
-
-    fprintf(f, "this");
 }
 
 void Printer_graph::visit(const NewArrExpression* n) {

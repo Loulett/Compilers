@@ -10,14 +10,14 @@ extern FILE *yyin;
 
 int main(int, char**) {
 	FILE* myfile = fopen("input.txt", "r");
-//	FILE* outfile = fopen("output.txt", "w");
+	FILE* outfile1 = fopen("output.txt", "w");
 	FILE* outfile = fopen("output.dot", "w");
 	yyin = myfile;
 	Goal* goal = nullptr;
 	yyparse(&goal);
 
-//    Printer tree_printer(outfile);
-//    tree_printer.visit(goal);
+    Printer tree_printer1(outfile1);
+    tree_printer1.visit(goal);
 
 
     Printer_graph tree_printer(outfile);

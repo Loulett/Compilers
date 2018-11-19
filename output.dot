@@ -33,7 +33,7 @@ graph Grammar{
 13 -- 16;
 16 [label="ComputeFac"];
 13 -- 17;
-13 [label="Argument"];
+17 [label="Argument"];
 13 -- 18;
 18 [label="IntType"];
 19 [label="int"];
@@ -86,7 +86,7 @@ graph Grammar{
 42 [label="This"];
 42 -- 43;
 43 [label="this"];
-this41 -- 44;
+41 -- 44;
 44 [label="ComputeFac"];
 41 -- 45;
 45 [label="MINUS"];
