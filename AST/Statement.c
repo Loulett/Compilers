@@ -1,20 +1,71 @@
 #include "Statement.h"
+#include "../Visitor.h"
+#include <iostream>
 
-Statement::Statement(std::vector<IStatement*> statements): statements(statements) {}
+Statement::Statement(std::vector<std::unique_ptr<IStatement>>* statements) {
+	if (statements == nullptr) {
+		std::cout << "Statement is nullptr.\n";
+	}
+	this->statements = std::unique_ptr<std::vector<std::unique_ptr<IStatement>>>(statements);
+}
 
-IfStatement::IfStatement(IExpression* clause, IStatement* true_statement, IStatement* false_statement):
-	clause(clause), true_statement(true_statement), false_statement(false_statement) {}
+void Statement::Accept(Visitor* v) const
+{
+	v->visit(this);
+}
 
-WhileStatement::WhileStatement(IExpression* clause, IStatement* body):
-	clause(clause), body(body) {}
 
-PrintStatement::PrintStatement(IExpression* print):
-	print(print) {}
+IfStatement::IfStatement(IExpression* clause, IStatement* true_statement, IStatement* false_statement) {
+	if (clause == nullptr || true_statement == nullptr || false_statement == nullptr) {
+		std::cout << "Statement is nullptr.\n";
+	}
+	this->clause = std::unique_ptr<IExpression>(clause);
+	this->true_statement = std::unique_ptr<IStatement>(true_statement);
+	this->false_statement = std::unique_ptr<IStatement>(false_statement);
+}
 
-AssignmentStatement::AssignmentStatement(IIdentifier* var, IExpression* expr):
-	var(var), expr(expr) {}
+void IfStatement::Accept(Visitor* v) const
+{
+	v->visit(this);
+}
 
-ArrAssignmentStatement::ArrAssignmentStatement(IIdentifier* var, IExpression* num, IExpression* expr):
-	var(var), num(num), expr(expr) {}
+WhileStatement::WhileStatement(IExpression* clause, IStatement* body) {
+	if (clause == nullptr || body == nullptr) {
+		std::cout << "Statement is nullptr.\n";
+	}
+	this->clause = std::unique_ptr<IExpression>(clause);
+	this->body = std::unique_ptr<IStatement>(body);
+}
 
-int main() {return 0;}
+void WhileStatement::Accept(Visitor* v) const
+{
+	v->visit(this);
+}
+
+PrintStatement::PrintStatement(IExpression* print) {
+	this->print = std::unique_ptr<IExpression>(print);
+}
+
+void PrintStatement::Accept(Visitor* v) const
+{
+	v->visit(this);
+}
+
+AssignmentStatement::AssignmentStatement(IIdentifier* var, IExpression* expr) {
+	this->var = std::unique_ptr<IIdentifier>(var);
+	this->expr = std::unique_ptr<IExpression>(expr);
+}
+void AssignmentStatement::Accept(Visitor* v) const
+{
+	v->visit(this);
+}
+
+ArrAssignmentStatement::ArrAssignmentStatement(IIdentifier* var, IExpression* num, IExpression* expr) {
+	this->var = std::unique_ptr<IIdentifier>(var);
+	this->num = std::unique_ptr<IExpression>(num);
+	this->expr = std::unique_ptr<IExpression>(expr);
+}
+void ArrAssignmentStatement::Accept(Visitor* v) const
+{
+	v->visit(this);
+}

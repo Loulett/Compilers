@@ -2,19 +2,55 @@
 #include <cstdio>
 #include <iostream>
 #include <string>
+#include <utility>
+#include <memory>
+#include "parser.tab.h"
 using namespace std;
 
 extern int yylex();
-extern int yyparse();
+extern int yyparse(Goal** goal);
 extern FILE *yyin;
 
-void yyerror(const string s);
+void yyerror(Goal** goal, const char* s);
 %}
+
+%code requires {
+#include "AST/INode.h"
+#include "AST/Identifier.h"
+#include "AST/Expression.h"
+#include "AST/Statement.h"
+#include "AST/Type.h"
+#include "AST/VarDeclaration.h"
+#include "AST/MethodDeclaration.h"
+#include "AST/ClassDeclaration.h"
+#include "AST/MainClass.h"
+#include "AST/Goal.h"
+}
+
+%parse-param {Goal** goal}
+%define parse.error verbose
 
 %union {
 	int ival;
-	char* sval;	
+	char* sval;
+	IIdentifier* ident;
+	IExpression* expr;
+	std::vector<std::unique_ptr<IExpression>>* exprs;	
+	IStatement* state;
+	std::vector<std::unique_ptr<IStatement>>* states;
+	IType* type;
+	IVarDeclaration* varDecl;
+	IMethodDeclaration* methodDecl;
+	std::vector<std::unique_ptr<IVarDeclaration>>* vars;
+	std::vector<std::pair<std::unique_ptr<IType>, std::unique_ptr<IIdentifier>>>* params;
+	IClassDeclaration* classDecl;
+	IIdentifier* extends;
+	std::vector<std::unique_ptr<IMethodDeclaration>>* methods;
+	IMainClass* main;
+	IGoal* goal;
+	std::vector<std::unique_ptr<IClassDeclaration>>* classes;
 }
+
 %left T_PLUS
 %left T_MINUS
 %left T_MULT
@@ -63,122 +99,240 @@ void yyerror(const string s);
 %token <ival> T_NUM
 %token <sval> T_IDENT
 
+%type <ident> identifier
+%type <expr> expression
+%type <exprs> expressions
+%type <state> statement
+%type <states> statements
+%type <type> type
+%type <varDecl> varDeclaration
+%type <methodDecl> methodDeclaration
+%type <vars> varsDeclaration
+%type <params> methodParams
+%type <classDecl> classDeclaration
+%type <extends> extends
+%type <methods> methodsDeclaration
+%type <main> mainClass
+%type <goal> parser
+%type <classes> classesDeclaration
+
+
 %%
 parser:
-	mainClass classesDeclaration {cout << "Start ";}
+	mainClass classesDeclaration {
+		*goal = new Goal($1, $2);
+	}
 	;
 
 mainClass:
-	T_CLASS identifier T_F_LEFT T_PUBLIC T_STATIC T_VOID T_MAIN T_R_LEFT T_STRING T_Q_LEFT T_Q_RIGHT identifier T_R_RIGHT T_F_LEFT statement T_F_RIGHT T_F_RIGHT {cout << "MainClass ";}
+	T_CLASS identifier T_F_LEFT T_PUBLIC T_STATIC T_VOID T_MAIN T_R_LEFT T_STRING T_Q_LEFT T_Q_RIGHT identifier T_R_RIGHT T_F_LEFT statement T_F_RIGHT T_F_RIGHT {
+		$$ = new MainClass($2, $12, $15);
+	}
 	;
 
 classesDeclaration:
-	%empty
-	| classesDeclaration classDeclaration
+	%empty {
+		$$ = new std::vector<std::unique_ptr<IClassDeclaration>>();
+	}
+	| classesDeclaration classDeclaration {
+		$1->push_back(std::unique_ptr<IClassDeclaration>($2));
+		$$ = $1;
+	}
 	;
 
 classDeclaration:
-	T_CLASS identifier extends T_F_LEFT varsDeclaration methodsDeclaration T_F_RIGHT {cout << "Class ";}
+	T_CLASS identifier extends T_F_LEFT varsDeclaration methodsDeclaration T_F_RIGHT {
+		$$ = new ClassDeclaration($2, $3, $5, $6);
+	}
 	;
 
 extends:
-	%empty
-	| T_EXTENDS identifier {cout << "Extends ";}
+	%empty {
+		$$ = nullptr;
+	}
+	| T_EXTENDS identifier {
+		$$ = $2;
+	}
 	;
 
 varsDeclaration:
-	%empty
-	| varsDeclaration varDeclaration
+	%empty {
+		$$ = new std::vector<std::unique_ptr<IVarDeclaration>>();
+	}
+	| varsDeclaration varDeclaration {
+		$1->push_back(std::unique_ptr<IVarDeclaration>($2));
+		$$ = $1;
+	}
 	;
 
 varDeclaration:
-	type identifier T_SCOLON {cout << "Var ";}
+	type identifier T_SCOLON {
+		$$ = new VarDeclaration($1, $2);
+		}
 	;
 
 methodsDeclaration:
-	%empty
-	| methodsDeclaration methodDeclaration
+	%empty {
+		$$ = new std::vector<std::unique_ptr<IMethodDeclaration>>();
+	}
+	| methodsDeclaration methodDeclaration {
+		$1->push_back(std::unique_ptr<IMethodDeclaration>($2));
+		$$ = $1;
+	}
 	;
 
 methodDeclaration:
-	methodType type identifier T_R_LEFT methodParams T_R_RIGHT T_F_LEFT varsDeclaration statements T_RETURN expression T_SCOLON T_F_RIGHT {cout << "Method ";}
+	methodType type identifier T_R_LEFT methodParams T_R_RIGHT T_F_LEFT varsDeclaration statements T_RETURN expression T_SCOLON T_F_RIGHT {
+		$$ = new MethodDeclaration($2, $3, $5, $8, $9, $11);
+	}
 	;
 
 methodType:
-	T_PUBLIC {cout << "Public ";}
-	| T_PRIVATE {cout << "Private ";}
+	T_PUBLIC {}
+	| T_PRIVATE {}
 	;
 
 methodParams:
-	%empty
-	| type identifier otherParams {cout << "Param ";}
-	;
-
-otherParams:
-	%empty
-	| T_COMMA type identifier otherParams {cout << "Param ";}
+	%empty {
+		$$ = new std::vector<std::pair<std::unique_ptr<IType>, std::unique_ptr<IIdentifier>>>();
+	}
+	| type identifier {
+		$$ = new std::vector<std::pair<std::unique_ptr<IType>, std::unique_ptr<IIdentifier>>>();
+		$$->push_back(std::make_pair(std::unique_ptr<IType>($1), std::unique_ptr<IIdentifier>($2)));
+	}
+	| methodParams T_COMMA type identifier {
+		$$->push_back(std::make_pair(std::unique_ptr<IType>($3), std::unique_ptr<IIdentifier>($4)));
+		$$ = $1;
+	}
 	;
 
 statements:
-	%empty
-	| statement statements
+	%empty {
+		$$ = new std::vector<std::unique_ptr<IStatement>>();
+		}
+	| statement statements {
+		$2->insert($2->begin(), std::unique_ptr<IStatement>($1));
+		$$ = $2;
+		}
 	;
 
 type:
-	T_INT T_Q_LEFT T_Q_RIGHT {cout << "Array int ";}
-	| T_BOOL {cout << "Bool ";}
-	| T_INT {cout << "Int ";}
-	| identifier
+	T_INT T_Q_LEFT T_Q_RIGHT {
+		$$ = new IntArrayType();
+		}
+	| T_BOOL {
+		$$ = new BoolType();
+		}
+	| T_INT {
+		$$ = new IntType();
+		}
+	| identifier {
+		$$ = new Type($1);
+		}
 	;
 
 statement:
-	T_F_LEFT statements T_F_RIGHT
-	| T_IF T_R_LEFT expression T_R_RIGHT statement T_ELSE statement {cout << "If ";}
-	| T_WHILE T_R_LEFT expression T_R_RIGHT statement {cout << "While ";}
-	| T_PRINT T_R_LEFT expression T_R_RIGHT T_SCOLON {cout << "Print ";}
-	| identifier T_EQ expression T_SCOLON {cout << "Assingment ";}
-	| identifier T_Q_LEFT expression T_Q_RIGHT T_EQ expression T_SCOLON {cout << "Array Assignment ";}
+	T_F_LEFT statements T_F_RIGHT {
+		$$ = new Statement($2);
+		}
+	| T_IF T_R_LEFT expression T_R_RIGHT statement T_ELSE statement {
+		$$ = new IfStatement($3, $5, $7);
+		}
+	| T_WHILE T_R_LEFT expression T_R_RIGHT statement {
+		$$ = new WhileStatement($3, $5);
+		}
+	| T_PRINT T_R_LEFT expression T_R_RIGHT T_SCOLON {
+		$$ = new PrintStatement($3);
+		}
+	| identifier T_EQ expression T_SCOLON {
+		$$ = new AssignmentStatement($1, $3);
+		}
+	| identifier T_Q_LEFT expression T_Q_RIGHT T_EQ expression T_SCOLON {
+		$$ = new ArrAssignmentStatement($1, $3, $6);
+		}
 	;
 
 expressions:
-	%empty
-	| expression {cout << "expression ";}
-	| expressions T_COMMA expression {cout << "expression ";}
+	%empty {
+		$$ = new std::vector<std::unique_ptr<IExpression>>();
+		}
+	| expression {
+		$$ = new std::vector<std::unique_ptr<IExpression>>();
+		$$->push_back(std::unique_ptr<IExpression>($1));
+		}
+	| expressions T_COMMA expression {
+		$$->push_back(std::unique_ptr<IExpression>($3));
+		$$ = $1;
+		}
 	;
 
 expression:
-	expression T_AND expression {cout << "And ";}
-	| expression T_LESS expression {cout << "Less ";}
-	| expression T_PLUS expression {cout << "Plus ";}
-	| expression T_MINUS expression {cout << "Minus ";}
-	| expression T_MULT expression {cout << "Mult ";}
-	| expression T_REMAIN expression {cout << "Remain ";}
-	| expression T_OR expression {cout << "Or ";}
-	| expression T_Q_LEFT expression T_Q_RIGHT {}
-	| expression T_LENGTH {cout << "Length ";}
-	| expression T_DOT identifier T_R_LEFT expressions T_R_RIGHT {}
-	| T_NUM {cout << "Int " << $1 << " ";}
-	| T_TRUE {cout << "True ";}
-	| T_FALSE {cout << "False ";}
-	| identifier {}
-	| T_THIS {cout << "This ";}
-	| T_NEW T_INT T_Q_LEFT expression T_Q_RIGHT {cout << "New int array ";}
-	| T_NEW identifier T_R_LEFT T_R_RIGHT {cout << "New ";}
-	| T_NOT expression {cout << "Not ";}
-	| T_R_LEFT expression T_R_RIGHT {}
+	expression T_AND expression {
+		$$ = new AndExpression($1, $3);
+		}
+	| expression T_LESS expression {
+		$$ = new LessExpression($1, $3);
+		}
+	| expression T_PLUS expression {
+		$$ = new PlusExpression($1, $3);
+		}
+	| expression T_MINUS expression {
+		$$ = new MinusExpression($1, $3);
+		}
+	| expression T_MULT expression {
+		$$ = new MultExpression($1, $3);
+		}
+	| expression T_REMAIN expression {
+		$$ = new RemainExpression($1, $3);
+		}
+	| expression T_OR expression {
+		$$ = new OrExpression($1, $3);
+		}
+	| expression T_Q_LEFT expression T_Q_RIGHT {
+		$$ = new ArrayExpression($1, $3);
+		}
+	| expression T_LENGTH {
+		$$ = new LengthExpression($1);
+		}
+	| expression T_DOT identifier T_R_LEFT expressions T_R_RIGHT {
+		$$ = new MethodExpression($1, $3, $5);
+		}
+	| T_NUM {
+		$$ = new Integer($1);
+		}
+	| T_TRUE {
+		$$ = new Bool(true);
+		}
+	| T_FALSE {
+		$$ = new Bool(false);
+		}
+	| identifier {
+		$$ = new IdentExpression($1);
+		}
+	| T_THIS {
+		$$ = new This();
+		}
+	| T_NEW T_INT T_Q_LEFT expression T_Q_RIGHT {
+		$$ = new NewArrExpression($4);
+		}
+	| T_NEW identifier T_R_LEFT T_R_RIGHT {
+		$$ = new NewExpression($2);
+		}
+	| T_NOT expression {
+		$$ = new NotExpression($2);
+		}
+	| T_R_LEFT expression T_R_RIGHT {
+		$$ = new Expression($2);
+		}
 	;
 
 identifier:
-	T_IDENT {cout << "String " << $1 << " ";}
+	T_IDENT {
+		$$ = new Identifier($1);
+	}
 	;
 %%
 
-int main(int, char**) {
-	FILE *myfile = fopen("input.txt", "r");
-	yyin = myfile;
-	yyparse();
-}
-
-void yyerror(const string s) {
+void yyerror(Goal** goal, const char* s) {
 	cout << "PARSE ERROR " << s << endl;
 }
