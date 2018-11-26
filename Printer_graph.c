@@ -112,13 +112,14 @@ void Printer_graph::visit(const MethodDeclaration* n)
     for (int i = 0; i < n->args->size(); i++) {
         nodeNumber++;
         fprintf( f, "%d -- %d;\n", cur, nodeNumber );
-        fprintf( f, "%d [label=\"Argument\"];\n", nodeNumber);
+        int argNumber = nodeNumber;
+        fprintf( f, "%d [label=\"Argument\"];\n", argNumber);
         nodeNumber++;
-        fprintf( f, "%d -- %d;\n", cur, nodeNumber );
+        fprintf( f, "%d -- %d;\n", argNumber, nodeNumber );
         ((*(n->args))[i]).first->Accept(this);      //type
 
         nodeNumber++;
-        fprintf( f, "%d -- %d;\n", cur, nodeNumber );
+        fprintf( f, "%d -- %d;\n", argNumber, nodeNumber );
         ((*(n->args))[i]).second->Accept(this);     //name
 
         if (i < n->args->size() - 1) {
@@ -140,6 +141,9 @@ void Printer_graph::visit(const MethodDeclaration* n)
     }
     nodeNumber++;
     fprintf( f, "%d -- %d;\n", cur, nodeNumber );
+    fprintf( f, "%d [label=\"Return\"];\n", nodeNumber);
+    nodeNumber++;
+    fprintf( f, "%d -- %d;\n", nodeNumber - 1, nodeNumber );
 
     n->return_expression->Accept(this);
 }

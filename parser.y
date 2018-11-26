@@ -135,7 +135,7 @@ classesDeclaration:
 		$$ = new std::vector<std::unique_ptr<IClassDeclaration>>();
 	}
 	| classesDeclaration classDeclaration {
-		$$->push_back(std::unique_ptr<IClassDeclaration>($2));
+		$1->push_back(std::unique_ptr<IClassDeclaration>($2));
 		$$ = $1;
 	}
 	;
@@ -160,7 +160,7 @@ varsDeclaration:
 		$$ = new std::vector<std::unique_ptr<IVarDeclaration>>();
 	}
 	| varsDeclaration varDeclaration {
-		$$->push_back(std::unique_ptr<IVarDeclaration>($2));
+		$1->push_back(std::unique_ptr<IVarDeclaration>($2));
 		$$ = $1;
 	}
 	;
@@ -176,7 +176,7 @@ methodsDeclaration:
 		$$ = new std::vector<std::unique_ptr<IMethodDeclaration>>();
 	}
 	| methodsDeclaration methodDeclaration {
-		$$->push_back(std::unique_ptr<IMethodDeclaration>($2));
+		$1->push_back(std::unique_ptr<IMethodDeclaration>($2));
 		$$ = $1;
 	}
 	;
@@ -211,8 +211,8 @@ statements:
 		$$ = new std::vector<std::unique_ptr<IStatement>>();
 		}
 	| statement statements {
+		$2->insert($2->begin(), std::unique_ptr<IStatement>($1));
 		$$ = $2;
-		$$->push_back(std::unique_ptr<IStatement>($1));
 		}
 	;
 
