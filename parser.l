@@ -13,10 +13,12 @@ NUM ({DIGIT})+
 CHAR [a-zA-Z_]
 STRING ({CHAR})+
 IDENT {STRING}({STRING}|{NUM})*
+COMMENT "//".*\n
+
 
 %%
-[ \t]+ ; // Ignore whitespace, tabs
-[\n] {cout << '\n';}
+[ \t\n]+ ; // Ignore whitespace, tabs, new lines
+{COMMENT} ; // Ignore comments
 
 
 "+" {return T_PLUS;}
@@ -67,6 +69,6 @@ IDENT {STRING}({STRING}|{NUM})*
 {IDENT} {yylval.sval = strdup(yytext); return T_IDENT;}
 {NUM} {yylval.ival = atoi(yytext); return T_NUM;}
 
-. {cout << "ERROR" << yytext;}
+. {cout << "Invalid syntax" << yytext << "\n";}
 
 %%
