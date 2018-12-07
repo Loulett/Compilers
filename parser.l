@@ -7,12 +7,15 @@
 #include "parser.tab.h"
 using namespace std;
 
-size_t line_pos = 1;
-size_t char_pos = 1;
-
 void update_pos() {
-	char_pos += yyleng;
+	yylloc.first_column = yylloc.last_column;
+	yylloc.last_column += yyleng;
 }
+
+//size_t column = 1;
+//#define YY_USER_ACTION yylloc->first_line = yylloc->last_line = yylineno; \
+//    yylloc->first_column = column; yylloc->last_column = column + yyleng; \
+//    column += yyleng;
 
 %}
 
@@ -27,8 +30,8 @@ COMMENT "//".*\n
 %%
 " " {update_pos();}
 \t {update_pos();}
-\n {line_pos++; char_pos = 0;}
-{COMMENT} {line_pos++; char_pos = 0;} // Ignore comments
+\n {yylloc.first_line++; yylloc.last_line++; yylloc.first_column=1; yylloc.last_column=1;}
+{COMMENT} {yylloc.first_line++; yylloc.last_line++; yylloc.first_column=1; yylloc.last_column=1;} // Ignore comments
 
 
 "+" {update_pos(); return T_PLUS;}
@@ -76,9 +79,9 @@ COMMENT "//".*\n
 "System.out.println" {update_pos(); return T_PRINT;}
 ".length" {update_pos(); return T_LENGTH;}
 
-{IDENT} {update_pos(); yylval.sval = strdup(yytext); return T_IDENT;}
-{NUM} {update_pos(); yylval.ival = atoi(yytext); return T_NUM;}
+{IDENT} {yylval.sval = strdup(yytext); update_pos(); return T_IDENT;}
+{NUM} {yylval.ival = atoi(yytext); update_pos(); return T_NUM;}
 
-. {cout << "Invalid syntax: " << yytext << " at line " << line_pos << ", column " << char_pos << "\n"; throw std::exception();}
+. {cout << "Invalid syntax: " << yytext << " at line " << yylloc.first_line << ", column " << yylloc.last_column << "\n"; throw std::exception();}
 
 %%

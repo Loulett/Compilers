@@ -29,6 +29,7 @@ void yyerror(Goal** goal, const char* s);
 
 %parse-param {Goal** goal}
 %define parse.error verbose
+%locations
 
 %union {
 	int ival;
@@ -60,7 +61,7 @@ void yyerror(Goal** goal, const char* s);
 %left T_LESS
 %left T_NOT
 
-%left T_R_LEFT
+%precedence T_R_LEFT
 %token T_R_RIGHT
 %left T_F_LEFT
 %token T_F_RIGHT
@@ -122,6 +123,7 @@ parser:
 	mainClass classesDeclaration {
 		*goal = new Goal($1, $2);
 	}
+	| error mainClass classesDeclaration {yyerrok;}
 	;
 
 mainClass:
@@ -138,12 +140,14 @@ classesDeclaration:
 		$1->push_back(std::unique_ptr<IClassDeclaration>($2));
 		$$ = $1;
 	}
+	| classesDeclaration error classDeclaration {yyerrok;}
 	;
 
 classDeclaration:
 	T_CLASS identifier extends T_F_LEFT varsDeclaration methodsDeclaration T_F_RIGHT {
 		$$ = new ClassDeclaration($2, $3, $5, $6);
 	}
+	| T_CLASS error T_F_LEFT varsDeclaration methodsDeclaration T_F_RIGHT {yyerrok;}
 	;
 
 extends:
@@ -153,6 +157,7 @@ extends:
 	| T_EXTENDS identifier {
 		$$ = $2;
 	}
+	| T_EXTENDS error {yyerrok;}
 	;
 
 varsDeclaration:
@@ -163,12 +168,14 @@ varsDeclaration:
 		$1->push_back(std::unique_ptr<IVarDeclaration>($2));
 		$$ = $1;
 	}
+	| varsDeclaration error varDeclaration {yyerrok;}
 	;
 
 varDeclaration:
 	type identifier T_SCOLON {
 		$$ = new VarDeclaration($1, $2);
 		}
+	| error T_SCOLON {yyerrok;}
 	;
 
 methodsDeclaration:
@@ -185,6 +192,7 @@ methodDeclaration:
 	methodType type identifier T_R_LEFT methodParams T_R_RIGHT T_F_LEFT varsDeclaration statements T_RETURN expression T_SCOLON T_F_RIGHT {
 		$$ = new MethodDeclaration($2, $3, $5, $8, $9, $11);
 	}
+	| methodType type identifier T_R_LEFT error T_R_RIGHT T_F_LEFT varsDeclaration statements T_RETURN expression T_SCOLON T_F_RIGHT {yyerrok;}
 	;
 
 methodType:
@@ -214,6 +222,7 @@ statements:
 		$2->insert($2->begin(), std::unique_ptr<IStatement>($1));
 		$$ = $2;
 		}
+	| statement error statements {yyerrok;}
 	;
 
 type:
@@ -250,6 +259,9 @@ statement:
 	| identifier T_Q_LEFT expression T_Q_RIGHT T_EQ expression T_SCOLON {
 		$$ = new ArrAssignmentStatement($1, $3, $6);
 		}
+	| T_F_LEFT error T_F_RIGHT {yyerrok;}
+	| T_IF T_R_LEFT error T_R_RIGHT statement T_ELSE statement {yyerrok;}
+	| T_WHILE T_R_LEFT error T_R_RIGHT statement {yyerrok;}
 	;
 
 expressions:
@@ -324,6 +336,7 @@ expression:
 	| T_R_LEFT expression T_R_RIGHT {
 		$$ = new Expression($2);
 		}
+	| T_R_LEFT error T_R_RIGHT {yyerrok;}
 	;
 
 identifier:
@@ -334,5 +347,5 @@ identifier:
 %%
 
 void yyerror(Goal** goal, const char* s) {
-	cout << "PARSE ERROR " << s << endl;
+	cout << "Parsing error at line: " << yylloc.first_line << " column: " << yylloc.first_column << ". Message: " << s << endl;
 }
