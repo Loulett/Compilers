@@ -1,5 +1,6 @@
 #pragma once
 #include "Visitor.h"
+#include <string>
 
 class Printer_graph : public Visitor
 {
@@ -7,7 +8,7 @@ private:
     FILE* f;
     int nodeNumber;
 public:
-    Printer_graph(FILE* outFile);
+    Printer_graph(std::string filename);
     ~Printer_graph();
 
     void visit(const Goal* n) override;

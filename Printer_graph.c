@@ -2,9 +2,9 @@
 #include "Printer.h"
 #include <cstdio>
 
-Printer_graph::Printer_graph(FILE* outFile)
+Printer_graph::Printer_graph(std::string outFile)
 {
-    f = outFile;
+    f = fopen(outFile.c_str(), "w");
     nodeNumber = 0;
     fprintf( f, "%s", "graph Grammar{\n" );
 }
