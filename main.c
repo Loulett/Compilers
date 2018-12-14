@@ -10,7 +10,6 @@ extern FILE *yyin;
 
 int main(int, char**) {
 	FILE* myfile = fopen("input.txt", "r");
-	FILE* outfile = fopen("output.dot", "w");
 	yyin = myfile;
 	Goal* goal = nullptr;
 	try {
@@ -19,11 +18,11 @@ int main(int, char**) {
 		return 0;
 	}
 
-    Printer_graph tree_printer(outfile);
+
+    Printer_graph tree_printer("output.dot");
 	tree_printer.visit(goal);
 	
 	fclose(myfile);
-	fclose(outfile);
 	delete goal;
 	return 0;
 }
