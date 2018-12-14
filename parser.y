@@ -25,6 +25,7 @@ void yyerror(Goal** goal, const char* s);
 #include "AST/ClassDeclaration.h"
 #include "AST/MainClass.h"
 #include "AST/Goal.h"
+#include "SymbolTable/Symbol.h"
 }
 
 %parse-param {Goal** goal}
@@ -341,7 +342,7 @@ expression:
 
 identifier:
 	T_IDENT {
-		$$ = new Identifier($1);
+		$$ = new Identifier(InternTable::getIntern(std::string($1)));
 	}
 	;
 %%

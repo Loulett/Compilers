@@ -470,7 +470,7 @@ void Printer_graph::visit(const Expression* n) {
 
 void Printer_graph::visit(const Identifier* n)
 {
-    fprintf( f, "%d [label=\"%s\"];\n", nodeNumber, n->name.c_str());
+    fprintf( f, "%d [label=\"%s\"];\n", nodeNumber, n->name->getString().c_str());
 }
 
 

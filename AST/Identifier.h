@@ -1,11 +1,12 @@
 #pragma once
 #include "INode.h"
-#include "string"
+#include "../SymbolTable/Symbol.h"
+#include <string>
 
 class Identifier: public IIdentifier {
  public:
- 	Identifier(std::string name);
+ 	Identifier(Symbol* name);
     void Accept(Visitor* v) const;
  public:
- 	std::string name;
+ 	Symbol* name;
 };

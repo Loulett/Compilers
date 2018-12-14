@@ -2,8 +2,8 @@
 #include "../Visitor.h"
 #include <iostream>
 
-Identifier::Identifier(std::string name) {
-	if (name.empty()) {
+Identifier::Identifier(Symbol* name) {
+	if (name == nullptr) {
 		std::cout << "Empty name in Identifier!\n";
 	}
 	this->name = name;

@@ -271,5 +271,5 @@ void Printer::visit(const Expression* n) {
 
 void Printer::visit(const Identifier* n)
 {
-    fprintf(f, "%s", n->name.c_str());
+    fprintf(f, "%s", n->name->getString().c_str());
 }
