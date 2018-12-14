@@ -18,6 +18,5 @@ const std::string& Symbol::getString() const {
 	return str;
 }
 
-int main() {
-	return 0;
-}
+std::unordered_map<std::string, Symbol*> InternTable::table;
+std::list<std::string> InternTable::allStrs;

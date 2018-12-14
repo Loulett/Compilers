@@ -1,0 +1,6 @@
+*.dot
+parser
+*.lexer.*
+*.output
+*.tab.*
+*.gch

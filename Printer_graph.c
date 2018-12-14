@@ -12,7 +12,6 @@ Printer_graph::Printer_graph(FILE* outFile)
 Printer_graph::~Printer_graph()
 {
     fprintf(f, "%s", "}");
-    fclose(f);
 }
 
 

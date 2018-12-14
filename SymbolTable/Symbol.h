@@ -25,7 +25,7 @@ class InternTable
  	static Symbol* getIntern(const std::string& str);
 
  private:
- 	static std::unordered_map<std::string, Symbol*> table = {};
- 	static std::list<std::string> allStrs = {};
+ 	static std::unordered_map<std::string, Symbol*> table;
+ 	static std::list<std::string> allStrs;
 
 };

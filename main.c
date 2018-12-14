@@ -21,7 +21,6 @@ int main(int, char**) {
 
     Printer_graph tree_printer(outfile);
 	tree_printer.visit(goal);
-    tree_printer.~Printer_graph();
 	
 	fclose(myfile);
 	fclose(outfile);
