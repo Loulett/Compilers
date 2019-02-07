@@ -1,26 +1,29 @@
 #pragma once
 #include "INode.h"
 #include <memory>
+#include <variant>
 
-class IntType: public IType {
- public:
-    void Accept(Visitor* v) const;
+struct IntType
+{
+};
+struct BoolType
+{
+};
+struct IntArrType
+{
+};
+struct ClassType
+{
+    IIdentifier* name;
 };
 
-class BoolType: public IType {
- public:
-    void Accept(Visitor* v) const;
-};
 
-class IntArrayType: public IType {
- public:
-    void Accept(Visitor* v) const;
-};
+using TYPE = std::variant<IntType, BoolType, IntArrType, ClassType>;
 
-class Type: public IType {
- public:
- 	Type(IIdentifier* name);
+struct Type: public IType
+{
+    TYPE type;
+    template <typename T>
+    Type(T&& t) : type(t) {}
     void Accept(Visitor* v) const;
- public:
- 	std::unique_ptr<IIdentifier> name;
 };

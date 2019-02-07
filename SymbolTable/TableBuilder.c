@@ -170,16 +170,10 @@ void TableBuilder::visit(const MethodDeclaration* n) {
         curMethod->args[curVar->symbol] = curVar;
     }
 
-    // for (auto& arg: *n->args) {
-    //     arg->Accept(this);
-    // }
     curMethod = nullptr;
 }
 
 
-void TableBuilder::visit(const IntType*) {assert(false);}
-void TableBuilder::visit(const BoolType*) {assert(false);}
-void TableBuilder::visit(const IntArrayType*) {assert(false);}
 void TableBuilder::visit(const Type*) {assert(false);}
 
 void TableBuilder::visit(const IfStatement*) {assert(false);}

@@ -1,6 +1,7 @@
 #include "Printer_graph.h"
 #include "Printer.h"
 #include <cstdio>
+#include <variant>
 
 Printer_graph::Printer_graph(std::string outFile)
 {
@@ -144,46 +145,39 @@ void Printer_graph::visit(const MethodDeclaration* n)
     n->return_expression->Accept(this);
 }
 
-
-void Printer_graph::visit(const IntType*)
-{
-    int cur = nodeNumber;
-    fprintf( f, "%d [label=\"IntType\"];\n", cur);
-
-    nodeNumber++;
-    fprintf( f, "%d [label=\"int\"];\n", nodeNumber );
-    fprintf( f, "%d -- %d;\n", cur, nodeNumber );
-
-}
-void Printer_graph::visit(const BoolType*)
-{
-    int cur = nodeNumber;
-    fprintf( f, "%d [label=\"BoolType\"];\n", cur);
-
-    nodeNumber++;
-    fprintf( f, "%d [label=\"boolean\"];\n", nodeNumber );
-    fprintf( f, "%d -- %d;\n", cur, nodeNumber );
-
-}
-void Printer_graph::visit(const IntArrayType*)
-{
-    int cur = nodeNumber;
-    fprintf( f, "%d [label=\"IntArrayType\"];\n", cur);
-
-    nodeNumber++;
-    fprintf( f, "%d [label=\"int[]\"];\n", nodeNumber );
-    fprintf( f, "%d -- %d;\n", cur, nodeNumber );
-
-}
-
 void Printer_graph::visit(const Type* n)
 {
     int cur = nodeNumber;
-    fprintf( f, "%d [label=\"Type\"];\n", cur);
-    nodeNumber++;
-    fprintf( f, "%d -- %d;\n", cur, nodeNumber );
+    if (std::get_if<IntType>(&(n->type))) {
+        fprintf( f, "%d [label=\"IntType\"];\n", cur);
 
-    n->name->Accept(this);
+        nodeNumber++;
+        fprintf( f, "%d [label=\"int\"];\n", nodeNumber );
+        fprintf( f, "%d -- %d;\n", cur, nodeNumber );
+    }
+    else if (std::get_if<BoolType>(&(n->type))) {
+        fprintf( f, "%d [label=\"BoolType\"];\n", cur);
+
+        nodeNumber++;
+        fprintf( f, "%d [label=\"boolean\"];\n", nodeNumber );
+        fprintf( f, "%d -- %d;\n", cur, nodeNumber );
+
+    }
+    else if (std::get_if<IntArrType>(&(n->type))) {
+        fprintf( f, "%d [label=\"IntArrayType\"];\n", cur);
+
+        nodeNumber++;
+        fprintf( f, "%d [label=\"int[]\"];\n", nodeNumber );
+        fprintf( f, "%d -- %d;\n", cur, nodeNumber );
+    }
+    else {
+        auto classVal = std::get_if<ClassType>(&(n->type));
+        fprintf( f, "%d [label=\"Type\"];\n", cur);
+        nodeNumber++;
+        fprintf( f, "%d -- %d;\n", cur, nodeNumber );
+
+        classVal->name->Accept(this);
+    }
 }
 
 void Printer_graph::visit(const Statement* n)

@@ -26,9 +26,6 @@ struct Visitor
     virtual void visit(const VarDeclaration* n) = 0;
     virtual void visit(const MethodDeclaration* n) = 0;
 
-    virtual void visit(const IntType* n) = 0;
-    virtual void visit(const BoolType* n) = 0;
-    virtual void visit(const IntArrayType* n) = 0;
     virtual void visit(const Type* n) = 0;
 
     virtual void visit(const IfStatement* n) = 0;

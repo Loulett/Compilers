@@ -14,11 +14,11 @@ WARNINGS = -Reverything -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedanti
 		   \
 		   -Wno-padded -Wno-exit-time-destructors
 
-CXXFLAGS=-std=c++11 #${DEBUG_FLAGS}
+CXXFLAGS=-std=c++17 #${DEBUG_FLAGS}
 
 AST=AST/Identifier.c AST/Expression.c AST/Statement.c AST/Type.c AST/VarDeclaration.c AST/MethodDeclaration.c AST/ClassDeclaration.c AST/MainClass.c AST/Goal.c
 
-PRINTER=Printer.c Printer_graph.c
+PRINTER=Printer_graph.c #Printer.c
 
 SYMBOLTABLE=SymbolTable/Symbol.c SymbolTable/TableBuilder.c SymbolTable/ClassInfo.c SymbolTable/MethodInfo.c SymbolTable/VariableInfo.c
 

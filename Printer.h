@@ -15,9 +15,9 @@ public:
     void visit(const VarDeclaration* n) override;
     void visit(const MethodDeclaration* n) override;
 
-    void visit(const IntType* n) override;
-    void visit(const BoolType* n) override;
-    void visit(const IntArrayType* n) override;
+    // void visit(const IntType* n) override;
+    // void visit(const BoolType* n) override;
+    // void visit(const IntArrayType* n) override;
     void visit(const Type* n) override;
 
     void visit(const IfStatement* n) override;

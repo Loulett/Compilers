@@ -231,16 +231,16 @@ statements:
 
 type:
 	T_INT T_Q_LEFT T_Q_RIGHT {
-		$$ = new IntArrayType();
+		$$ = new Type(IntArrType{});
 		}
 	| T_BOOL {
-		$$ = new BoolType();
+		$$ = new Type(BoolType{});
 		}
 	| T_INT {
-		$$ = new IntType();
+		$$ = new Type(IntType{});
 		}
 	| identifier {
-		$$ = new Type($1);
+		$$ = new Type(ClassType{$1});
 		}
 	;
 
