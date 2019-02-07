@@ -1,4 +1,7 @@
 %{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Weverything"
+
 #include <cstdio>
 #include <iostream>
 #include <string>
@@ -37,7 +40,7 @@ void yyerror(Goal** goal, const char* s);
 	char* sval;
 	IIdentifier* ident;
 	IExpression* expr;
-	std::vector<std::unique_ptr<IExpression>>* exprs;	
+	std::vector<std::unique_ptr<IExpression>>* exprs;
 	IStatement* state;
 	std::vector<std::unique_ptr<IStatement>>* states;
 	IType* type;
@@ -350,3 +353,5 @@ identifier:
 void yyerror(Goal** goal, const char* s) {
 	cout << "Parsing error at line: " << yylloc.first_line << " column: " << yylloc.first_column << ". Message: " << s << endl;
 }
+
+#pragma clang diagnostic pop

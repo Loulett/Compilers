@@ -60,4 +60,6 @@ struct Visitor
     virtual void visit(const Expression* n) = 0;
 
     virtual void visit(const Identifier* n) = 0;
+
+    virtual ~Visitor() = default;
 };

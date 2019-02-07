@@ -177,35 +177,35 @@ void TableBuilder::visit(const MethodDeclaration* n) {
 }
 
 
-void TableBuilder::visit(const IntType* n) {assert(false);}
-void TableBuilder::visit(const BoolType* n) {assert(false);}
-void TableBuilder::visit(const IntArrayType* n) {assert(false);}
-void TableBuilder::visit(const Type* n) {assert(false);}
+void TableBuilder::visit(const IntType*) {assert(false);}
+void TableBuilder::visit(const BoolType*) {assert(false);}
+void TableBuilder::visit(const IntArrayType*) {assert(false);}
+void TableBuilder::visit(const Type*) {assert(false);}
 
-void TableBuilder::visit(const IfStatement* n) {assert(false);}
-void TableBuilder::visit(const WhileStatement* n) {assert(false);}
-void TableBuilder::visit(const Statement* n) {assert(false);}
-void TableBuilder::visit(const PrintStatement* n) {assert(false);}
-void TableBuilder::visit(const AssignmentStatement* n) {assert(false);}
-void TableBuilder::visit(const ArrAssignmentStatement* n) {assert(false);}
+void TableBuilder::visit(const IfStatement*) {assert(false);}
+void TableBuilder::visit(const WhileStatement*) {assert(false);}
+void TableBuilder::visit(const Statement*) {assert(false);}
+void TableBuilder::visit(const PrintStatement*) {assert(false);}
+void TableBuilder::visit(const AssignmentStatement*) {assert(false);}
+void TableBuilder::visit(const ArrAssignmentStatement*) {assert(false);}
 
-void TableBuilder::visit(const AndExpression* n) {assert(false);}
-void TableBuilder::visit(const LessExpression* n) {assert(false);}
-void TableBuilder::visit(const PlusExpression* n) {assert(false);}
-void TableBuilder::visit(const MinusExpression* n) {assert(false);}
-void TableBuilder::visit(const MultExpression* n) {assert(false);}
-void TableBuilder::visit(const OrExpression* n) {assert(false);}
-void TableBuilder::visit(const RemainExpression* n) {assert(false);}
-void TableBuilder::visit(const ArrayExpression* n) {assert(false);}
-void TableBuilder::visit(const LengthExpression* n) {assert(false);}
-void TableBuilder::visit(const MethodExpression* n) {assert(false);}
-void TableBuilder::visit(const Integer* n) {assert(false);}
-void TableBuilder::visit(const Bool* n) {assert(false);}
-void TableBuilder::visit(const IdentExpression* n) {assert(false);}
-void TableBuilder::visit(const This* n) {assert(false);}
-void TableBuilder::visit(const NewArrExpression* n) {assert(false);}
-void TableBuilder::visit(const NewExpression* n) {assert(false);}
-void TableBuilder::visit(const NotExpression* n) {assert(false);}
-void TableBuilder::visit(const Expression* n)  {assert(false);}
+void TableBuilder::visit(const AndExpression*) {assert(false);}
+void TableBuilder::visit(const LessExpression*) {assert(false);}
+void TableBuilder::visit(const PlusExpression*) {assert(false);}
+void TableBuilder::visit(const MinusExpression*) {assert(false);}
+void TableBuilder::visit(const MultExpression*) {assert(false);}
+void TableBuilder::visit(const OrExpression*) {assert(false);}
+void TableBuilder::visit(const RemainExpression*) {assert(false);}
+void TableBuilder::visit(const ArrayExpression*) {assert(false);}
+void TableBuilder::visit(const LengthExpression*) {assert(false);}
+void TableBuilder::visit(const MethodExpression*) {assert(false);}
+void TableBuilder::visit(const Integer*) {assert(false);}
+void TableBuilder::visit(const Bool*) {assert(false);}
+void TableBuilder::visit(const IdentExpression*) {assert(false);}
+void TableBuilder::visit(const This*) {assert(false);}
+void TableBuilder::visit(const NewArrExpression*) {assert(false);}
+void TableBuilder::visit(const NewExpression*) {assert(false);}
+void TableBuilder::visit(const NotExpression*) {assert(false);}
+void TableBuilder::visit(const Expression*)  {assert(false);}
 
-void TableBuilder::visit(const Identifier* n)  {assert(false);}
+void TableBuilder::visit(const Identifier*)  {assert(false);}

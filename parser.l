@@ -2,6 +2,9 @@
 %option outfile="parser.lexer.c" header-file="parser.lexer.h"
 
 %{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Weverything"
+
 #include <string>
 #include <iostream>
 #include "parser.tab.h"
@@ -85,3 +88,5 @@ COMMENT "//".*\n
 . {cout << "Invalid syntax: " << yytext << " at line " << yylloc.first_line << ", column " << yylloc.last_column << "\n"; throw std::exception();}
 
 %%
+
+#pragma clang diagnostic pop
