@@ -121,10 +121,6 @@ void Printer_graph::visit(const MethodDeclaration* n)
         nodeNumber++;
         fprintf( f, "%d -- %d;\n", argNumber, nodeNumber );
         ((*(n->args))[i]).second->Accept(this);     //name
-
-        if (i < n->args->size() - 1) {
-            fprintf(f, ", ");
-        }
     }
 
     for (int i = 0; i < n->vars->size(); i++) {
@@ -391,9 +387,6 @@ void Printer_graph::visit(const MethodExpression* n) {
         fprintf( f, "%d -- %d;\n", cur, nodeNumber );
 
         (*n->params)[i]->Accept(this);
-        if (i != n->params->size() - 1) {
-            fprintf(f, ", ");
-        }
     }
 }
 

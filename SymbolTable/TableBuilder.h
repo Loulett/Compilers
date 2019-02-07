@@ -11,18 +11,20 @@ class TableBuilder: Visitor {
 
  private:
  	Table* table;
- 	ClassInfo* cl;
- 	MethodInfo* method;
- 	VariableInfo* var;
- 	std::vector<std::string> errors;
+ 	ClassInfo* curClass;
+ 	MethodInfo* curMethod;
+ 	VariableInfo* curVar;
 
  public:
+    std::vector<std::string> errors;
+    TableBuilder();
+
  	Table* buildTable(Goal* n) {
  		visit(n);
  		return table;
  	}
 
- 	Table();
+    bool hasClass(Symbol* className);
 
  	void visit(const Goal* n) override;
     void visit(const MainClass* n) override;

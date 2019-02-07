@@ -197,6 +197,7 @@ NotExpression::NotExpression(IExpression* expr) {
 	if(expr == nullptr) {
 		std::cout << "While initializing NotExpression, one of params is nullptr.\n";
 	}
+	this->expr = std::unique_ptr<IExpression>(expr);
 }
 void NotExpression::Accept(Visitor* v) const
 {

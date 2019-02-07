@@ -6,15 +6,15 @@ parser.tab.c parser.tab.h: parser.y
 parser.lexer.c parser.lexer.h: parser.l parser.tab.c parser.tab.h
 	flex parser.l
 
-FLAGS=-fsanitize=address,undefined -g 
+FLAGS=-fsanitize=address,undefined -g
 
-CXXFLAGS=-std=c++11 ${FLAGS}
+CXXFLAGS=-std=c++11
 
 AST=AST/Identifier.c AST/Expression.c AST/Statement.c AST/Type.c AST/VarDeclaration.c AST/MethodDeclaration.c AST/ClassDeclaration.c AST/MainClass.c AST/Goal.c
 
 PRINTER=Printer.c Printer_graph.c
 
-SYMBOLTABLE=SymbolTable/Symbol.c
+SYMBOLTABLE=SymbolTable/Symbol.c SymbolTable/TableBuilder.c SymbolTable/ClassInfo.c SymbolTable/MethodInfo.c SymbolTable/VariableInfo.c
 
 parser: parser.lexer.c parser.lexer.h parser.tab.c parser.tab.h main.c
 	g++ ${CXXFLAGS} main.c parser.tab.c parser.lexer.c ${AST} ${PRINTER} ${SYMBOLTABLE} -o parser

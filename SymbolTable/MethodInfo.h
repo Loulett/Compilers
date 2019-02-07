@@ -1,14 +1,15 @@
+#pragma once
 #include "Symbol.h"
 #include "../AST/Type.h"
-#include "VaribleInfo.h"
+#include "VariableInfo.h"
 #include <unordered_map>
 
 class MethodInfo {
  public:
- 	MethodInfo(Type* type_, Symbol* name_)
+ 	MethodInfo(Type* type_, Symbol* name_);
 
  	Type* type;
  	Symbol* name;
- 	std::unordered_map<Symbol*, VaribleInfo*> args;
- 	std::unordered_map<Symbol*, VaribleInfo*> locals;
+ 	std::unordered_map<Symbol*, VariableInfo*> args;
+ 	std::unordered_map<Symbol*, VariableInfo*> locals;
 };

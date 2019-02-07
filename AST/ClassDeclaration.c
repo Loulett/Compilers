@@ -8,6 +8,7 @@ ClassDeclaration::ClassDeclaration(IIdentifier* class_name, IIdentifier* extends
 		std::cout << "Nullptr encountered in ClassDeclaration initializer.\n";
 	}
 	this->class_name = std::unique_ptr<IIdentifier>(class_name);
+    this->extends_class_name = std::unique_ptr<IIdentifier>(extends_class_name);
 	this->vars = std::unique_ptr<std::vector<std::unique_ptr<IVarDeclaration>>>(vars);
 	this->methods = std::unique_ptr<std::vector<std::unique_ptr<IMethodDeclaration>>>(methods);
 }

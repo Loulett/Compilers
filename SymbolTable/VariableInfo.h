@@ -4,6 +4,7 @@
 
 class VariableInfo {
  public:
+ 	VariableInfo() = default;
  	VariableInfo(Type* type_, Symbol* symbol_);
 
  	Type* type;
