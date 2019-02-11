@@ -66,8 +66,8 @@ void TableBuilder::visit(const Goal* n) {
                     }
                     if (auto classVal = std::get_if<ClassType>(&(met.second->type->type))) {
                         if (table->classes.find(classVal->name) == table->classes.end()) {
-                            std::cout << "error: type of arg was not declared yet\n";
-                            errors.push_back("error: type of arg was not declared yet\n");
+                            std::cout << "error: type of method was not declared yet\n";
+                            errors.push_back("error: type of method was not declared yet\n");
                         }
                     }
                 }
@@ -97,8 +97,8 @@ void TableBuilder::visit(const Goal* n) {
             }
             if (auto classVal = std::get_if<ClassType>(&(met.second->type->type))) {
                 if (table->classes.find(classVal->name) == table->classes.end()) {
-                    std::cout << "error: type of arg was not declared yet\n";
-                    errors.push_back("error: type of arg was not declared yet\n");
+                    std::cout << "error: type of method was not declared yet\n";
+                    errors.push_back("error: type of method was not declared yet\n");
                 }
             }
         }
@@ -189,18 +189,6 @@ void TableBuilder::visit(const VarDeclaration* n) {
 void TableBuilder::visit(const MethodDeclaration* n) {
     // Type problems
 	curMethod = new MethodInfo(dynamic_cast<Type*>(n->return_type.get()), dynamic_cast<Identifier*>(n->name.get())->name);
-	if (curClass->HasMethod(curMethod->name)) {
-        auto method = curClass->GetMethod(curMethod->name);
-        if (method->args.size() != n->args->size()) {
-            // std::string error = string_format(
-            //         "Method %s was already declared in class %s.\n",
-            //         curMethod->name->getString().c_str(),
-            //         curClass->name->getString().c_str());
-            std::cout << "error: Method was already declared.\n";
-            errors.push_back("error: Method was already declared.\n");
-        }
-    }
-    curClass->methods[curMethod->name] = curMethod;
 
     for (auto& var: *n->vars) {
         var->Accept(this);
@@ -215,10 +203,38 @@ void TableBuilder::visit(const MethodDeclaration* n) {
         curMethod->args[curVar->symbol] = curVar;
     }
 
+    if (curClass->HasMethod(curMethod->name)) {
+        auto method = curClass->GetMethod(curMethod->name);
+        if (method->args.size() != curMethod->args.size()) {
+            std::cout << "error: Method was already declared.\n";
+            errors.push_back("error: Method was already declared.\n");
+        }
+        else {
+            for (auto arg1 = method->args.begin(), arg2 = curMethod->args.begin();
+                arg1 != method->args.end();
+                arg1++, arg2++) {
+                if (arg1->second->type->type != arg2->second->type->type) {
+                    std::cout << "error: method already was declared -- 2\n";
+                    errors.push_back("error: method already was declared -- 2\n");
+                    break;
+                }
+            }
+        }
+    }
+
+    curClass->methods[curMethod->name] = curMethod;
+
     for (auto& stat: *n->statements) {
         stat->Accept(this);
     }
 
+    n->return_expression->Accept(this);
+    if (valExpr && curType != *(curMethod->type)) {
+        std::cout << "error: Wrong type returned\n";
+        errors.push_back("error: Wrong type returned\n");
+    }
+    valExpr = true;
+    curType = Type(NoneType{});
     curMethod = nullptr;
 }
 
@@ -256,6 +272,10 @@ void TableBuilder::visit(const Statement* n) {
 
 void TableBuilder::visit(const PrintStatement* n) {
     n->print->Accept(this);
+    if (valExpr && curType != Type(IntType{})) {
+        std::cout << "error: wrong type for printing\n";
+        errors.push_back("error: wrong type for printing\n");
+    }
 }
 
 void TableBuilder::visit(const AssignmentStatement* n) {
@@ -452,6 +472,8 @@ void TableBuilder::visit(const LengthExpression* n) {
 void TableBuilder::visit(const MethodExpression* n) {
     n->class_name->Accept(this);
     if (curType == Type(IntType{}) || curType == Type(NoneType{}) || curType == Type(IntArrType{}) || curType == Type(BoolType{})) {
+        std::cout << "error: calling a method from a primitive type.\n";
+        errors.push_back("error: calling a method from a primitive type.\n");
         valExpr = false;
         return;
     }
