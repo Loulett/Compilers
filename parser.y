@@ -240,7 +240,7 @@ type:
 		$$ = new Type(IntType{});
 		}
 	| identifier {
-		$$ = new Type(ClassType{$1});
+		$$ = new Type(ClassType{dynamic_cast<Identifier*>($1)->name});
 		}
 	;
 

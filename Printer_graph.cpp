@@ -175,8 +175,9 @@ void Printer_graph::visit(const Type* n)
         fprintf( f, "%d [label=\"Type\"];\n", cur);
         nodeNumber++;
         fprintf( f, "%d -- %d;\n", cur, nodeNumber );
+        fprintf( f, "%d [label=\"%s\"];\n", nodeNumber, classVal->name->getString().c_str());
 
-        classVal->name->Accept(this);
+        // classVal->name->Accept(this);
     }
 }
 

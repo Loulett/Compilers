@@ -3,4 +3,3 @@ parser
 *.lexer.*
 *.output
 *.tab.*
-*.gch

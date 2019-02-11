@@ -34,11 +34,12 @@ class QS{
     int j ;
     int nt;
     int t ;
+    QS QS;
     boolean cont01;
     boolean cont02;
     int aux03 ;
-    t = 0 ;
-    if (left - right){           // HERE
+    QS = 1 ;    // HERE
+    if (left < right){
         v = number[right] ;
         i = left - 1 ;
         j = right ;

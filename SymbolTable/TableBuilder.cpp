@@ -58,14 +58,14 @@ void TableBuilder::visit(const Goal* n) {
                     }
                     for (auto& arg: met.second->args) {
                         if (auto classVal = std::get_if<ClassType>(&(arg.second->type->type))) {
-                            if (table->classes.find(dynamic_cast<Identifier*>(classVal->name)->name) == table->classes.end()) {
+                            if (table->classes.find(classVal->name) == table->classes.end()) {
                                 std::cout << "error: type of arg was not declared yet\n";
                                 errors.push_back("error: type of arg was not declared yet\n");
                             }
                         }
                     }
                     if (auto classVal = std::get_if<ClassType>(&(met.second->type->type))) {
-                        if (table->classes.find(dynamic_cast<Identifier*>(classVal->name)->name) == table->classes.end()) {
+                        if (table->classes.find(classVal->name) == table->classes.end()) {
                             std::cout << "error: type of arg was not declared yet\n";
                             errors.push_back("error: type of arg was not declared yet\n");
                         }
@@ -89,14 +89,14 @@ void TableBuilder::visit(const Goal* n) {
         for (auto& met: curClass->methods) {
             for (auto& arg: met.second->args) {
                 if (auto classVal = std::get_if<ClassType>(&(arg.second->type->type))) {
-                    if (table->classes.find(dynamic_cast<Identifier*>(classVal->name)->name) == table->classes.end()) {
+                    if (table->classes.find(classVal->name) == table->classes.end()) {
                         std::cout << "error: type of arg was not declared yet\n";
                         errors.push_back("error: type of arg was not declared yet\n");
                     }
                 }
             }
             if (auto classVal = std::get_if<ClassType>(&(met.second->type->type))) {
-                if (table->classes.find(dynamic_cast<Identifier*>(classVal->name)->name) == table->classes.end()) {
+                if (table->classes.find(classVal->name) == table->classes.end()) {
                     std::cout << "error: type of arg was not declared yet\n";
                     errors.push_back("error: type of arg was not declared yet\n");
                 }
@@ -150,8 +150,11 @@ void TableBuilder::visit(const ClassDeclaration* n) {
 	for (auto& varDeclaration: *(n->vars)) {
         varDeclaration->Accept(this);
     }
-    for (auto& methodDeclaration: *(n->methods)) {
-        methodDeclaration->Accept(this);
+    // for (auto& methodDeclaration: *(n->methods)) {
+    //     methodDeclaration->Accept(this);
+    // }
+    for (auto methodDeclaration = n->methods->rbegin(); methodDeclaration != n->methods->rend(); methodDeclaration++) {
+        methodDeclaration->get()->Accept(this);
     }
     curClass = nullptr;
 }
@@ -257,16 +260,23 @@ void TableBuilder::visit(const PrintStatement* n) {
 
 void TableBuilder::visit(const AssignmentStatement* n) {
     n->expr->Accept(this);
-    if (curMethod->locals.find(dynamic_cast<Identifier*>(n->var.get())->name) == curMethod->locals.end()) {
-        std::cout << "error: variable doesn't exist\n";
-        errors.push_back("error: variable doesn't exist\n");
-    }
-    else {
+    if (curMethod->locals.find(dynamic_cast<Identifier*>(n->var.get())->name) != curMethod->locals.end()) {
         auto var = curMethod->locals.find(dynamic_cast<Identifier*>(n->var.get())->name)->second;
         if (valExpr && curType != *(var->type)) {
             std::cout << "error: type mismatch while assigning.\n";
             errors.push_back("error: type mismatch while assigning.\n");
         }
+    }
+    else if (curClass->vars.find(dynamic_cast<Identifier*>(n->var.get())->name) != curClass->vars.end()) {
+        auto var = curClass->vars.find(dynamic_cast<Identifier*>(n->var.get())->name)->second;
+        if (valExpr && curType != *(var->type)) {
+            std::cout << "error: type mismatch while assigning.\n";
+            errors.push_back("error: type mismatch while assigning.\n");
+        }
+    }
+    else {
+        std::cout << "error: variable " << dynamic_cast<Identifier*>(n->var.get())->name->getString() << " doesn't exist\n";
+        errors.push_back("error: variable doesn't exist\n");
     }
     valExpr = true;
     curType = Type(NoneType{});
@@ -288,8 +298,9 @@ void TableBuilder::visit(const ArrAssignmentStatement* n) {
     }
     valExpr = true;
     curType = Type(NoneType{});
-    if (curMethod->locals.find(dynamic_cast<Identifier*>(n->var.get())->name) == curMethod->locals.end()) {
-        std::cout << "error: variable doesn't exist\n";
+    if (curMethod->locals.find(dynamic_cast<Identifier*>(n->var.get())->name) == curMethod->locals.end() &&
+        curClass->vars.find(dynamic_cast<Identifier*>(n->var.get())->name) == curClass->vars.end()) {
+        std::cout << "error: variable " << dynamic_cast<Identifier*>(n->var.get())->name->getString() << " doesn't exist 22\n";
         errors.push_back("error: variable doesn't exist\n");
     }
 }
@@ -314,17 +325,17 @@ void TableBuilder::visit(const LessExpression* n) {
     n->expr1->Accept(this);
     if (curType != Type(IntType{})) {
         valExpr = false;
-        std::cout << "error: type mismatch.\n";
+        std::cout << "error: type mismatch in less 1.\n";
         errors.push_back("error: type mismatch.\n");
     }
     curType = Type(NoneType{});
     n->expr2->Accept(this);
     if (curType != Type(IntType{})) {
         valExpr = false;
-        std::cout << "error: type mismatch.\n";
+        std::cout << "error: type mismatch in less 2.\n";
         errors.push_back("error: type mismatch.\n");
     }
-    curType = Type(IntType{});
+    curType = Type(BoolType{});
 }
 void TableBuilder::visit(const PlusExpression* n) {
     n->expr1->Accept(this);
@@ -444,6 +455,21 @@ void TableBuilder::visit(const MethodExpression* n) {
         valExpr = false;
         return;
     }
+    if (curClass->methods.find(dynamic_cast<Identifier*>(n->method.get())->name) == curClass->methods.end()) {
+        valExpr = false;
+        std::cout << "error: Method " << dynamic_cast<Identifier*>(n->method.get())->name->getString() << " doesn't exist.\n";
+        errors.push_back("error: Method doesn't exist.\n");
+        return;
+    }
+    auto met = curClass->methods[dynamic_cast<Identifier*>(n->method.get())->name];
+    if (met->args.size() != n->params->size()) {
+        valExpr = false;
+        std::cout << "error: Wrong args.\n";
+        errors.push_back("error: Wrong args.\n");
+        return;
+    }
+    curType = *(met->type);
+
 }
 
 void TableBuilder::visit(const Integer*) {
@@ -459,7 +485,7 @@ void TableBuilder::visit(const IdentExpression* n) {
 }
 
 void TableBuilder::visit(const This*) {
-    // curType = Type(ClassType{curClass->name});
+    curType = Type(ClassType{curClass->name});
 }
 
 void TableBuilder::visit(const NewArrExpression* n) {
@@ -483,7 +509,7 @@ void TableBuilder::visit(const NotExpression* n) {
     n->expr->Accept(this);
     if (curType != Type(BoolType{})) {
         valExpr = false;
-        std::cout << "error: type mismatch.\n";
+        std::cout << "error: type mismatch in not.\n";
         errors.push_back("error: type mismatch.\n");
     }
     curType = Type(BoolType{});
@@ -493,5 +519,26 @@ void TableBuilder::visit(const Expression* n)  {
 }
 
 void TableBuilder::visit(const Identifier* n)  {
-    //
+    if (curClass->vars.find(n->name) != curClass->vars.end()) {
+        auto var = curClass->vars[n->name];
+        curType = *(var->type);
+    }
+    else if (curMethod->locals.find(n->name) != curMethod->locals.end()) {
+        auto var = curMethod->locals[n->name];
+        curType = *(var->type);
+    }
+    else if (curMethod->args.find(n->name) != curMethod->args.end()) {
+        auto var = curMethod->args[n->name];
+        curType = *(var->type);
+    }
+    else if (table->classes.find(n->name) != table->classes.end()) {
+        auto cl = table->classes[n->name];
+        curType = Type(ClassType{cl->name});
+        curClass = cl;
+    }
+    else {
+        valExpr = false;
+        std::cout << "error: Identifier "<< n->name->getString() << " doesn't exist.\n";
+        errors.push_back("error: Identifier doesn't exist.\n");
+    }
 }

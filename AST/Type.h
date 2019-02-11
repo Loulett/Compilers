@@ -44,12 +44,12 @@ struct IntArrType
 struct ClassType
 {
     bool operator ==(const ClassType& t) const {
-        return dynamic_cast<Identifier*>(name)->name == dynamic_cast<Identifier*>(t.name)->name;
+        return name == t.name;
     }
     bool operator !=(const ClassType& t) const {
-        return dynamic_cast<Identifier*>(name)->name != dynamic_cast<Identifier*>(t.name)->name;
+        return name != t.name;
     }
-    IIdentifier* name;
+    Symbol* name;
 };
 
 
