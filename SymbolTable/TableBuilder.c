@@ -3,7 +3,7 @@
 #include <cassert>
 #include <iostream>
 
-TableBuilder::TableBuilder(): table(new Table), curClass(nullptr), curMethod(nullptr), curVar(nullptr) {}
+TableBuilder::TableBuilder(): table(new Table), curClass(nullptr), curMethod(nullptr), curVar(nullptr), curType(TYPE(NoneType{})), valExpr(true) {}
 
 bool TableBuilder::hasClass(Symbol* className)
 {
@@ -11,10 +11,10 @@ bool TableBuilder::hasClass(Symbol* className)
 }
 
 void TableBuilder::visit(const Goal* n) {
-	n->main_class->Accept(this);
 	for (auto& classDecl: *(n->class_declarations)) {
 		classDecl->Accept(this);
 	}
+    n->main_class->Accept(this);
 
     for (auto& classDecl: *n->class_declarations) {
         curClass = table->classes[dynamic_cast<Identifier*>(dynamic_cast<ClassDeclaration*>(classDecl.get())->class_name.get())->name];
@@ -122,6 +122,7 @@ void TableBuilder::visit(const MainClass* n) {
     curVar = new VariableInfo(nullptr, dynamic_cast<Identifier*>(n->arg.get())->name);
     curMethod->args[curVar->symbol] = curVar;
     curClass->methods[curMethod->name] = curMethod;
+    n->statement->Accept(this);
 
 	// method = new MethodInfo(getIndent("main"), nullptr);
 	// var = new VariableInfo(nullptr, n->arg->name)
@@ -211,36 +212,286 @@ void TableBuilder::visit(const MethodDeclaration* n) {
         curMethod->args[curVar->symbol] = curVar;
     }
 
+    for (auto& stat: *n->statements) {
+        stat->Accept(this);
+    }
+
     curMethod = nullptr;
 }
 
 
 void TableBuilder::visit(const Type*) {assert(false);}
 
-void TableBuilder::visit(const IfStatement*) {assert(false);}
-void TableBuilder::visit(const WhileStatement*) {assert(false);}
-void TableBuilder::visit(const Statement*) {assert(false);}
-void TableBuilder::visit(const PrintStatement*) {assert(false);}
-void TableBuilder::visit(const AssignmentStatement*) {assert(false);}
-void TableBuilder::visit(const ArrAssignmentStatement*) {assert(false);}
+void TableBuilder::visit(const IfStatement* n) {
+    n->clause->Accept(this);
+    if (valExpr && curType != Type(BoolType{})) {
+        std::cout << "error: if clause should have bool type.\n";
+        errors.push_back("error: if clause should have bool type.\n");
+    }
+    valExpr = true;
+    curType = Type(NoneType{});
+    n->true_statement->Accept(this);
+    n->false_statement->Accept(this);
 
-void TableBuilder::visit(const AndExpression*) {assert(false);}
-void TableBuilder::visit(const LessExpression*) {assert(false);}
-void TableBuilder::visit(const PlusExpression*) {assert(false);}
-void TableBuilder::visit(const MinusExpression*) {assert(false);}
-void TableBuilder::visit(const MultExpression*) {assert(false);}
-void TableBuilder::visit(const OrExpression*) {assert(false);}
-void TableBuilder::visit(const RemainExpression*) {assert(false);}
-void TableBuilder::visit(const ArrayExpression*) {assert(false);}
-void TableBuilder::visit(const LengthExpression*) {assert(false);}
-void TableBuilder::visit(const MethodExpression*) {assert(false);}
-void TableBuilder::visit(const Integer*) {assert(false);}
-void TableBuilder::visit(const Bool*) {assert(false);}
-void TableBuilder::visit(const IdentExpression*) {assert(false);}
-void TableBuilder::visit(const This*) {assert(false);}
-void TableBuilder::visit(const NewArrExpression*) {assert(false);}
-void TableBuilder::visit(const NewExpression*) {assert(false);}
-void TableBuilder::visit(const NotExpression*) {assert(false);}
-void TableBuilder::visit(const Expression*)  {assert(false);}
+}
+void TableBuilder::visit(const WhileStatement* n) {
+    n->clause->Accept(this);
+    if (valExpr && curType != Type(BoolType{})) {
+        std::cout << "error: while clause should have bool type.\n";
+        errors.push_back("error: while clause should have bool type.\n");
+    }
+    valExpr = true;
+    curType = Type(NoneType{});
+    n->body->Accept(this);
+}
 
-void TableBuilder::visit(const Identifier*)  {assert(false);}
+void TableBuilder::visit(const Statement* n) {
+    for (auto& stat: *(n->statements)) {
+        stat->Accept(this);
+    }
+}
+
+void TableBuilder::visit(const PrintStatement* n) {
+    n->print->Accept(this);
+}
+
+void TableBuilder::visit(const AssignmentStatement* n) {
+    n->expr->Accept(this);
+    if (curMethod->locals.find(dynamic_cast<Identifier*>(n->var.get())->name) == curMethod->locals.end()) {
+        std::cout << "error: variable doesn't exist\n";
+        errors.push_back("error: variable doesn't exist\n");
+    }
+    else {
+        auto var = curMethod->locals.find(dynamic_cast<Identifier*>(n->var.get())->name)->second;
+        if (valExpr && curType != *(var->type)) {
+            std::cout << "error: type mismatch while assigning.\n";
+            errors.push_back("error: type mismatch while assigning.\n");
+        }
+    }
+    valExpr = true;
+    curType = Type(NoneType{});
+}
+
+void TableBuilder::visit(const ArrAssignmentStatement* n) {
+    n->num->Accept(this);
+    if (valExpr && curType != Type(IntType{})) {
+        std::cout << "error: array index can only be an integer.\n";
+        errors.push_back("error: array index can only be an integer.\n");
+    }
+    valExpr = true;
+    curType = Type(NoneType{});
+
+    n->expr->Accept(this);
+    if (valExpr && curType != Type(IntType{})) {
+        std::cout << "error: type mismatch while assigning.\n";
+        errors.push_back("error: type mismatch while assigning.\n");
+    }
+    valExpr = true;
+    curType = Type(NoneType{});
+    if (curMethod->locals.find(dynamic_cast<Identifier*>(n->var.get())->name) == curMethod->locals.end()) {
+        std::cout << "error: variable doesn't exist\n";
+        errors.push_back("error: variable doesn't exist\n");
+    }
+}
+
+void TableBuilder::visit(const AndExpression* n) {
+    n->expr1->Accept(this);
+    if (curType != Type(BoolType{})) {
+        valExpr = false;
+        std::cout << "error: type mismatch.\n";
+        errors.push_back("error: type mismatch.\n");
+    }
+    curType = Type(NoneType{});
+    n->expr2->Accept(this);
+    if (curType != Type(BoolType{})) {
+        valExpr = false;
+        std::cout << "error: type mismatch.\n";
+        errors.push_back("error: type mismatch.\n");
+    }
+    curType = Type(BoolType{});
+}
+void TableBuilder::visit(const LessExpression* n) {
+    n->expr1->Accept(this);
+    if (curType != Type(IntType{})) {
+        valExpr = false;
+        std::cout << "error: type mismatch.\n";
+        errors.push_back("error: type mismatch.\n");
+    }
+    curType = Type(NoneType{});
+    n->expr2->Accept(this);
+    if (curType != Type(IntType{})) {
+        valExpr = false;
+        std::cout << "error: type mismatch.\n";
+        errors.push_back("error: type mismatch.\n");
+    }
+    curType = Type(IntType{});
+}
+void TableBuilder::visit(const PlusExpression* n) {
+    n->expr1->Accept(this);
+    if (curType != Type(IntType{})) {
+        valExpr = false;
+        std::cout << "error: type mismatch.\n";
+        errors.push_back("error: type mismatch.\n");
+    }
+    curType = Type(NoneType{});
+    n->expr2->Accept(this);
+    if (curType != Type(IntType{})) {
+        valExpr = false;
+        std::cout << "error: type mismatch.\n";
+        errors.push_back("error: type mismatch.\n");
+    }
+    curType = Type(IntType{});
+}
+
+void TableBuilder::visit(const MinusExpression* n) {
+    n->expr1->Accept(this);
+    if (curType != Type(IntType{})) {
+        valExpr = false;
+        std::cout << "error: type mismatch.\n";
+        errors.push_back("error: type mismatch.\n");
+    }
+    curType = Type(NoneType{});
+    n->expr2->Accept(this);
+    if (curType != Type(IntType{})) {
+        valExpr = false;
+        std::cout << "error: type mismatch.\n";
+        errors.push_back("error: type mismatch.\n");
+    }
+    curType = Type(IntType{});
+}
+
+void TableBuilder::visit(const MultExpression* n) {
+    n->expr1->Accept(this);
+    if (curType != Type(IntType{})) {
+        valExpr = false;
+        std::cout << "error: type mismatch.\n";
+        errors.push_back("error: type mismatch.\n");
+    }
+    curType = Type(NoneType{});
+    n->expr2->Accept(this);
+    if (curType != Type(IntType{})) {
+        valExpr = false;
+        std::cout << "error: type mismatch.\n";
+        errors.push_back("error: type mismatch.\n");
+    }
+    curType = Type(IntType{});
+}
+
+void TableBuilder::visit(const OrExpression* n) {
+    n->expr1->Accept(this);
+    if (curType != Type(BoolType{})) {
+        valExpr = false;
+        std::cout << "error: type mismatch.\n";
+        errors.push_back("error: type mismatch.\n");
+    }
+    curType = Type(NoneType{});
+    n->expr2->Accept(this);
+    if (curType != Type(BoolType{})) {
+        valExpr = false;
+        std::cout << "error: type mismatch.\n";
+        errors.push_back("error: type mismatch.\n");
+    }
+    curType = Type(BoolType{});
+}
+
+void TableBuilder::visit(const RemainExpression* n) {
+    n->expr1->Accept(this);
+    if (curType != Type(IntType{})) {
+        valExpr = false;
+        std::cout << "error: type mismatch.\n";
+        errors.push_back("error: type mismatch.\n");
+    }
+    curType = Type(NoneType{});
+    n->expr2->Accept(this);
+    if (curType != Type(IntType{})) {
+        valExpr = false;
+        std::cout << "error: type mismatch.\n";
+        errors.push_back("error: type mismatch.\n");
+    }
+    curType = Type(IntType{});
+}
+
+void TableBuilder::visit(const ArrayExpression* n) {
+    n->expr1->Accept(this);
+    if (curType != Type(IntArrType{})) {
+        valExpr = false;
+        std::cout << "error: type mismatch.\n";
+        errors.push_back("error: type mismatch.\n");
+    }
+    curType = Type(NoneType{});
+    n->expr2->Accept(this);
+    if (curType != Type(IntType{})) {
+        valExpr = false;
+        std::cout << "error: type mismatch.\n";
+        errors.push_back("error: type mismatch.\n");
+    }
+    curType = Type(IntType{});
+}
+
+void TableBuilder::visit(const LengthExpression* n) {
+    n->expr->Accept(this);
+    if (curType != Type(IntArrType{})) {
+        valExpr = false;
+        std::cout << "error: type mismatch.\n";
+        errors.push_back("error: type mismatch.\n");
+    }
+    curType = Type(IntType{});
+}
+
+void TableBuilder::visit(const MethodExpression* n) {
+    n->class_name->Accept(this);
+    if (curType == Type(IntType{}) || curType == Type(NoneType{}) || curType == Type(IntArrType{}) || curType == Type(BoolType{})) {
+        valExpr = false;
+        return;
+    }
+}
+
+void TableBuilder::visit(const Integer*) {
+    curType = Type(IntType{});
+}
+
+void TableBuilder::visit(const Bool*) {
+    curType = Type(BoolType{});
+}
+
+void TableBuilder::visit(const IdentExpression* n) {
+    n->ident->Accept(this);
+}
+
+void TableBuilder::visit(const This*) {
+    // curType = Type(ClassType{curClass->name});
+}
+
+void TableBuilder::visit(const NewArrExpression* n) {
+    n->expr->Accept(this);
+    if (curType != Type(IntType{})) {
+        valExpr = false;
+        std::cout << "error: type mismatch.\n";
+        errors.push_back("error: type mismatch.\n");
+    }
+    curType = Type(IntArrType{});
+}
+
+void TableBuilder::visit(const NewExpression* n) {
+    n->ident->Accept(this);
+    if (curType == Type(IntType{}) || curType == Type(NoneType{}) || curType == Type(IntArrType{}) || curType == Type(BoolType{})) {
+        valExpr = false;
+    }
+}
+
+void TableBuilder::visit(const NotExpression* n) {
+    n->expr->Accept(this);
+    if (curType != Type(BoolType{})) {
+        valExpr = false;
+        std::cout << "error: type mismatch.\n";
+        errors.push_back("error: type mismatch.\n");
+    }
+    curType = Type(BoolType{});
+}
+void TableBuilder::visit(const Expression* n)  {
+    n->expr->Accept(this);
+}
+
+void TableBuilder::visit(const Identifier* n)  {
+    //
+}

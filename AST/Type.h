@@ -4,6 +4,16 @@
 #include <memory>
 #include <variant>
 
+struct NoneType
+{
+   bool operator ==(const NoneType&) const {
+        return true;
+    }
+    bool operator !=(const NoneType&) const {
+        return false;
+    }
+};
+
 struct IntType
 {
     bool operator ==(const IntType&) const {
@@ -43,7 +53,7 @@ struct ClassType
 };
 
 
-using TYPE = std::variant<IntType, BoolType, IntArrType, ClassType>;
+using TYPE = std::variant<NoneType, IntType, BoolType, IntArrType, ClassType>;
 
 struct Type: public IType
 {
@@ -51,4 +61,10 @@ struct Type: public IType
     template <typename T>
     Type(T&& t) : type(t) {}
     void Accept(Visitor* v) const;
+    bool operator ==(const Type& t) const {
+        return type == t.type;
+    }
+    bool operator !=(const Type& t) const {
+        return type != t.type;
+    }
 };

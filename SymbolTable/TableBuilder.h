@@ -14,6 +14,8 @@ class TableBuilder: Visitor {
  	ClassInfo* curClass;
  	MethodInfo* curMethod;
  	VariableInfo* curVar;
+    Type curType;
+    bool valExpr;
 
  public:
     std::vector<std::string> errors;
