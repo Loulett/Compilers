@@ -36,13 +36,38 @@ void TableBuilder::visit(const Goal* n) {
                     if (curClass->HasMethod(met.second->name)) {
                         auto method = curClass->GetMethod(met.second->name);
                         // TODO : Add type checking
-                        if (method->args.size() != met.second->args.size()) {
+                        if (method->type->type != met.second->type->type ||
+                            method->args.size() != met.second->args.size()) {
                             // std::string error = string_format(
                             //         "Method %s was already declared in class %s.\n",
                             //         met.second->name->getString().c_str(),
                             //         curClass->name->getString().c_str());
-                            std::cout << "error: method already was declared\n";
-                            errors.push_back("error: method already was declared\n");
+                            std::cout << "error: method already was declared -- 1\n";
+                            errors.push_back("error: method already was declared -- 1\n");
+                        } else {
+                            for (auto arg1 = method->args.begin(), arg2 = met.second->args.begin();
+                                arg1 != method->args.end();
+                                arg1++, arg2++) {
+                                if (arg1->second->type->type != arg2->second->type->type) {
+                                    std::cout << "error: method already was declared -- 2\n";
+                                    errors.push_back("error: method already was declared -- 2\n");
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    for (auto& arg: met.second->args) {
+                        if (auto classVal = std::get_if<ClassType>(&(arg.second->type->type))) {
+                            if (table->classes.find(dynamic_cast<Identifier*>(classVal->name)->name) == table->classes.end()) {
+                                std::cout << "error: type of arg was not declared yet\n";
+                                errors.push_back("error: type of arg was not declared yet\n");
+                            }
+                        }
+                    }
+                    if (auto classVal = std::get_if<ClassType>(&(met.second->type->type))) {
+                        if (table->classes.find(dynamic_cast<Identifier*>(classVal->name)->name) == table->classes.end()) {
+                            std::cout << "error: type of arg was not declared yet\n";
+                            errors.push_back("error: type of arg was not declared yet\n");
                         }
                     }
                 }
@@ -61,6 +86,22 @@ void TableBuilder::visit(const Goal* n) {
             errors.push_back("error: class extension\n");
         }
 
+        for (auto& met: curClass->methods) {
+            for (auto& arg: met.second->args) {
+                if (auto classVal = std::get_if<ClassType>(&(arg.second->type->type))) {
+                    if (table->classes.find(dynamic_cast<Identifier*>(classVal->name)->name) == table->classes.end()) {
+                        std::cout << "error: type of arg was not declared yet\n";
+                        errors.push_back("error: type of arg was not declared yet\n");
+                    }
+                }
+            }
+            if (auto classVal = std::get_if<ClassType>(&(met.second->type->type))) {
+                if (table->classes.find(dynamic_cast<Identifier*>(classVal->name)->name) == table->classes.end()) {
+                    std::cout << "error: type of arg was not declared yet\n";
+                    errors.push_back("error: type of arg was not declared yet\n");
+                }
+            }
+        }
         curClass = nullptr;
     }
 }
@@ -116,7 +157,7 @@ void TableBuilder::visit(const ClassDeclaration* n) {
 
 void TableBuilder::visit(const VarDeclaration* n) {
     // Type problems
-	curVar = new VariableInfo(nullptr, dynamic_cast<Identifier*>(n->name.get())->name);
+	curVar = new VariableInfo(dynamic_cast<Type*>(n->type.get()), dynamic_cast<Identifier*>(n->name.get())->name);
 	if (curMethod != nullptr) {
         if (curMethod->locals.find(curVar->symbol) != curMethod->locals.end()) {
             // std::string error = string_format(
@@ -143,7 +184,7 @@ void TableBuilder::visit(const VarDeclaration* n) {
 
 void TableBuilder::visit(const MethodDeclaration* n) {
     // Type problems
-	curMethod = new MethodInfo(nullptr, dynamic_cast<Identifier*>(n->name.get())->name);
+	curMethod = new MethodInfo(dynamic_cast<Type*>(n->return_type.get()), dynamic_cast<Identifier*>(n->name.get())->name);
 	if (curClass->HasMethod(curMethod->name)) {
         auto method = curClass->GetMethod(curMethod->name);
         if (method->args.size() != n->args->size()) {
@@ -162,7 +203,7 @@ void TableBuilder::visit(const MethodDeclaration* n) {
     }
 
     for (auto& arg: *n->args) {
-        curVar = new VariableInfo(nullptr, dynamic_cast<Identifier*>(arg.second.get())->name);
+        curVar = new VariableInfo(dynamic_cast<Type*>(arg.first.get()), dynamic_cast<Identifier*>(arg.second.get())->name);
         if (curMethod->args.find(curVar->symbol) != curMethod->args.end()) {
             std::cout << "error: Arg was already declared.\n";
             errors.push_back("error: Arg was already declared.\n");

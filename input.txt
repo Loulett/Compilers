@@ -1,60 +1,84 @@
-// Comment
-
-class BubbleSort{
+class QuickSort{
     public static void main(String[] a){
-    System.out.println(new BBS().Start(10)); // One more comment
+    System.out.println(new QS().Start(10));      // HERE
     }
 }
 
 
-class BBS{
+// This class contains the array of integers and
+// methods to initialize, print and sort the array
+// using Quicksort
+class QS{
 
     int[] number ;
     int size ;
 
-    public int Start(int sz){
+    // Invoke the Initialization, Sort and Printing
+    // Methods
+    public QS Start(int sz){    // HERE
     int aux01 ;
     aux01 = this.Init(sz);
     aux01 = this.Print();
-    System.out.println(99999);
-    aux01 = this.Sort();
+    System.out.println(9999);
+    aux01 = size - 1 ;
+    aux01 = this.Sort(0,aux01);
     aux01 = this.Print();
-    return 0 ;
+    return new QS();
     }
 
 
-    public int Sort(){
-    int nt ;
+    // Sort array of integers using Quicksort method
+    public int Sort(int left, int right){
+    int v ;
     int i ;
-    int aux02 ;
-    int aux04 ;
-    int aux05 ;
-    int aux06 ;
-    int aux07 ;
     int j ;
+    int nt;
     int t ;
-    i = size - 1 ;
-    aux02 = 0 - 1 ;
-    while (aux02 < i) {
-        j = 1 ;
-        while (j < (i+1)){
-        aux07 = j - 1 ;
-        aux04 = number[aux07] ;
-        aux05 = number[j] ;
-        if (aux05 < aux04) {
-            aux06 = j - 1 ;
-            t = number[aux06] ;
-            number[aux06] = number[j] ;
-            number[j] = t;
+    boolean cont01;
+    boolean cont02;
+    int aux03 ;
+    t = 0 ;
+    if (left < right){
+        v = number[right] ;
+        i = left - 1 ;
+        j = right ;
+        cont01 = true ;
+        while (cont01){
+        cont02 = true ;
+        while (cont02){
+            i = i + 1 ;
+            aux03 = number[i] ;
+            if (!(aux03<v)) cont02 = false ;
+            else cont02 = true ;
         }
-        else nt = 0 ;
-        j = j + 1 ;
+        cont02 = true ;
+        while (cont02){
+            j = j - 1 ;
+            aux03 = number[j] ;
+            if (!(v < aux03)) cont02 = false ;
+            else cont02 = true ;
         }
-        i = i - 1 ;
+
+
+        t = number[i] ;
+        number[i] = number[j] ;
+        number[j] = t ;
+        //aux03 = i + 1 ;
+        if ( j < (i+1)) cont01 = false ;
+        else cont01 = true ;
+        }
+        number[j] = number[i] ;
+        number[i] = number[right] ;
+        number[right] = t ;
+        nt = this.Sort(left,i-1);
+        nt = this.Sort(i+1,right);
     }
+    else nt = 0 ;
     return 0 ;
     }
 
+
+    // Print array of integers
     public int Print(){
     int j ;
     j = 0 ;
@@ -65,6 +89,8 @@ class BBS{
     return 0 ;
     }
 
+
+    // Initialize array of integers
     public int Init(int sz){
     size = sz ;
     number = new int[sz] ;

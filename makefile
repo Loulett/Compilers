@@ -12,7 +12,7 @@ WARNINGS = -Reverything -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedanti
 		   -Wno-missing-variable-declarations -Wno-shadow-field-in-constructor \
 		   -Wno-weak-vtables -Wno-return-std-move-in-c++11 \
 		   \
-		   -Wno-padded -Wno-exit-time-destructors
+		   -Wno-padded -Wno-exit-time-destructors -Wno-deprecated
 
 CXXFLAGS=-std=c++17 #${DEBUG_FLAGS}
 
