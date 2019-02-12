@@ -23,10 +23,6 @@ void TableBuilder::visit(const Goal* n) {
                 cl.second->parentInfo = curClass;
                 for (auto& var: cl.second->vars) {
                     if (curClass->HasField(var.second->symbol)) {
-                        // std::string error = string_format(
-                        //         "Variable %s was already declared as field of class %s.\n",
-                        //         var.second->symbol->getString().c_str(),
-                        //         cl.second->name->getString().c_str());
                         std::cout << "error: variable already was declared\n";
                         errors.push_back("error: variable already was declared\n");
                     }
@@ -35,13 +31,8 @@ void TableBuilder::visit(const Goal* n) {
                 for (auto& met: cl.second->methods) {
                     if (curClass->HasMethod(met.second->name)) {
                         auto method = curClass->GetMethod(met.second->name);
-                        // TODO : Add type checking
                         if (method->type->type != met.second->type->type ||
                             method->args.size() != met.second->args.size()) {
-                            // std::string error = string_format(
-                            //         "Method %s was already declared in class %s.\n",
-                            //         met.second->name->getString().c_str(),
-                            //         curClass->name->getString().c_str());
                             std::cout << "error: method already was declared -- 1\n";
                             errors.push_back("error: method already was declared -- 1\n");
                         } else {
@@ -79,9 +70,6 @@ void TableBuilder::visit(const Goal* n) {
     for (auto& classDecl: *n->class_declarations) {
         curClass = table->classes[dynamic_cast<Identifier*>(dynamic_cast<ClassDeclaration*>(classDecl.get())->class_name.get())->name];
         if (curClass->parent != nullptr && (curClass->parentInfo == nullptr || curClass->parentInfo->parent == curClass->name)) {
-            // std::string error = string_format( "Class %s extends at class %s which wasn't declared\n",
-            //                                    curClass->name->getString().c_str(),
-            //                                    curClass->parent->getString().c_str());
             std::cout << "error: class extension\n";
             errors.push_back("error: class extension\n");
         }
@@ -110,10 +98,8 @@ void TableBuilder::visit(const MainClass* n) {
 	curClass = new ClassInfo(dynamic_cast<Identifier*>(n->class_name.get())->name, nullptr);
 
     if (hasClass(curClass->name)) {
-        // std::string error = string_format("Class %s was already declared\n",
-        //                                    curClass->name->getString().c_str());
-        std::cout << "error: class already was declared -- 1\n";
-        errors.push_back("error: class already was declared\n");
+        std::cout << "error: class already was declared.\n";
+        errors.push_back("error: class already was declared.\n");
     }
 
     table->classes[curClass->name] = curClass;
@@ -124,13 +110,6 @@ void TableBuilder::visit(const MainClass* n) {
     curClass->methods[curMethod->name] = curMethod;
     n->statement->Accept(this);
 
-	// method = new MethodInfo(getIndent("main"), nullptr);
-	// var = new VariableInfo(nullptr, n->arg->name)
-	// method->args[n->arg->name] = var;
-	// cl->methods[method->name] = method;
-	// table->classes[cl->name] = cl;
-	// var = 0;
-	// method = 0;
 	curClass = nullptr;
     curMethod = nullptr;
     curVar = nullptr;
@@ -141,8 +120,6 @@ void TableBuilder::visit(const ClassDeclaration* n) {
         n->extends_class_name == nullptr ? nullptr : dynamic_cast<Identifier*>(n->extends_class_name.get())->name);
 
     if (hasClass(curClass->name)) {
-        // std::string error = string_format("Class %s was already declared\n",
-        //                                    curClass->name->getString().c_str());
         std::cout << "error: class already was declared -- 2\n";
         errors.push_back("error: class already was declared.\n");
     }
@@ -150,9 +127,6 @@ void TableBuilder::visit(const ClassDeclaration* n) {
 	for (auto& varDeclaration: *(n->vars)) {
         varDeclaration->Accept(this);
     }
-    // for (auto& methodDeclaration: *(n->methods)) {
-    //     methodDeclaration->Accept(this);
-    // }
     for (auto methodDeclaration = n->methods->rbegin(); methodDeclaration != n->methods->rend(); methodDeclaration++) {
         methodDeclaration->get()->Accept(this);
     }
@@ -160,24 +134,15 @@ void TableBuilder::visit(const ClassDeclaration* n) {
 }
 
 void TableBuilder::visit(const VarDeclaration* n) {
-    // Type problems
 	curVar = new VariableInfo(dynamic_cast<Type*>(n->type.get()), dynamic_cast<Identifier*>(n->name.get())->name);
 	if (curMethod != nullptr) {
         if (curMethod->locals.find(curVar->symbol) != curMethod->locals.end()) {
-            // std::string error = string_format(
-            //         "Variable %s was already declared as local variable of method %s.\n",
-            //         curVar->symbol->getString().c_str(),
-            //         curMethod->name->getString().c_str());
             std::cout << "error: var already was declared as local var.\n";
             errors.push_back("error: var already was declared as local var.\n");
         }
         curMethod->locals[curVar->symbol] = curVar;
 	} else {
 		if (curClass->HasField(curVar->symbol)) {
-            // std::string error = string_format(
-            //         "Variable %s was already declared as field of class %s.\n",
-            //         curVar->symbol->getString().c_str(),
-            //         curClass->name->getString().c_str());
             std::cout << "error: var already was declared as class field.\n";
             errors.push_back("error: var already was declared as class field.\n");
         }
@@ -187,7 +152,6 @@ void TableBuilder::visit(const VarDeclaration* n) {
 }
 
 void TableBuilder::visit(const MethodDeclaration* n) {
-    // Type problems
 	curMethod = new MethodInfo(dynamic_cast<Type*>(n->return_type.get()), dynamic_cast<Identifier*>(n->name.get())->name);
 
     for (auto& var: *n->vars) {

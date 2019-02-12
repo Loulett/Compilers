@@ -7,6 +7,8 @@ class INode {
  public:
     virtual void Accept(Visitor* v) const = 0;
     virtual ~INode() = default;
+    int first_line;
+    int first_column;
 };
 
 class IGoal: public INode {

@@ -5,7 +5,7 @@
 
 class Identifier: public IIdentifier {
  public:
- 	Identifier(Symbol* name);
+ 	Identifier(int first_line, int first_column, Symbol* name);
     void Accept(Visitor* v) const;
  public:
  	Symbol* name;
