@@ -9,7 +9,7 @@ Printer::Printer(FILE* outFile)
 void Printer::visit(const Goal* n)
 {
     n->main_class->Accept(this);
-    for (size_t i = 0; i < n->class_declarations->size(); i++) {
+    for (int i = 0; i < n->class_declarations->size(); i++) {
         auto& ptr = (*n->class_declarations)[i];
         if (ptr) {
             ptr->Accept(this);
@@ -39,10 +39,10 @@ void Printer::visit(const ClassDeclaration* n)
         n->extends_class_name->Accept(this);
     }
     fprintf(f, " { \n");
-    for (size_t i = 0; i < n->vars->size(); i++) {
+    for (int i = 0; i < n->vars->size(); i++) {
         (*(n->vars))[i]->Accept(this);
     }
-    for (size_t i = 0; i < n->methods->size(); i++) {
+    for (int i = 0; i < n->methods->size(); i++) {
         (*(n->methods))[i]->Accept(this);
     }
     fprintf(f, "} \n");
@@ -61,7 +61,7 @@ void Printer::visit(const MethodDeclaration* n)
     n->return_type->Accept(this);
     n->name->Accept(this);
     fprintf(f, "(");
-    for (size_t i = 0; i < n->args->size(); i++) {
+    for (int i = 0; i < n->args->size(); i++) {
         ((*(n->args))[i]).first->Accept(this);
         ((*(n->args))[i]).second->Accept(this);
         if (i < n->args->size() - 1) {
@@ -69,10 +69,10 @@ void Printer::visit(const MethodDeclaration* n)
         }
     }
     fprintf(f, ") { \n");
-    for (size_t i = 0; i < n->vars->size(); i++) {
+    for (int i = 0; i < n->vars->size(); i++) {
         (*(n->vars))[i]->Accept(this);
     }
-    for (size_t i = 0; i < n->statements->size(); i++) {
+    for (int i = 0; i < n->statements->size(); i++) {
         (*(n->statements))[i]->Accept(this);
     }
     fprintf(f, "return ");
@@ -81,15 +81,15 @@ void Printer::visit(const MethodDeclaration* n)
 }
 
 
-void Printer::visit(const IntType*)
+void Printer::visit(const IntType* n)
 {
     fprintf(f, "int " );
 }
-void Printer::visit(const BoolType*)
+void Printer::visit(const BoolType* n)
 {
     fprintf(f, "boolean ");
 }
-void Printer::visit(const IntArrayType*)
+void Printer::visit(const IntArrayType* n)
 {
     fprintf(f, "int[] ");
 }
@@ -103,7 +103,7 @@ void Printer::visit(const Type* n)
 void Printer::visit(const Statement* n)
 {
     fprintf(f, "{ ");
-    for (size_t i = 0; i < n->statements->size(); i++) {
+    for (int i = 0; i < n->statements->size(); i++) {
         (*(n->statements))[i]->Accept(this);
     }
     fprintf(f, "} \n");
@@ -221,7 +221,7 @@ void Printer::visit(const MethodExpression* n) {
     fprintf(f, ".");
     n->method->Accept(this);
     fprintf(f, "(");
-    for (size_t i = 0; i < n->params->size(); ++i) {
+    for (int i = 0; i < n->params->size(); ++i) {
         (*n->params)[i]->Accept(this);
         if (i != n->params->size() - 1) {
             fprintf(f, ", ");
@@ -242,7 +242,7 @@ void Printer::visit(const IdentExpression* n) {
     n->ident->Accept(this);
 }
 
-void Printer::visit(const This*) {
+void Printer::visit(const This* n) {
     fprintf(f, "this");
 }
 
@@ -271,5 +271,5 @@ void Printer::visit(const Expression* n) {
 
 void Printer::visit(const Identifier* n)
 {
-    fprintf(f, "%s", n->name->getString().c_str());
+    fprintf(f, "%s", n->name.c_str());
 }

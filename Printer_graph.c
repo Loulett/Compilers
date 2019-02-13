@@ -1,11 +1,10 @@
 #include "Printer_graph.h"
 #include "Printer.h"
 #include <cstdio>
-#include <variant>
 
-Printer_graph::Printer_graph(std::string outFile)
+Printer_graph::Printer_graph(FILE* outFile)
 {
-    f = fopen(outFile.c_str(), "w");
+    f = outFile;
     nodeNumber = 0;
     fprintf( f, "%s", "graph Grammar{\n" );
 }
@@ -26,7 +25,7 @@ void Printer_graph::visit(const Goal* n)
     fprintf( f, "%d -- %d;\n", cur, nodeNumber );
 
     n->main_class->Accept(this);
-    for (size_t i = 0; i < n->class_declarations->size(); i++) {
+    for (int i = 0; i < n->class_declarations->size(); i++) {
         auto& ptr = (*n->class_declarations)[i];
         if (ptr) {
             nodeNumber++;
@@ -70,13 +69,13 @@ void Printer_graph::visit(const ClassDeclaration* n)
 
         n->extends_class_name->Accept(this);
     }
-    for (size_t i = 0; i < n->vars->size(); i++) {
+    for (int i = 0; i < n->vars->size(); i++) {
         nodeNumber++;
         fprintf( f, "%d -- %d;\n", cur, nodeNumber );
 
         (*(n->vars))[i]->Accept(this);
     }
-    for (size_t i = 0; i < n->methods->size(); i++) {
+    for (int i = 0; i < n->methods->size(); i++) {
         nodeNumber++;
         fprintf( f, "%d -- %d;\n", cur, nodeNumber );
 
@@ -110,7 +109,7 @@ void Printer_graph::visit(const MethodDeclaration* n)
     fprintf( f, "%d -- %d;\n", cur, nodeNumber );
 
     n->name->Accept(this);
-    for (size_t i = 0; i < n->args->size(); i++) {
+    for (int i = 0; i < n->args->size(); i++) {
         nodeNumber++;
         fprintf( f, "%d -- %d;\n", cur, nodeNumber );
         int argNumber = nodeNumber;
@@ -122,15 +121,19 @@ void Printer_graph::visit(const MethodDeclaration* n)
         nodeNumber++;
         fprintf( f, "%d -- %d;\n", argNumber, nodeNumber );
         ((*(n->args))[i]).second->Accept(this);     //name
+
+        if (i < n->args->size() - 1) {
+            fprintf(f, ", ");
+        }
     }
 
-    for (size_t i = 0; i < n->vars->size(); i++) {
+    for (int i = 0; i < n->vars->size(); i++) {
         nodeNumber++;
         fprintf( f, "%d -- %d;\n", cur, nodeNumber );
 
         (*(n->vars))[i]->Accept(this);
     }
-    for (size_t i = 0; i < n->statements->size(); i++) {
+    for (int i = 0; i < n->statements->size(); i++) {
         nodeNumber++;
         fprintf( f, "%d -- %d;\n", cur, nodeNumber );
 
@@ -145,40 +148,46 @@ void Printer_graph::visit(const MethodDeclaration* n)
     n->return_expression->Accept(this);
 }
 
+
+void Printer_graph::visit(const IntType* n)
+{
+    int cur = nodeNumber;
+    fprintf( f, "%d [label=\"IntType\"];\n", cur);
+
+    nodeNumber++;
+    fprintf( f, "%d [label=\"int\"];\n", nodeNumber );
+    fprintf( f, "%d -- %d;\n", cur, nodeNumber );
+
+}
+void Printer_graph::visit(const BoolType* n)
+{
+    int cur = nodeNumber;
+    fprintf( f, "%d [label=\"BoolType\"];\n", cur);
+
+    nodeNumber++;
+    fprintf( f, "%d [label=\"boolean\"];\n", nodeNumber );
+    fprintf( f, "%d -- %d;\n", cur, nodeNumber );
+
+}
+void Printer_graph::visit(const IntArrayType* n)
+{
+    int cur = nodeNumber;
+    fprintf( f, "%d [label=\"IntArrayType\"];\n", cur);
+
+    nodeNumber++;
+    fprintf( f, "%d [label=\"int[]\"];\n", nodeNumber );
+    fprintf( f, "%d -- %d;\n", cur, nodeNumber );
+
+}
+
 void Printer_graph::visit(const Type* n)
 {
     int cur = nodeNumber;
-    if (std::get_if<IntType>(&(n->type))) {
-        fprintf( f, "%d [label=\"IntType\"];\n", cur);
+    fprintf( f, "%d [label=\"Type\"];\n", cur);
+    nodeNumber++;
+    fprintf( f, "%d -- %d;\n", cur, nodeNumber );
 
-        nodeNumber++;
-        fprintf( f, "%d [label=\"int\"];\n", nodeNumber );
-        fprintf( f, "%d -- %d;\n", cur, nodeNumber );
-    }
-    else if (std::get_if<BoolType>(&(n->type))) {
-        fprintf( f, "%d [label=\"BoolType\"];\n", cur);
-
-        nodeNumber++;
-        fprintf( f, "%d [label=\"boolean\"];\n", nodeNumber );
-        fprintf( f, "%d -- %d;\n", cur, nodeNumber );
-
-    }
-    else if (std::get_if<IntArrType>(&(n->type))) {
-        fprintf( f, "%d [label=\"IntArrayType\"];\n", cur);
-
-        nodeNumber++;
-        fprintf( f, "%d [label=\"int[]\"];\n", nodeNumber );
-        fprintf( f, "%d -- %d;\n", cur, nodeNumber );
-    }
-    else {
-        auto classVal = std::get_if<ClassType>(&(n->type));
-        fprintf( f, "%d [label=\"Type\"];\n", cur);
-        nodeNumber++;
-        fprintf( f, "%d -- %d;\n", cur, nodeNumber );
-        fprintf( f, "%d [label=\"%s\"];\n", nodeNumber, classVal->name->getString().c_str());
-
-        // classVal->name->Accept(this);
-    }
+    n->name->Accept(this);
 }
 
 void Printer_graph::visit(const Statement* n)
@@ -186,7 +195,7 @@ void Printer_graph::visit(const Statement* n)
     int cur = nodeNumber;
     fprintf( f, "%d [label=\"Statement\"];\n", cur);
 
-    for (size_t i = 0; i < n->statements->size(); i++) {
+    for (int i = 0; i < n->statements->size(); i++) {
         nodeNumber++;
         fprintf( f, "%d -- %d;\n", cur, nodeNumber );
 
@@ -377,11 +386,14 @@ void Printer_graph::visit(const MethodExpression* n) {
     fprintf( f, "%d -- %d;\n", cur, nodeNumber );
 
     n->method->Accept(this);
-    for (size_t i = 0; i < n->params->size(); ++i) {
+    for (int i = 0; i < n->params->size(); ++i) {
         nodeNumber++;
         fprintf( f, "%d -- %d;\n", cur, nodeNumber );
 
         (*n->params)[i]->Accept(this);
+        if (i != n->params->size() - 1) {
+            fprintf(f, ", ");
+        }
     }
 }
 
@@ -412,7 +424,7 @@ void Printer_graph::visit(const IdentExpression* n) {
     n->ident->Accept(this);
 }
 
-void Printer_graph::visit(const This*) {
+void Printer_graph::visit(const This* n) {
     int cur = nodeNumber;
     fprintf( f, "%d [label=\"This\"];\n", cur);
     nodeNumber++;
@@ -458,7 +470,7 @@ void Printer_graph::visit(const Expression* n) {
 
 void Printer_graph::visit(const Identifier* n)
 {
-    fprintf( f, "%d [label=\"%s\"];\n", nodeNumber, n->name->getString().c_str());
+    fprintf( f, "%d [label=\"%s\"];\n", nodeNumber, n->name.c_str());
 }
 
 
