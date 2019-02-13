@@ -1,9 +1,13 @@
 %{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Weverything"
+
 #include <cstdio>
 #include <iostream>
 #include <string>
 #include <utility>
 #include <memory>
+#include <exception>
 #include "parser.tab.h"
 using namespace std;
 
@@ -25,17 +29,19 @@ void yyerror(Goal** goal, const char* s);
 #include "AST/ClassDeclaration.h"
 #include "AST/MainClass.h"
 #include "AST/Goal.h"
+#include "SymbolTable/Symbol.h"
 }
 
 %parse-param {Goal** goal}
 %define parse.error verbose
+%locations
 
 %union {
 	int ival;
 	char* sval;
 	IIdentifier* ident;
 	IExpression* expr;
-	std::vector<std::unique_ptr<IExpression>>* exprs;	
+	std::vector<std::unique_ptr<IExpression>>* exprs;
 	IStatement* state;
 	std::vector<std::unique_ptr<IStatement>>* states;
 	IType* type;
@@ -60,7 +66,7 @@ void yyerror(Goal** goal, const char* s);
 %left T_LESS
 %left T_NOT
 
-%left T_R_LEFT
+%precedence T_R_LEFT
 %token T_R_RIGHT
 %left T_F_LEFT
 %token T_F_RIGHT
@@ -120,13 +126,14 @@ void yyerror(Goal** goal, const char* s);
 %%
 parser:
 	mainClass classesDeclaration {
-		*goal = new Goal($1, $2);
+		*goal = new Goal(@1.first_line, @1.first_column, $1, $2);
 	}
+	| error mainClass classesDeclaration {yyerrok;}
 	;
 
 mainClass:
 	T_CLASS identifier T_F_LEFT T_PUBLIC T_STATIC T_VOID T_MAIN T_R_LEFT T_STRING T_Q_LEFT T_Q_RIGHT identifier T_R_RIGHT T_F_LEFT statement T_F_RIGHT T_F_RIGHT {
-		$$ = new MainClass($2, $12, $15);
+		$$ = new MainClass(@1.first_line, @1.first_column, $2, $12, $15);
 	}
 	;
 
@@ -138,12 +145,14 @@ classesDeclaration:
 		$1->push_back(std::unique_ptr<IClassDeclaration>($2));
 		$$ = $1;
 	}
+	| classesDeclaration error classDeclaration {yyerrok;}
 	;
 
 classDeclaration:
 	T_CLASS identifier extends T_F_LEFT varsDeclaration methodsDeclaration T_F_RIGHT {
-		$$ = new ClassDeclaration($2, $3, $5, $6);
+		$$ = new ClassDeclaration(@1.first_line, @1.first_column, $2, $3, $5, $6);
 	}
+	| T_CLASS error T_F_LEFT varsDeclaration methodsDeclaration T_F_RIGHT {yyerrok;}
 	;
 
 extends:
@@ -153,6 +162,7 @@ extends:
 	| T_EXTENDS identifier {
 		$$ = $2;
 	}
+	| T_EXTENDS error {yyerrok;}
 	;
 
 varsDeclaration:
@@ -163,12 +173,14 @@ varsDeclaration:
 		$1->push_back(std::unique_ptr<IVarDeclaration>($2));
 		$$ = $1;
 	}
+	| varsDeclaration error varDeclaration {yyerrok;}
 	;
 
 varDeclaration:
 	type identifier T_SCOLON {
-		$$ = new VarDeclaration($1, $2);
+		$$ = new VarDeclaration(@1.first_line, @1.first_column, $1, $2);
 		}
+	| error T_SCOLON {yyerrok;}
 	;
 
 methodsDeclaration:
@@ -183,8 +195,9 @@ methodsDeclaration:
 
 methodDeclaration:
 	methodType type identifier T_R_LEFT methodParams T_R_RIGHT T_F_LEFT varsDeclaration statements T_RETURN expression T_SCOLON T_F_RIGHT {
-		$$ = new MethodDeclaration($2, $3, $5, $8, $9, $11);
+		$$ = new MethodDeclaration(@1.first_line, @1.first_column, $2, $3, $5, $8, $9, $11);
 	}
+	| methodType type identifier T_R_LEFT error T_R_RIGHT T_F_LEFT varsDeclaration statements T_RETURN expression T_SCOLON T_F_RIGHT {yyerrok;}
 	;
 
 methodType:
@@ -214,42 +227,46 @@ statements:
 		$2->insert($2->begin(), std::unique_ptr<IStatement>($1));
 		$$ = $2;
 		}
+	| statement error statements {yyerrok;}
 	;
 
 type:
 	T_INT T_Q_LEFT T_Q_RIGHT {
-		$$ = new IntArrayType();
+		$$ = new Type(IntArrType{});
 		}
 	| T_BOOL {
-		$$ = new BoolType();
+		$$ = new Type(BoolType{});
 		}
 	| T_INT {
-		$$ = new IntType();
+		$$ = new Type(IntType{});
 		}
 	| identifier {
-		$$ = new Type($1);
+		$$ = new Type(ClassType{dynamic_cast<Identifier*>($1)->name});
 		}
 	;
 
 statement:
 	T_F_LEFT statements T_F_RIGHT {
-		$$ = new Statement($2);
+		$$ = new Statement(@1.first_line, @1.first_column, $2);
 		}
 	| T_IF T_R_LEFT expression T_R_RIGHT statement T_ELSE statement {
-		$$ = new IfStatement($3, $5, $7);
+		$$ = new IfStatement(@1.first_line, @1.first_column, $3, $5, $7);
 		}
 	| T_WHILE T_R_LEFT expression T_R_RIGHT statement {
-		$$ = new WhileStatement($3, $5);
+		$$ = new WhileStatement(@1.first_line, @1.first_column, $3, $5);
 		}
 	| T_PRINT T_R_LEFT expression T_R_RIGHT T_SCOLON {
-		$$ = new PrintStatement($3);
+		$$ = new PrintStatement(@1.first_line, @1.first_column, $3);
 		}
 	| identifier T_EQ expression T_SCOLON {
-		$$ = new AssignmentStatement($1, $3);
+		$$ = new AssignmentStatement(@1.first_line, @1.first_column, $1, $3);
 		}
 	| identifier T_Q_LEFT expression T_Q_RIGHT T_EQ expression T_SCOLON {
-		$$ = new ArrAssignmentStatement($1, $3, $6);
+		$$ = new ArrAssignmentStatement(@1.first_line, @1.first_column, $1, $3, $6);
 		}
+	| T_F_LEFT error T_F_RIGHT {yyerrok;}
+	| T_IF T_R_LEFT error T_R_RIGHT statement T_ELSE statement {yyerrok;}
+	| T_WHILE T_R_LEFT error T_R_RIGHT statement {yyerrok;}
 	;
 
 expressions:
@@ -268,71 +285,75 @@ expressions:
 
 expression:
 	expression T_AND expression {
-		$$ = new AndExpression($1, $3);
+		$$ = new AndExpression(@1.first_line, @1.first_column, $1, $3);
 		}
 	| expression T_LESS expression {
-		$$ = new LessExpression($1, $3);
+		$$ = new LessExpression(@1.first_line, @1.first_column, $1, $3);
 		}
 	| expression T_PLUS expression {
-		$$ = new PlusExpression($1, $3);
+		$$ = new PlusExpression(@1.first_line, @1.first_column, $1, $3);
 		}
 	| expression T_MINUS expression {
-		$$ = new MinusExpression($1, $3);
+		$$ = new MinusExpression(@1.first_line, @1.first_column, $1, $3);
 		}
 	| expression T_MULT expression {
-		$$ = new MultExpression($1, $3);
+		$$ = new MultExpression(@1.first_line, @1.first_column, $1, $3);
 		}
 	| expression T_REMAIN expression {
-		$$ = new RemainExpression($1, $3);
+		$$ = new RemainExpression(@1.first_line, @1.first_column, $1, $3);
 		}
 	| expression T_OR expression {
-		$$ = new OrExpression($1, $3);
+		$$ = new OrExpression(@1.first_line, @1.first_column, $1, $3);
 		}
 	| expression T_Q_LEFT expression T_Q_RIGHT {
-		$$ = new ArrayExpression($1, $3);
+		$$ = new ArrayExpression(@1.first_line, @1.first_column, $1, $3);
 		}
 	| expression T_LENGTH {
-		$$ = new LengthExpression($1);
+		$$ = new LengthExpression(@1.first_line, @1.first_column, $1);
 		}
 	| expression T_DOT identifier T_R_LEFT expressions T_R_RIGHT {
-		$$ = new MethodExpression($1, $3, $5);
+		$$ = new MethodExpression(@1.first_line, @1.first_column, $1, $3, $5);
 		}
 	| T_NUM {
-		$$ = new Integer($1);
+		$$ = new Integer(@1.first_line, @1.first_column, $1);
 		}
 	| T_TRUE {
-		$$ = new Bool(true);
+		$$ = new Bool(@1.first_line, @1.first_column, true);
 		}
 	| T_FALSE {
-		$$ = new Bool(false);
+		$$ = new Bool(@1.first_line, @1.first_column, false);
 		}
 	| identifier {
-		$$ = new IdentExpression($1);
+		$$ = new IdentExpression(@1.first_line, @1.first_column, $1);
 		}
 	| T_THIS {
-		$$ = new This();
+		$$ = new This(@1.first_line, @1.first_column);
 		}
 	| T_NEW T_INT T_Q_LEFT expression T_Q_RIGHT {
-		$$ = new NewArrExpression($4);
+		$$ = new NewArrExpression(@1.first_line, @1.first_column, $4);
 		}
 	| T_NEW identifier T_R_LEFT T_R_RIGHT {
-		$$ = new NewExpression($2);
+		$$ = new NewExpression(@1.first_line, @1.first_column, $2);
 		}
 	| T_NOT expression {
-		$$ = new NotExpression($2);
+		$$ = new NotExpression(@1.first_line, @1.first_column, $2);
 		}
 	| T_R_LEFT expression T_R_RIGHT {
-		$$ = new Expression($2);
+		$$ = new Expression(@1.first_line, @1.first_column, $2);
 		}
+	| T_R_LEFT error T_R_RIGHT {yyerrok;}
 	;
 
 identifier:
 	T_IDENT {
-		$$ = new Identifier($1);
+		$$ = new Identifier(@1.first_line, @1.first_column, InternTable::getIntern(std::string($1)));
 	}
 	;
 %%
 
 void yyerror(Goal** goal, const char* s) {
-	cout << "PARSE ERROR " << s << endl;
+	cout << "Error at line: " << yylloc.first_line << " column: " << yylloc.first_column << ". Message: " << s << endl;
+	throw std::exception();
 }
+
+#pragma clang diagnostic pop

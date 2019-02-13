@@ -1,23 +1,41 @@
-#pragma once
-#include "Visitor.h"
+#include "Table.h"
+#include "Symbol.h"
+#include "MethodInfo.h"
+#include "ClassInfo.h"
+#include "VariableInfo.h"
+#include "../Visitor.h"
+#include <vector>
+#include <string>
 
-class Printer : public Visitor
-{
-private:
-    FILE* f;
+class TableBuilder: Visitor {
 
-public:
-    Printer(FILE* outFile);
+ private:
+ 	Table* table;
+ 	ClassInfo* curClass;
+ 	MethodInfo* curMethod;
+ 	VariableInfo* curVar;
+    Type curType;
+    bool valExpr;
+    std::vector<std::string> errors;
 
-    void visit(const Goal* n) override;
+ public:
+    TableBuilder();
+
+ 	Table* buildTable(Goal* n) {
+ 		visit(n);
+ 		return table;
+ 	}
+
+    void printErrors();
+
+    bool hasClass(Symbol* className);
+
+ 	void visit(const Goal* n) override;
     void visit(const MainClass* n) override;
     void visit(const ClassDeclaration* n) override;
     void visit(const VarDeclaration* n) override;
     void visit(const MethodDeclaration* n) override;
 
-    // void visit(const IntType* n) override;
-    // void visit(const BoolType* n) override;
-    // void visit(const IntArrayType* n) override;
     void visit(const Type* n) override;
 
     void visit(const IfStatement* n) override;
@@ -28,42 +46,22 @@ public:
     void visit(const ArrAssignmentStatement* n) override;
 
     void visit(const AndExpression* n) override;
-
     void visit(const LessExpression* n) override;
-
     void visit(const PlusExpression* n) override;
-
     void visit(const MinusExpression* n) override;
-
     void visit(const MultExpression* n) override;
-
     void visit(const OrExpression* n) override;
-
     void visit(const RemainExpression* n) override;
-
-
-
-
     void visit(const ArrayExpression* n) override;
-
     void visit(const LengthExpression* n) override;
-
     void visit(const MethodExpression* n) override;
-
     void visit(const Integer* n) override;
-
     void visit(const Bool* n) override;
-
     void visit(const IdentExpression* n) override;
-
     void visit(const This* n) override;
-
     void visit(const NewArrExpression* n) override;
-
     void visit(const NewExpression* n) override;
-
     void visit(const NotExpression* n) override;
-
     void visit(const Expression* n) override;
 
     void visit(const Identifier* n) override;

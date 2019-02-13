@@ -5,7 +5,7 @@
 
 class Statement:public IStatement{
 public:
- 	Statement(std::vector<std::unique_ptr<IStatement>>* statements);
+ 	Statement(int first_line, int first_column, std::vector<std::unique_ptr<IStatement>>* statements);
   void Accept(Visitor* v) const;
 public:
  	std::unique_ptr<std::vector<std::unique_ptr<IStatement>>> statements;
@@ -13,7 +13,7 @@ public:
 
 class IfStatement: public IStatement {
  public:
- 	IfStatement(IExpression* clause, IStatement* true_statement, IStatement* false_statement);
+ 	IfStatement(int first_line, int first_column, IExpression* clause, IStatement* true_statement, IStatement* false_statement);
     void Accept(Visitor* v) const;
 
  public:
@@ -24,7 +24,7 @@ class IfStatement: public IStatement {
 
 class WhileStatement: public IStatement {
  public:
- 	WhileStatement(IExpression* clause, IStatement* body);
+ 	WhileStatement(int first_line, int first_column, IExpression* clause, IStatement* body);
     void Accept(Visitor* v) const;
  public:
  	std::unique_ptr<IExpression> clause;
@@ -33,7 +33,7 @@ class WhileStatement: public IStatement {
 
 class PrintStatement: public IStatement {
  public:
- 	PrintStatement(IExpression* print);
+ 	PrintStatement(int first_line, int first_column, IExpression* print);
     void Accept(Visitor* v) const;
  public:
  	std::unique_ptr<IExpression> print;
@@ -41,7 +41,7 @@ class PrintStatement: public IStatement {
 
 class AssignmentStatement: public IStatement {
  public:
-	AssignmentStatement(IIdentifier* var, IExpression* expr);
+	AssignmentStatement(int first_line, int first_column, IIdentifier* var, IExpression* expr);
     void Accept(Visitor* v) const;
  public:
  	std::unique_ptr<IIdentifier> var;
@@ -50,7 +50,7 @@ class AssignmentStatement: public IStatement {
 
 class ArrAssignmentStatement: public IStatement {
  public:
- 	ArrAssignmentStatement(IIdentifier* var, IExpression* num, IExpression* expr);
+ 	ArrAssignmentStatement(int first_line, int first_column, IIdentifier* var, IExpression* num, IExpression* expr);
     void Accept(Visitor* v) const;
  public:
  	std::unique_ptr<IIdentifier> var;
