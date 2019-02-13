@@ -7,6 +7,7 @@
 #include <string>
 #include <utility>
 #include <memory>
+#include <exception>
 #include "parser.tab.h"
 using namespace std;
 
@@ -351,7 +352,8 @@ identifier:
 %%
 
 void yyerror(Goal** goal, const char* s) {
-	cout << "Parsing error at line: " << yylloc.first_line << " column: " << yylloc.first_column << ". Message: " << s << endl;
+	cout << "Error at line: " << yylloc.first_line << " column: " << yylloc.first_column << ". Message: " << s << endl;
+	throw std::exception();
 }
 
 #pragma clang diagnostic pop

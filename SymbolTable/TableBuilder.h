@@ -16,15 +16,17 @@ class TableBuilder: Visitor {
  	VariableInfo* curVar;
     Type curType;
     bool valExpr;
+    std::vector<std::string> errors;
 
  public:
-    std::vector<std::string> errors;
     TableBuilder();
 
  	Table* buildTable(Goal* n) {
  		visit(n);
  		return table;
  	}
+
+    void printErrors();
 
     bool hasClass(Symbol* className);
 

@@ -16,40 +16,20 @@ int main(int, char**) {
 	FILE* myfile = fopen("input.txt", "r");
 	yyin = myfile;
 	Goal* goal = nullptr;
+	Table* table = nullptr;
 	try {
 		yyparse(&goal);
+		Printer_graph tree_printer("output.dot");
+		tree_printer.visit(goal);
+
+		TableBuilder table_builder;
+		table = table_builder.buildTable(goal);
+		table_builder.printErrors();
 	} catch(...) {
+		fclose(myfile);
+		delete goal;
+		delete table;
 		return 0;
-	}
-
-    Printer_graph tree_printer("output.dot");
-	tree_printer.visit(goal);
-
-	TableBuilder table_builder;
-	Table* table = table_builder.buildTable(goal);
-
-	std::cout << "Found " << table_builder.errors.size() << " errors\n";
-
-	for (auto& cl: table->classes) {
-		std::cout << "Class: " << cl.first->getString() << "\n";
-		if (cl.second->parent != nullptr) {
-			std::cout << "Parent: " << cl.second->parent->getString() << "\n";
-		}
-		else {
-			std::cout << "Parent: NONE\n";
-		}
-		for (auto& var: cl.second->vars) {
-			std::cout << "Var: " << var.first->getString() << "\n";
-		}
-		for (auto& met: cl.second->methods) {
-			std::cout << "Method: " << met.first->getString() << "\n";
-			for (auto& arg: met.second->args) {
-				std::cout << "Arg: " << arg.first->getString() << "\n";
-			}
-			for (auto& loc: met.second->locals) {
-				std::cout << "Local: " << loc.first->getString() << "\n";
-			}
-		}
 	}
 
 	fclose(myfile);
