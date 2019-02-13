@@ -9,7 +9,7 @@ private:
     int nodeNumber;
 public:
     Printer_graph(std::string filename);
-    ~Printer_graph();
+    ~Printer_graph() override;
 
     void visit(const Goal* n) override;
     void visit(const MainClass* n) override;
@@ -17,9 +17,6 @@ public:
     void visit(const VarDeclaration* n) override;
     void visit(const MethodDeclaration* n) override;
 
-    void visit(const IntType* n) override;
-    void visit(const BoolType* n) override;
-    void visit(const IntArrayType* n) override;
     void visit(const Type* n) override;
 
     void visit(const IfStatement* n) override;
