@@ -6,7 +6,7 @@
 
 class MethodDeclaration: public IMethodDeclaration{
 public:
-	MethodDeclaration(int first_line, int first_column, IType* return_type, IIdentifier* name, std::vector<std::pair<std::unique_ptr<IType>, std::unique_ptr<IIdentifier>>>* args, std::vector<std::unique_ptr<IVarDeclaration>>* vars, std::vector<std::unique_ptr<IStatement>>* statements, IExpression* return_expression);
+	MethodDeclaration(IType* return_type, IIdentifier* name, std::vector<std::pair<std::unique_ptr<IType>, std::unique_ptr<IIdentifier>>>* args, std::vector<std::unique_ptr<IVarDeclaration>>* vars, std::vector<std::unique_ptr<IStatement>>* statements, IExpression* return_expression);
   void Accept(Visitor* v) const;
  public:
  	std::unique_ptr<IType> return_type;

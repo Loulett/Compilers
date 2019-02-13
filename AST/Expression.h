@@ -5,7 +5,7 @@
 
 class AndExpression: public IExpression {
  public:
- 	AndExpression(int first_line, int first_column, IExpression* expr1, IExpression* expr2);
+ 	AndExpression(IExpression* expr1, IExpression* expr2);
 
  	void Accept(Visitor* v) const;
 
@@ -16,7 +16,7 @@ class AndExpression: public IExpression {
 
 class LessExpression: public IExpression {
  public:
- 	LessExpression(int first_line, int first_column, IExpression* expr1, IExpression* expr2);
+ 	LessExpression(IExpression* expr1, IExpression* expr2);
  	void Accept(Visitor* v) const;
  public:
  	std::unique_ptr<IExpression> expr1;
@@ -26,7 +26,7 @@ class LessExpression: public IExpression {
 class PlusExpression: public IExpression {
  public:
  	void Accept(Visitor* v) const;
-	PlusExpression(int first_line, int first_column, IExpression* expr1, IExpression* expr2);
+	PlusExpression(IExpression* expr1, IExpression* expr2);
  public:
  	std::unique_ptr<IExpression> expr1;
  	std::unique_ptr<IExpression> expr2;
@@ -34,7 +34,7 @@ class PlusExpression: public IExpression {
 
 class MinusExpression: public IExpression {
  public:
-	MinusExpression(int first_line, int first_column, IExpression* expr1, IExpression* expr2);
+	MinusExpression(IExpression* expr1, IExpression* expr2);
  	void Accept(Visitor* v) const;
  public:
  	std::unique_ptr<IExpression> expr1;
@@ -43,7 +43,7 @@ class MinusExpression: public IExpression {
 
 class MultExpression: public IExpression {
  public:
- 	MultExpression(int first_line, int first_column, IExpression* expr1, IExpression* expr2);
+ 	MultExpression(IExpression* expr1, IExpression* expr2);
 	void Accept(Visitor* v) const;
 
  public:
@@ -53,7 +53,7 @@ class MultExpression: public IExpression {
 
 class RemainExpression: public IExpression {
  public:
- 	RemainExpression(int first_line, int first_column, IExpression* expr1, IExpression* expr2);
+ 	RemainExpression(IExpression* expr1, IExpression* expr2);
 	void Accept(Visitor* v) const;
  public:
  	std::unique_ptr<IExpression> expr1;
@@ -62,7 +62,7 @@ class RemainExpression: public IExpression {
 
 class OrExpression: public IExpression {
  public:
- 	OrExpression(int first_line, int first_column, IExpression* expr1, IExpression* expr2);
+ 	OrExpression(IExpression* expr1, IExpression* expr2);
 	void Accept(Visitor* v) const;
  public:
  	std::unique_ptr<IExpression> expr1;
@@ -72,7 +72,7 @@ class OrExpression: public IExpression {
 
 class ArrayExpression: public IExpression {
  public:
- 	ArrayExpression(int first_line, int first_column, IExpression* expr1, IExpression* expr2);
+ 	ArrayExpression(IExpression* expr1, IExpression* expr2);
 	void Accept(Visitor* v) const;
  public:
  	std::unique_ptr<IExpression> expr1;
@@ -81,7 +81,7 @@ class ArrayExpression: public IExpression {
 
 class LengthExpression: public IExpression {
  public:
- 	LengthExpression(int first_line, int first_column, IExpression* expr);
+ 	LengthExpression(IExpression* expr);
 	void Accept(Visitor* v) const;
  public:
  	std::unique_ptr<IExpression> expr;
@@ -89,7 +89,7 @@ class LengthExpression: public IExpression {
 
 class MethodExpression: public IExpression {
  public:
- 	MethodExpression(int first_line, int first_column, IExpression* class_name, IIdentifier* method, std::vector<std::unique_ptr<IExpression>>* params);
+ 	MethodExpression(IExpression* class_name, IIdentifier* method, std::vector<std::unique_ptr<IExpression>>* params);
 	void Accept(Visitor* v) const;
  public:
  	std::unique_ptr<IExpression> class_name;
@@ -99,7 +99,7 @@ class MethodExpression: public IExpression {
 
 class Integer: public IExpression {
  public:
- 	Integer(int first_line, int first_column, int num);
+ 	Integer(int num);
 	void Accept(Visitor* v) const;
  public:
  	int num;
@@ -107,7 +107,7 @@ class Integer: public IExpression {
 
 class Bool: public IExpression {
  public:
- 	Bool(int first_line, int first_column, bool b);
+ 	Bool(bool b);
 
 	void Accept(Visitor* v) const;
 
@@ -117,7 +117,7 @@ class Bool: public IExpression {
 
 class IdentExpression: public IExpression {
 public:
-	IdentExpression(int first_line, int first_column, IIdentifier* ident);
+	IdentExpression(IIdentifier* ident);
 
 	void Accept(Visitor* v) const;
 
@@ -127,13 +127,13 @@ public:
 
 class This: public IExpression {
 public:
-	This(int first_line, int first_column);
+	This();
 	void Accept(Visitor* v) const;
 };
 
 class NewArrExpression: public IExpression {
  public:
- 	NewArrExpression(int first_line, int first_column, IExpression* expr);
+ 	NewArrExpression(IExpression* expr);
 
 	void Accept(Visitor* v) const;
 
@@ -143,7 +143,7 @@ class NewArrExpression: public IExpression {
 
 class NewExpression: public IExpression {
  public:
- 	NewExpression(int first_line, int first_column, IIdentifier* ident);
+ 	NewExpression(IIdentifier* ident);
 
 	void Accept(Visitor* v) const;
 
@@ -153,7 +153,7 @@ class NewExpression: public IExpression {
 
 class NotExpression: public IExpression {
  public:
- 	NotExpression(int first_line, int first_column, IExpression* expr);
+ 	NotExpression(IExpression* expr);
 
 	void Accept(Visitor* v) const;
 
@@ -163,7 +163,7 @@ class NotExpression: public IExpression {
 
 class Expression: public IExpression {
 public:
-	Expression(int first_line, int first_column, IExpression* expr);
+	Expression(IExpression* expr);
 
 	void Accept(Visitor* v) const;
 

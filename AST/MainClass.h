@@ -4,7 +4,7 @@
 
 class MainClass: public IMainClass {
  public:
-	MainClass(int first_line, int first_column, IIdentifier* class_name, IIdentifier* arg, IStatement* statement);
+	MainClass(IIdentifier* class_name, IIdentifier* arg, IStatement* statement);
     void Accept(Visitor* v) const override;
  public:
  	std::unique_ptr<IIdentifier> class_name;

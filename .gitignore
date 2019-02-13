@@ -1,5 +1,0 @@
-*.dot
-parser
-*.lexer.*
-*.output
-*.tab.*
