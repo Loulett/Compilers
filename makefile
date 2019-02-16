@@ -13,7 +13,7 @@ WARNINGS = -Reverything -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedanti
 		   -Wno-missing-variable-declarations -Wno-shadow-field-in-constructor \
 		   -Wno-weak-vtables -Wno-return-std-move-in-c++11 \
 		   \
-		   -Wno-padded -Wno-exit-time-destructors -Wno-deprecated
+		   -Wno-padded -Wno-exit-time-destructors
 
 CXXFLAGS=-std=c++17 #${DEBUG_FLAGS}
 
@@ -24,10 +24,10 @@ PRINTER=Printer_graph.cpp #Printer.cpp
 SYMBOLTABLE=SymbolTable/Symbol.cpp SymbolTable/TableBuilder.cpp SymbolTable/ClassInfo.cpp SymbolTable/MethodInfo.cpp SymbolTable/VariableInfo.cpp
 
 parser.tab.o: parser.tab.c parser.tab.h
-	clang++ ${CXXFLAGS} -c parser.tab.c -o parser.tab.o
+	clang++ ${CXXFLAGS} -Wno-deprecated -c parser.tab.c -o parser.tab.o
 
 parser.lexer.o: parser.lexer.c parser.lexer.h
-	clang++ ${CXXFLAGS} -c parser.lexer.c -o parser.lexer.o
+	clang++ ${CXXFLAGS} -Wno-deprecated -c parser.lexer.c -o parser.lexer.o
 
 parser: parser.lexer.o parser.tab.o main.cpp ${AST} ${PRINTER} ${SYMBOLTABLE}
 	clang++ ${CXXFLAGS} ${WARNINGS} main.cpp parser.tab.o parser.lexer.o ${AST} ${PRINTER} ${SYMBOLTABLE} -o parser
