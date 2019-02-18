@@ -13,7 +13,7 @@ extern void yyerror(Goal* goal, const char* msg);
 extern FILE *yyin;
 
 int main(int, char**) {
-	FILE* myfile = fopen("input.txt", "r");
+	FILE* myfile = fopen("valid_input.txt", "r");
 	yyin = myfile;
 	Goal* goal = nullptr;
 	Table* table = nullptr;
@@ -25,6 +25,13 @@ int main(int, char**) {
 		TableBuilder table_builder;
 		table = table_builder.buildTable(goal);
 		table_builder.printErrors();
+
+		//IRTree::CTranslator t;
+		//t.visit(ast.get());
+
+		// AST root pointer inside &goal
+
+
 	} catch(...) {
 		fclose(myfile);
 		delete goal;
