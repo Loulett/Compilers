@@ -1,65 +1,109 @@
 #pragma once
-#include "../AST/ITreeNodes.h"
+
+#include <iosfwd>
+#include <bits/unique_ptr.h>
+#include <src/AST/ITreeNodes.h>
+#include "IExpression.h"
+#include "IStatement.h"
+#include "Label.h"
+#include "List.h"
 
 
-class CRConstExpression : public IExpression {
+namespace IRTree {
+    class ConstExpression : public IExpression {
 
- public:
-    IRConstExpression();
+    public:
+        const int value;
 
- private:
+        ConstExpression( const int value );
 
-};
+    private:
+    };
 
-class IRNameExpression : public IExpression {
+    class NameExpression : public IExpression {
 
- public:
-    IRNameExpression();
+    public:
+        std::unique_ptr<Label> label;
 
- private:
-};
+        NameExpression( Label* label );
 
-class IRTempExpression : public IExpression {
+    private:
+    };
 
- public:
-    IRTempExpression();
+    class TempExpression : public IExpression {
 
- private:
+    public:
+        enum ETempType {
+            ID,
+            NAME
+        };
+        ETempType tempType;
 
-};
+        const int id;
+        const std::string name;
 
-class IRBinaryExpression : public IExpression {
+        TempExpression();
+        TempExpression( const std::string &name );
 
- public:
-    IRBinaryExpression();
+    private:
+        static int countAll;
 
- private:
+    };
 
-};
+    typedef std::vector<std::unique_ptr<TempExpression>> TempList;
 
-class IRMemoryExpression : public IExpression {
+    class BinaryExpression : public IExpression {
 
- public:
-    IRMemoryExpression();
+    public:
+        enum EBinaryType {
+            AND,
+            PLUS,
+            MINUS,
+            MULTIPLY
+        };
 
- private:
+        const EBinaryType binType;
+        std::unique_ptr<IExpression> leftExp;
+        std::unique_ptr<IExpression> rightExp;
 
-};
+        BinaryExpression( EBinaryType binaryType, IExpression* left, IExpression* right );
 
-class IRCallExpression : public IExpression {
+    private:
 
- public:
-    IRCallExpression();
+    };
 
- private:
+    class MemoryExpression : public IExpression {
 
-};
+    public:
+        std::unique_ptr<IExpression> exp;
 
-class IRESEQExpression : public IExpression {
+        MemoryExpression( IExpression* exp );
 
- public:
-    IRESEQExpression();
+    private:
 
- private:
+    };
 
-};
+    class CallExpression : public IExpression {
+
+    public:
+        std::unique_ptr<IExpression> funcExp;
+        std::unique_ptr<ExpList> args;
+
+        CallExpression( IExpression* funcExp, ExpList* args );
+
+    private:
+
+    };
+
+    class ESEQExpression : public IExpression {
+
+    public:
+        std::unique_ptr<IStatement> stm;
+        std::unique_ptr<IExpression> exp;
+
+        ESEQExpression( IStatement* stm, IExpression* exp );
+
+    private:
+
+    };
+}

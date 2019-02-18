@@ -1,51 +1,89 @@
 #pragma once
-#include "../AST/ITreeNodes.h"
+#include <bits/unique_ptr.h>
+#include <src/AST/ITreeNodes.h>
+#include "IStatement.h"
+#include "Label.h"
+#include "CIRExpression.h"
 
 
-class IRMoveStatement : public IStatement {
+namespace IRTree
+{
+    class MoveStatement : public IStatement
+    {
 
- public:
-    IRMoveStatement();
+    public:
+        std::unique_ptr<IExpression> dst;
+        std::unique_ptr<IExpression> src;
 
- private:
-};
+        MoveStatement( IExpression* dst, IExpression* src );
 
-class IRExpressionStatement : public IStatement {
+    private:
+    };
 
- public:
-    IRExpressionStatement();
+    class ExpressionStatement : public IStatement
+    {
 
- private:
-};
+    public:
+        std::unique_ptr<IExpression> exp;
 
-class IRJumpStatement : public IStatement {
+        ExpressionStatement( IExpression* exp );
 
- public:
-    IRJumpStatement();
+    private:
+    };
 
- private:
-};
+    class JumpStatement : public IStatement
+    {
 
-class IRCJumpStatement : public IStatement {
+    public:
+        std::unique_ptr<IExpression> exp;
+        std::unique_ptr<TempList> targetList;
 
- public:
-    IRCJumpStatement();
+        JumpStatement( IExpression* exp, TempList* tempList );
 
- private:
-};
+    private:
+    };
 
-class IRSeqStatement : public IStatement {
+    class JumpStatement : public IStatement
+    {
 
- public:
-    IRSeqStatement();
+    public:
+        enum ERelationType {
+            EQ,
+            NOTEQ,
+            LESS
+        };
 
- private:
-};
+        const ERelationType relationType;
+        std::unique_ptr<IExpression> leftExp;
+        std::unique_ptr<IExpression> rightExp;
+        std::unique_ptr<Label> ifTrueLabel;
+        std::unique_ptr<Label> ifFalseLabel;
 
-class IRLabelStatement : public IStatement {
+        JumpStatement( ERelationType relType, IExpression* left, IExpression* right, Label* ifTrue, Label* ifFalse );
 
- public:
-    IRLabelStatement();
+    private:
+    };
 
- private:
-};
+    class SeqStatement : public IStatement
+    {
+
+    public:
+        std::unique_ptr<IStatement> leftStm;
+        std::unique_ptr<IStatement> rightStm;
+
+        SeqStatement( IStatement* left, IStatement* right );
+
+    private:
+    };
+
+    class LabelStatement : public IStatement
+    {
+
+    public:
+        std::unique_ptr<Label> label;
+
+        LabelStatement( Label* label );
+
+    private:
+    };
+}
