@@ -14,6 +14,7 @@ extern FILE *yyin;
 
 int main(int argc, char** argv) {
 	FILE* myfile;
+
 	if (argc == 1) {
 		std::cout << "Reading data from file input.txt\n";
 		myfile = fopen("input.txt", "r");

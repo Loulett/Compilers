@@ -92,7 +92,7 @@ void TableBuilder::visit(const Goal* n) {
                     if (table->classes.find(classVal->name) == table->classes.end()) {
                         errors.push_back("Error at line: " + std::to_string(arg.second->first_line) +
                                          " column: " + std::to_string(arg.second->first_column) +
-                                         "error: type of argument " + arg.first->getString() + " was not declared yet.\n");
+                                         ". Message: type of argument " + arg.first->getString() + " was not declared yet.\n");
                     }
                 }
             }
