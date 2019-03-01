@@ -3,27 +3,27 @@
 namespace IRTree {
     MoveStatement::MoveStatement( IExpr* dst, IExpr* src ) :
             dst( dst ),
-            src( (std::unique_ptr<IExpr>&&) src )
+            src(  src )
     {
     }
 
 
     ExpressionStatement::ExpressionStatement( IExpr* exp) :
-            exp( (std::unique_ptr<IExpr>&&) exp )
+            exp(  exp )
     {
     }
 
 
     JumpStatement::JumpStatement( IExpr* exp, TempList* tempList ) :
-            exp( (std::unique_ptr<IExpr>&&) exp )
+            exp(  exp )
             targetList( (std::unique_ptr<TempList>&&) tempList )
     {
     }
 
     CJumpStatement::CCJumpStatement( ERelationType relType, IExpr* left, IExpr* right, Label* ifTrue, Label* ifFalse ) :
             relationType( relType ),
-            leftExp( (std::unique_ptr<IExpr>&&) left ),
-            rightExp( (std::unique_ptr<IExpr>&&) right ),
+            leftExp(  left ),
+            rightExp(  right ),
             ifTrueLabel( (std::unique_ptr<Label>&&) ifTrue ),
             ifFalseLabel( (std::unique_ptr<Label>&&) ifFalse )
     {

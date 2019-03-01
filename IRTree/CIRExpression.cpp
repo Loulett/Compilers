@@ -7,7 +7,7 @@ namespace IRTree {
     }
 
     NameExpression::NameExpression( Label* label ) :
-            label( (std::unique_ptr<Label>&&) label )
+            label(  label )
     {
     }
 
@@ -23,27 +23,27 @@ namespace IRTree {
 
     BINOP::BINOP( EBinaryType binType, IExpr* left, IExpr* right ) :
         binType( binType ),
-        leftExp( (std::unique_ptr<IExpr>&&) left ),
-        rightExp( (std::unique_ptr<IExpr>&&) right )
+        leftExp(  left ),
+        rightExp(  right )
     {
     }
 
     MemoryExpression::MemoryExpression( IExpr* exp ) :
-            exp( (std::unique_ptr<IExpr>&&) exp )
+            exp(  exp )
 
     {
     }
 
 
     CallExpression::CallExpression( IExpr* funcExp, ExpList* args ) :
-            funcExp( (std::unique_ptr<IExpr>&&) funcExp ),
-            args( (std::unique_ptr<ExpList>&&) args )
+            funcExp(  funcExp ),
+            args(  args )
     {
     }
 
     ESEQExpression::ESEQExpression( IStatement* stm, IExpr* exp ) :
-        stm( (std::unique_ptr<IStatement>&&) stm ),
-        exp( (std::unique_ptr<IExpr>&&) exp )
+        stm(  stm ),
+        exp(  exp )
     {
     }
 

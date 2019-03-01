@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iosfwd>
-#include <bits/unique_ptr.h>
+#include <memory>
 #include <src/AST/ITreeNodes.h>
 #include "IExpression.h"
 #include "IStatement.h"
