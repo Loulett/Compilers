@@ -21,27 +21,29 @@ namespace IRTree {
     {
     }
 
-    BinaryExpression::BinaryExpression( EBinaryType binType, IExpression* left, IExpression* right ) :
-            binType( binType ),
-            leftExp( (std::unique_ptr<IExpression>&&) left ),
-            rightExp( (std::unique_ptr<IExpression>&&) right )
+    BINOP::BINOP( EBinaryType binType, IExpr* left, IExpr* right ) :
+        binType( binType ),
+        leftExp( (std::unique_ptr<IExpr>&&) left ),
+        rightExp( (std::unique_ptr<IExpr>&&) right )
     {
     }
 
-    MemoryExpression::MemoryExpression( IExpression* exp ) :
-            exp( (std::unique_ptr<IExpression>&&) exp )
+    MemoryExpression::MemoryExpression( IExpr* exp ) :
+            exp( (std::unique_ptr<IExpr>&&) exp )
+
     {
     }
 
-    CallExpression::CallExpression( IExpression* funcExp, ExpList* args ) :
-            funcExp( (std::unique_ptr<IExpression>&&) funcExp ),
+
+    CallExpression::CallExpression( IExpr* funcExp, ExpList* args ) :
+            funcExp( (std::unique_ptr<IExpr>&&) funcExp ),
             args( (std::unique_ptr<ExpList>&&) args )
     {
     }
 
-    ESEQExpression::ESEQExpression( IStatement* stm, IExpression* exp ) :
-            stm( (std::unique_ptr<IStatement>&&) stm ),
-            exp( (std::unique_ptr<IExpression>&&) exp )
+    ESEQExpression::ESEQExpression( IStatement* stm, IExpr* exp ) :
+        stm( (std::unique_ptr<IStatement>&&) stm ),
+        exp( (std::unique_ptr<IExpr>&&) exp )
     {
     }
 

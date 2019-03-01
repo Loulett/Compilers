@@ -3,10 +3,10 @@
 
 namespace IRTree {
 
-    class IExpression {
+    class IExpr {
 
      public:
-        IExpression()
+        IExpr()
         {
         }
     };

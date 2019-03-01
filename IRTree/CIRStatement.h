@@ -12,11 +12,10 @@ namespace IRTree
     {
 
     public:
-        std::unique_ptr<IExpression> dst;
-        std::unique_ptr<IExpression> src;
+        std::unique_ptr<IExpr> dst;
+        std::unique_ptr<IExpr> src;
 
-        MoveStatement( IExpression* dst, IExpression* src );
-
+        MoveStatement( IExpr* dst, IExpr* src );
     private:
     };
 
@@ -24,9 +23,8 @@ namespace IRTree
     {
 
     public:
-        std::unique_ptr<IExpression> exp;
-
-        ExpressionStatement( IExpression* exp );
+        std::unique_ptr<IExpr> exp;
+        CExpressionStatement( IExpr* exp );
 
     private:
     };
@@ -38,7 +36,7 @@ namespace IRTree
         std::unique_ptr<IExpression> exp;
         std::unique_ptr<TempList> targetList;
 
-        JumpStatement( IExpression* exp, TempList* tempList );
+        JumpStatement( IExpr* exp, TempList* tempList );
 
     private:
     };
@@ -54,12 +52,12 @@ namespace IRTree
         };
 
         const ERelationType relationType;
-        std::unique_ptr<IExpression> leftExp;
-        std::unique_ptr<IExpression> rightExp;
+        std::unique_ptr<IExpr> leftExp;
+        std::unique_ptr<IExpr> rightExp;
         std::unique_ptr<Label> ifTrueLabel;
         std::unique_ptr<Label> ifFalseLabel;
 
-        JumpStatement( ERelationType relType, IExpression* left, IExpression* right, Label* ifTrue, Label* ifFalse );
+        JumpStatement( ERelationType relType, IExpr* left, IExpr* right, Label* ifTrue, Label* ifFalse );
 
     private:
     };

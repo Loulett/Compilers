@@ -52,8 +52,8 @@ namespace IRTree {
 
     typedef std::vector<std::unique_ptr<TempExpression>> TempList;
 
-    class BinaryExpression : public IExpression {
-
+    class BINOP : public IExpr
+    {
     public:
         enum EBinaryType {
             AND,
@@ -63,10 +63,11 @@ namespace IRTree {
         };
 
         const EBinaryType binType;
-        std::unique_ptr<IExpression> leftExp;
-        std::unique_ptr<IExpression> rightExp;
+        std::unique_ptr<IExpr> leftExp;
+        std::unique_ptr<IExpr> rightExp;
 
-        BinaryExpression( EBinaryType binaryType, IExpression* left, IExpression* right );
+
+        BINOP( EBinaryType binaryType, IExpr* left, IExpr* right );
 
     private:
 
@@ -75,21 +76,19 @@ namespace IRTree {
     class MemoryExpression : public IExpression {
 
     public:
-        std::unique_ptr<IExpression> exp;
+        std::unique_ptr<IExpr> exp;
 
-        MemoryExpression( IExpression* exp );
+        CMemoryExpression( IExpr* exp );
 
     private:
-
     };
 
-    class CallExpression : public IExpression {
-
+    class CCallExpression : public IExpr {
     public:
-        std::unique_ptr<IExpression> funcExp;
+        std::unique_ptr<IExpr> funcExp;
         std::unique_ptr<ExpList> args;
 
-        CallExpression( IExpression* funcExp, ExpList* args );
+        CallExpression( IExpr* funcExp, ExpList* args );
 
     private:
 
@@ -99,9 +98,9 @@ namespace IRTree {
 
     public:
         std::unique_ptr<IStatement> stm;
-        std::unique_ptr<IExpression> exp;
+        std::unique_ptr<IExpr> exp;
 
-        ESEQExpression( IStatement* stm, IExpression* exp );
+        ESEQExpression( IStatement* stm, IExpr* exp );
 
     private:
 

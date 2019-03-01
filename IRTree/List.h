@@ -10,7 +10,7 @@ namespace IRTree {
         // arguments
     };
 
-    using ExpList = List<IExpression>;
+    using ExpList = List<IExpr>;
     using StmList = List<IStatement>;
 
 }

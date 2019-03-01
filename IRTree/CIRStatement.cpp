@@ -1,27 +1,29 @@
 #include "CIRStatement.h"
 
 namespace IRTree {
-    MoveStatement::MoveStatement( IExpression* dst, IExpression* src ) :
-            dst( (std::unique_ptr<IExpression>&&) dst ),
-            src( (std::unique_ptr<IExpression>&&) src )
+    MoveStatement::MoveStatement( IExpr* dst, IExpr* src ) :
+            dst( dst ),
+            src( (std::unique_ptr<IExpr>&&) src )
     {
     }
 
-    ExpressionStatement::ExpressionStatement( IExpression* exp) :
-            exp( (std::unique_ptr<IExpression>&&) exp )
+
+    ExpressionStatement::ExpressionStatement( IExpr* exp) :
+            exp( (std::unique_ptr<IExpr>&&) exp )
     {
     }
 
-    JumpStatement::JumpStatement( IExpression* exp, TempList* tempList ) :
-            exp( (std::unique_ptr<IExpression>&&) exp ),
+
+    JumpStatement::JumpStatement( IExpr* exp, TempList* tempList ) :
+            exp( (std::unique_ptr<IExpr>&&) exp )
             targetList( (std::unique_ptr<TempList>&&) tempList )
     {
     }
 
-    JumpStatement::JumpStatement( ERelationType relType, IExpression* left, IExpression* right, Label* ifTrue, Label* ifFalse ) :
+    CJumpStatement::CCJumpStatement( ERelationType relType, IExpr* left, IExpr* right, Label* ifTrue, Label* ifFalse ) :
             relationType( relType ),
-            leftExp( (std::unique_ptr<IExpression>&&) left ),
-            rightExp( (std::unique_ptr<IExpression>&&) right ),
+            leftExp( (std::unique_ptr<IExpr>&&) left ),
+            rightExp( (std::unique_ptr<IExpr>&&) right ),
             ifTrueLabel( (std::unique_ptr<Label>&&) ifTrue ),
             ifFalseLabel( (std::unique_ptr<Label>&&) ifFalse )
     {

@@ -10,7 +10,7 @@ struct CCodeFragment {
 };
 
 class CTranslator : public IVisitor {
-
+    IFrame* curFrame;
     std::vector<CCodeFragment> codeFragments;
 
     void visit( const CGoal* n ) override;
