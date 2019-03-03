@@ -30,7 +30,6 @@ namespace IRTree {
 
     MemoryExpression::MemoryExpression( IExpr* exp ) :
             exp(  exp )
-
     {
     }
 

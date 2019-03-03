@@ -3,6 +3,8 @@
 #include "../Visitor.h"
 #include "..ActivationRecords/IFrame.h"
 #include "IStatement.h"
+#include "../SymbolTable/TableBuilder.cpp"
+#include "WrapperSubTree.h"
 
 struct CCodeFragment {
     const IFrame* frame;
@@ -13,34 +15,82 @@ class CTranslator : public IVisitor {
     IFrame* curFrame;
     std::vector<CCodeFragment> codeFragments;
 
-    void visit( const CGoal* n ) override;
-    void visit( const CMainClass* n ) override;
-    void visit( const СClassDeclaration* n ) override;
-    void visit( const CVarDeclaration* n ) override;
-    void visit( const CArgument* n ) override;
-    void visit( const CMethodDeclaration* n ) override;
+    std::map<std::string, IFrame*> frames;
 
-    void visit( const CType* n ) override;
+    ISubtreeWrapper* curWrapper;
+    Table* symbolTable;
+    ClassInfo* curClass;
+    MethodInfo* curMethod;
 
-    void visit( const CIfStatement* n ) override;
-    void visit( const CWhileStatement* n ) override;
-    void visit( const CComplexStatement* n ) override;
-    void visit( const CPrintStatement* n ) override;
-    void visit( const CAssignmentStatement* n ) override;
-    void visit( const CArrayAssignmentStatement* n ) override;
+    void buildNewFrame( const MethodDeclaration* declaration ) {
+        ClassInfo* classDefinition = symbolTable->classes[curClass->name].get();
+        MethodInfo* methodDefinition = classDefinition->methods[declaration->name->value].get();
 
-    void visit( const CBinaryExpression* n ) override;
-    void visit( const CIndexExpression* n ) override;
-    void visit( const CLengthExpression* n ) override;
-    void visit( const CMethodCallExpression* n ) override;
-    void visit( const CIntegerExpression* n ) override;
-    void visit( const CBooleanConstExpression* n ) override;
-    void visit( const CIdentifierExpression* n ) override;
-    void visit( const CThisExpression* n ) override;
-    void visit( const CNewArrExpression* n ) override;
-    void visit( const CNewExpression* n ) override;
-    void visit( const CNegationExpression* n ) override;
-    void visit( const CParenthesesExpression* n ) override;
+        curFrame = new CFrame( classDefinition->name, methodDefinition->name);
 
-    void visit( const CIdentifier* n ) override;
+        for ( auto& it: ...) {  // by Frame
+            // go through args of Frame classDef
+        }
+        for ( auto& it: ... ) {
+            // go through args of Frame methodDef
+        }
+
+        frames.emplace( curFrame->GetName(),  curFrame );
+    }
+
+
+    void ProcessStatementList(const std::vector<std::unique_ptr<IStatement>>* statements) {
+
+        WrapperSubtree* rightTail = nullptr;
+
+        if (!statements->empty()) {
+            statements->back()->Accept( this);
+            rightTail = curWrapper;
+        }
+        for(auto&& stmt = std::next(statements->crbegin()); stmt != statements->crend(); ++stmt) {
+            (*stmt)->Accept( this);
+            auto curResult = curWrapper;
+            rightTail = new WrapperStmt(new CSeqStatement(curResult->ToStm(), rightTail->ToStm()));
+        }
+        curWrapper = rightTail;
+    }
+
+
+    virtual void visit(const Goal* n)override;
+    virtual void visit(const MainClass* n) override;
+    virtual void visit(const ClassDeclaration* n) override;
+    virtual void visit(const VarDeclaration* n) override;
+    virtual void visit(const MethodDeclaration* n) override;
+
+    virtual void visit(const Type* n) override;
+
+    virtual void visit(const IfStatement* n) override;
+    virtual void visit(const WhileStatement* n) override;
+    virtual void visit(const Statement* n) override;
+    virtual void visit(const PrintStatement* n) override;
+    virtual void visit(const AssignmentStatement* n) override;
+    virtual void visit(const ArrAssignmentStatement* n) override;
+
+    virtual void visit(const MinusExpression* n) override;
+    virtual void visit(const PlusExpression* n) override;
+    virtual void visit(const AndExpression* n) override;
+    virtual void visit(const LessExpression* n) override;
+    virtual void visit(const MultExpression* n) override;
+
+
+    virtual void visit(const RemainExpression* n) override;
+    virtual void visit(const OrExpression* n) override;
+    virtual void visit(const ArrayExpression* n) override;
+    virtual void visit(const LengthExpression* n) override;
+    virtual void visit(const MethodExpression* n) override;
+    virtual void visit(const Integer* n) override;
+    virtual void visit(const Bool* n) override;
+    virtual void visit(const IdentExpression* n) override;
+    virtual void visit(const This* n) override;
+    virtual void visit(const NewArrExpression* n) override;
+    virtual void visit(const NewExpression* n) override;
+    virtual void visit(const NotExpression* n) override;
+    virtual void visit(const Expression* n) override;
+
+    virtual void visit(const Identifier* n) override;
 };

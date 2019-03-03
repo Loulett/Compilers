@@ -24,7 +24,7 @@ namespace IRTree
 
     public:
         std::unique_ptr<IExpr> exp;
-        CExpressionStatement( IExpr* exp );
+        CExpressionStatement( IExpr* exp);
 
     private:
     };
