@@ -8,6 +8,6 @@ namespace IRTree {
      public:
         IStatement()
         {
-        }
+        } = default;
     };
 }
