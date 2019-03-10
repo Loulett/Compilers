@@ -2,9 +2,7 @@
 
 
 namespace IRTree {
-
     class IExpr {
-
      public:
         IExpr()
         {

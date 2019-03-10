@@ -1,4 +1,11 @@
+#include <../IRTree/IExpression.h>
 
-class IAccess {
-    virtual ~IAccess() = default;
-};
+namespace IRTree
+{
+    class IAccess
+    {
+    public:
+        virtual ~IAccess() = default;
+        virtual IExpr* ToExpression() const = 0;
+    };
+}

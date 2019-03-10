@@ -34,7 +34,7 @@ namespace IRTree {
     }
 
 
-    CallExpression::CallExpression( IExpr* funcExp, ExpList* args ) :
+    CallExpression::CallExpression( IExpr* funcExp, ExpressionsList* args ) :
             funcExp(  funcExp ),
             args(  args )
     {

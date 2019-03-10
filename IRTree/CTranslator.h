@@ -26,7 +26,7 @@ class CTranslator : public IVisitor {
         ClassInfo* classDefinition = symbolTable->classes[curClass->name].get();
         MethodInfo* methodDefinition = classDefinition->methods[declaration->name->value].get();
 
-        curFrame = new CFrame( classDefinition->name, methodDefinition->name);
+        curFrame = new X86MiniJavaFrame( classDefinition->name, methodDefinition->name);
 
         for ( auto& it: ...) {  // by Frame
             // go through args of Frame classDef

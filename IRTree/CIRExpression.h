@@ -86,9 +86,9 @@ namespace IRTree {
     class CCallExpression : public IExpr {
     public:
         std::unique_ptr<IExpr> funcExp;
-        std::unique_ptr<ExpList> args;
+        std::unique_ptr<ExpressionsList> args;
 
-        CallExpression( IExpr* funcExp, ExpList* args );
+        CallExpression( IExpr* funcExp, ExpressionsList* args );
 
     private:
 
