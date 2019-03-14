@@ -5,6 +5,7 @@
 #include "SymbolTable/Table.h"
 #include "SymbolTable/TableBuilder.h"
 #include "SymbolTable/Symbol.h"
+#include "IRTree/CTranslator.h"
 #include <cstdio>
 #include <iostream>
 
@@ -26,8 +27,8 @@ int main(int, char**) {
 		table = table_builder.buildTable(goal);
 		table_builder.printErrors();
 
-		//IRTree::CTranslator t;
-		//t.visit(ast.get());
+		IRTree::CTranslator t;
+		t.visit(ast.get());
 
 		// AST root pointer inside &goal
 

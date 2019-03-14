@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Visitor.h"
-#include "..ActivationRecords/IFrame.h"
+#include "../ActivationRecords/IFrame.h"
 #include "IStatement.h"
 #include "../SymbolTable/TableBuilder.cpp"
 #include "WrapperSubTree.h"
