@@ -61,27 +61,164 @@ void visit(const MethodDeclaration* n) {
                     new SeqStatement(
                         stm_wrapper->ToStm(),
                         MoveStatement(
-                            ,
+                            curFrame->GetAccess(X86MiniJavaFrame::return_pointer)->ToExp(),
                             return_exp
                         )
                     )
                 )
-            )
+            );
     }
-
+    CodeFragment cf(curFrame, curWrapper->ToStm());
+    fragments[curFrame->name] = std::move(cf);
+    curMethod = nullptr;
 }
 
 
-void visit(const Type* n) override;
+void Translator::visit(const Type*) {assert(false);}
 
-void visit(const IfStatement* n) override;
-void visit(const WhileStatement* n) override;
-void visit(const Statement* n) override;
-void visit(const PrintStatement* n) override;
-void visit(const AssignmentStatement* n) override;
-void visit(const ArrAssignmentStatement* n) override;
+void Translator::visit(const IfStatement* n) {
+    n->clause->Accept(this);
+    auto cond_wrapper = std::move(curWrapper);
 
-void visit(const AndExpression* n) override;
+    n->true_statement->Accept(this);
+    auto true_wrapper = std::move(curWrapper);
+
+    n->false_statement->Accept(this);
+    auto false_wrapper = std::move(curWrapper);
+
+    std::string true_label = "True::" + std::string(ifCounter);
+    std::string false_label = "False::" + std::string(ifCounter);
+    std::string exit_label = "IfExit::" + std::string(ifCounter);
+
+    curWrapper = new StmWrapper(
+            new SeqStatement(
+                cond_wrapper->ToCond(true_label, false_label),
+                new SeqStatement(
+                    new LabelStatement(true_label),
+                    new SeqStatement(
+                        true_wrapper->ToStm(),
+                        new SeqStatement(
+                            new JumpStatement(exit_label),
+                            new SeqStatement(
+                                new LabelStatement(false_label),
+                                new SeqStatement(
+                                    false_wrapper->ToStm(),
+                                    new LabelStatement(exit_label)
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        );
+
+    ifCounter++;
+}
+
+void Translator::visit(const WhileStatement* n) {
+    n->clause->Accept(this);
+    auto clause_wrapper = std::move(curWrapper);
+
+    n->body->Accept(this);
+    auto body_wrapper = std::move(curWrapper);
+
+    std::string loop_label = "Loop::" + std::string(WhileCounter);
+    std::string body_label = "Body::" + std::string(WhileCounter);
+    std::string done_label = "Done::" + std::string(WhileCounter);
+
+    curWrapper = new StmWrapper(
+            new SeqStatement(
+                new LabelStatement(loop_label),
+                new SeqStatement(
+                    clause_wrapper->ToCond(body_label, done_label),
+                    new SeqStatement(
+                        new LabelStatement(body_label),
+                        new SeqStatement(
+                            body_wrapper->ToStm(),
+                            new SeqStatement(
+                                new JumpStatement(loop_label),
+                                new LabelStatement(done_label)
+                            )
+                        )
+                    )
+                )
+            )
+        );
+
+    WhileCounter++;
+}
+
+void Traslator::visit(const Statement* n) {
+    AcceptStms(n->statements);
+}
+
+void Translator::visit(const PrintStatement* n) {
+    n->print->Accept(this);
+
+    curWrapper = new ExpWrapper(
+            curFrame->ExternalCall("print", curWrapper->ToExp())
+        );
+}
+
+void Translator::visit(const AssignmentStatement* n) {
+    n->var->Accept(this);
+    auto var = curWrapper->ToExp();
+
+    n->expr->Accept(this);
+    auto expr = curWrapper->ToExp();
+
+    curWrapper = new StmWrapper(
+            new MoveStatement(
+                expr,
+                var
+            )
+        );
+}
+
+void Translator::visit(const ArrAssignmentStatement* n) {
+    n->var->Accept(this);
+    auto var = curWrapper->ToExp();
+
+    n->num->Accept(this);
+    auto num = curWrapper->ToExp();
+
+    n->expr->Accept(this);
+    auto expr = curWrapper->ToExp();
+
+    curWrapper = new StmWrapper(
+            new MoveStatement(
+                expr,
+                new MemExpression(
+                    new BinOpExpression(
+                        BinOpExpression::BinOp::PLUS,
+                        var,
+                        new BinOpExpression(
+                            BinOpExpression::BinOp::MULT,
+                            new BinOpExpression(
+                                BinOpExpression::BinOp::PLUS,
+                                num,
+                                new ConstExpression(1)
+                                ),
+                            new ConstExpression(
+                                curFrame->WordSize()
+                            )
+                        )
+                    )
+                )
+            )
+        );
+}
+
+void Translate::visit(const AndExpression* n) {
+    n->expr1->Accept(this);
+    auto expr1 = std::move(curWrapper);
+
+    n->expr2->Accept(this);
+    auto expr2 = std::move(curWrapper);
+
+    curWrapper = new
+}
+
 void visit(const LessExpression* n) override;
 void visit(const PlusExpression* n) override;
 void visit(const MinusExpression* n) override;

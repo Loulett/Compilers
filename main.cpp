@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <iostream>
 
+
 extern int yyparse(Goal* goal);
 extern void yyerror(Goal* goal, const char* msg);
 extern FILE *yyin;

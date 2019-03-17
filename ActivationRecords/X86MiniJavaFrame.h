@@ -10,14 +10,15 @@ class X86MiniJavaFrame: public IFrame {
     void AddLocal(std::string name) override;
     IAccess* GetAccess(std::string name);
     IRExpression ExternalCall(std::string name, IRExpression* args);
+
+    const static std::string frame_pointer;
+    const static std::string this_pointer;
+    const static std::string return_pointer;
     // int FormalsCount() override;
     // IAccess* Formal(int index) override;
     // IAccess* FindLocalOrFormal(const Symbol* name) override;
  private:
     std::string name;
-    const static std::string frame_pointer;
-    const static std::string this_pointer;
-    const static std::string return_pointer;
     int frame_size;
     const int word_size = 4;
     std::map<std::string, IAccess*> addresses;

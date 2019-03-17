@@ -54,4 +54,6 @@ public:
     ClassInfo* curClass = nullptr;
     MethodInfo* curMethod = nullptr;
     Table* table;
+    int ifCounter = 0;
+    int whileCounter = 0;
 };
