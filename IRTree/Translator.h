@@ -1,14 +1,24 @@
 #pragma once
 #include "../Visitor.h"
-#include "../SymbolsTable/Table.h"
+#include "../SymbolTable/Table.h"
+#include "../ActivationRecords/IFrame.h"
+#include "../ActivationRecords/X86MiniJavaFrame.h"
+#include "IRStatement.h"
+#include "IRExpression.h"
 #include "Statement.h"
 #include "Expression.h"
+#include "CodeFragment.h"
+#include "SubTreeWrapper.h"
+#include <map>
 
 class Translator: public Visitor
 {
 
 public:
-    Translator(Table table);
+    Translator(Table* table);
+    void AddClassFields(ClassInfo* class_info);
+    void AddMethodFields(MethodInfo* method_info);
+    void BuildFrame(Symbol* class_name, Symbol* method_name);
 
     void visit(const Goal* n) override;
     void visit(const MainClass* n) override;

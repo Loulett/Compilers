@@ -1,9 +1,10 @@
 // #include "../SymbolTable/Symbol.h"
+#pragma once
+
+#include "IRStatement.h"
+#include "IRExpression.h"
 #include <vector>
-
-class IRStatement {
-
-};
+#include <string>
 
 class MoveStatement: public IRStatement {
  public:
@@ -23,9 +24,9 @@ class ExpStatement: public IRStatement {
 
 class JumpStatement: public IRStatement {
  public:
-    JumpStatement(IRExpression* exp);
+    JumpStatement(std::string& label);
 
-    IRExpression* exp;
+    std::string& label;
 };
 
 class CJumpStatement: public IRStatement {
@@ -50,8 +51,8 @@ class SeqStatement: public IRStatement {
 
 class LabelStatement: public IRStatement {
  public:
-    LabelStatement(Symbol* label);
+    LabelStatement(std::string& label);
 
-    Symbol* label;
+    std::string& label;
 
 };

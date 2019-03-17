@@ -1,10 +1,10 @@
 // #include "../SymbolTable/Symbol.h"
-#include "Statement.h"
+#pragma once
+
+#include "IRExpression.h"
+#include "IRStatement.h"
 #include <vector>
 #include <string>
-
-class IRExpression {
-};
 
 class IRExpList {
  public:

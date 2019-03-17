@@ -14,9 +14,9 @@ std::vector<IRExpression*> IRExpList::Get() {
 
 ConstExpression::ConstExpression(int val): value(val) {}
 
-NameExpression::NameExpression(Symbol* name): name(name) {}
+NameExpression::NameExpression(std::string& name): name(name) {}
 
-TempExpression::TempExpression(Symbol* name): name(name) {}
+TempExpression::TempExpression(std::string& name): name(name) {}
 
 BinOpExpression::BinOpExpression(BinOp binop, IRExpression* left, IRExpression* right): binop(binop), left(left), right(right) {}
 

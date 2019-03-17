@@ -10,7 +10,7 @@ IRStatement* ExpWrapper::ToStm() {
     return new ExpStatement(exp);
 }
 
-StmWrapper::StmWrapper(IRStatement* stm): smt(stm) {}
+StmWrapper::StmWrapper(IRStatement* stm): stm(stm) {}
 
 IRStatement* StmWrapper::ToStm() {
     return stm;

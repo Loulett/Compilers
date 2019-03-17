@@ -5,6 +5,7 @@
 #include "SymbolTable/Table.h"
 #include "SymbolTable/TableBuilder.h"
 #include "SymbolTable/Symbol.h"
+#include "IRTree/Translator.h"
 #include <cstdio>
 #include <iostream>
 
@@ -34,6 +35,9 @@ int main(int argc, char** argv) {
 		TableBuilder table_builder;
 		table = table_builder.buildTable(goal);
 		table_builder.printErrors();
+
+		Translator translator(table);
+		translator.visit(goal);
 	} catch(...) {
 		fclose(myfile);
 		delete goal;

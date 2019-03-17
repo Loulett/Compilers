@@ -1,3 +1,5 @@
+#include "IRStatement.h"
+#include "IRExpression.h"
 #include "Statement.h"
 #include "Expression.h"
 #include <string>

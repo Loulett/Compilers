@@ -23,6 +23,10 @@ PRINTER=#Printer.cpp
 
 SYMBOLTABLE=SymbolTable/Symbol.cpp SymbolTable/ClassInfo.cpp SymbolTable/MethodInfo.cpp SymbolTable/VariableInfo.cpp
 
+ACTIVATIONRECORDS=ActivationRecords/InFrameAccess.cpp ActivationRecords/InRegAccess.cpp ActivationRecords/X86MiniJavaFrame.cpp
+
+IRTREE=IRTree/Expression.cpp IRTree/Statement.cpp IRTree/SubTreeWrapper.cpp IRTree/Translator.cpp
+
 parser.tab.o: parser.tab.c parser.tab.h
 	clang++ ${CXXFLAGS} -Wno-deprecated -c parser.tab.c -o parser.tab.o
 
@@ -35,8 +39,8 @@ TableBuilder.o: SymbolTable/TableBuilder.cpp
 Printer_graph.o: Printer_graph.cpp
 	clang++ ${CXXFLAGS} ${WARNINGS} -c Printer_graph.cpp -o Printer_graph.o
 
-parser: parser.lexer.o parser.tab.o TableBuilder.o Printer_graph.o main.cpp ${AST} ${PRINTER} ${SYMBOLTABLE}
-	clang++ ${CXXFLAGS} ${WARNINGS} main.cpp parser.tab.o parser.lexer.o TableBuilder.o Printer_graph.o ${AST} ${PRINTER} ${SYMBOLTABLE} -o parser
+parser: parser.lexer.o parser.tab.o TableBuilder.o Printer_graph.o main.cpp ${AST} ${PRINTER} ${SYMBOLTABLE} ${ACTIVATIONRECORDS} ${IRTREE}
+	clang++ ${CXXFLAGS} ${WARNINGS} main.cpp parser.tab.o parser.lexer.o TableBuilder.o Printer_graph.o ${AST} ${PRINTER} ${SYMBOLTABLE} ${ACTIVATIONRECORDS} ${IRTREE} -o parser
 
 clean:
 	rm -f parser parser.lexer.c parser.lexer.h parser.tab.c parser.tab.h parser.output output.dot *.o

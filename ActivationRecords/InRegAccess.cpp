@@ -2,6 +2,6 @@
 
 InRegAccess::InRegAccess(std::string name): name(name) {}
 
-IRExpression* InRegAccess::ToExp() {
+IRExpression* InRegAccess::GetExp() {
     return new TempExpression(name);
 }
