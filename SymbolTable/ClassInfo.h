@@ -11,6 +11,7 @@ class ClassInfo{
  	bool HasField(Symbol* field_name);
  	bool HasMethod(Symbol* method_name);
  	MethodInfo* GetMethod(Symbol* method_name);
+    int GetSize();
 
  	Symbol* name;
  	Symbol* parent;
