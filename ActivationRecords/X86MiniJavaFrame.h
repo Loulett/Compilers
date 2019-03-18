@@ -11,13 +11,13 @@ class X86MiniJavaFrame: public IFrame {
     std::string GetName() override {return name;}
     void AddFormal(const std::string& formal_name) override;
     void AddLocal(const std::string& local_name) override;
-    IAccess* GetAccess(std::string& access_name) override;
+    IAccess* GetAccess(const std::string& access_name) override;
     IRExpression* ExternalCall(std::string& method_name, IRExpression* args) override;
     int WordSize() override {return word_size;}
 
-    static std::string frame_pointer;
-    static std::string this_pointer;
-    static std::string return_pointer;
+    const static std::string frame_pointer;
+    const static std::string this_pointer;
+    const static std::string return_pointer;
     // int FormalsCount() override;
     // IAccess* Formal(int index) override;
     // IAccess* FindLocalOrFormal(const Symbol* name) override;

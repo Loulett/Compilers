@@ -32,3 +32,7 @@ MethodInfo* ClassInfo::GetMethod (Symbol* method_name) {
 	}
 	return nullptr;
 }
+
+int ClassInfo::GetSize() {
+	return vars.size() + (parentInfo == nullptr ? 0 : parentInfo->GetSize());
+}

@@ -36,3 +36,29 @@ class StmWrapper: public ISubTreeWrapper {
  private:
     IRStatement* stm;
 };
+
+class CondWrapper: public ISubTreeWrapper {
+ public:
+    CondWrapper(CJumpStatement::Relation rel, IRExpression* left, IRExpression* right);
+
+    IRExpression* ToExp() override;
+    IRStatement* ToStm() override;
+    IRStatement* ToCond(std::string& t, std::string& f) override;
+ private:
+    CJumpStatement::Relation rel;
+    IRExpression* left;
+    IRExpression* right;
+
+
+};
+
+class CondNotWrapper: public ISubTreeWrapper {
+ public:
+    CondNotWrapper(ISubTreeWrapper* wrapper);
+
+    IRExpression* ToExp() override;
+    IRStatement* ToStm() override;
+    IRStatement* ToCond(std::string& t, std::string& f) override;
+ private:
+    ISubTreeWrapper* wrapper;
+};

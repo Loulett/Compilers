@@ -9,6 +9,7 @@
 class MoveStatement: public IRStatement {
  public:
     MoveStatement(IRExpression* dst, IRExpression* src);
+    void Accept( IRVisitor* v ) const override;
 
     IRExpression* dst;
     IRExpression* src;
@@ -17,6 +18,7 @@ class MoveStatement: public IRStatement {
 class ExpStatement: public IRStatement {
  public:
     ExpStatement(IRExpression* exp);
+    void Accept( IRVisitor* v ) const override;
 
     IRExpression* exp;
 
@@ -25,25 +27,34 @@ class ExpStatement: public IRStatement {
 class JumpStatement: public IRStatement {
  public:
     JumpStatement(std::string& label);
+    void Accept( IRVisitor* v ) const override;
 
-    std::string& label;
+    std::string label;
 };
 
 class CJumpStatement: public IRStatement {
  public:
-    CJumpStatement(int rel, IRExpression* left, IRExpression* right, std::string& if_left, std::string& if_right);
+    enum Relation{
+        LESS,
+        NEQ,
+        EQ
+    };
 
-    int rel;
+    CJumpStatement(CJumpStatement::Relation rel, IRExpression* left, IRExpression* right, std::string& if_left, std::string& if_right);
+    void Accept( IRVisitor* v ) const override;
+
+    CJumpStatement::Relation rel;
     IRExpression* left;
     IRExpression* right;
-    std::string& if_left;
-    std::string& if_right;
+    std::string if_left;
+    std::string if_right;
 
 };
 
 class SeqStatement: public IRStatement {
  public:
     SeqStatement(IRStatement* left, IRStatement* right);
+    void Accept( IRVisitor* v ) const override;
 
     IRStatement* left;
     IRStatement* right;
@@ -52,7 +63,8 @@ class SeqStatement: public IRStatement {
 class LabelStatement: public IRStatement {
  public:
     LabelStatement(std::string& label);
+    void Accept( IRVisitor* v ) const override;
 
-    std::string& label;
+    std::string label;
 
 };

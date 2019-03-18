@@ -1,4 +1,7 @@
-#pragma once
+#ifndef AST_Statement
+#define AST_Statement
+
+
 #include "INode.h"
 #include <vector>
 #include <memory>
@@ -57,3 +60,5 @@ class ArrAssignmentStatement: public IStatement {
  	std::unique_ptr<IExpression> num;
  	std::unique_ptr<IExpression> expr;
 };
+
+#endif  // AST_Statement

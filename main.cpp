@@ -6,6 +6,7 @@
 #include "SymbolTable/TableBuilder.h"
 #include "SymbolTable/Symbol.h"
 #include "IRTree/Translator.h"
+#include "IRTree/IRPrinter.h"
 #include <cstdio>
 #include <iostream>
 
@@ -16,6 +17,8 @@ extern FILE *yyin;
 
 int main(int argc, char** argv) {
 	FILE* myfile;
+
+	// std::cout.
 
 	if (argc == 1) {
 		std::cout << "Reading data from file input.txt\n";
@@ -38,6 +41,11 @@ int main(int argc, char** argv) {
 
 		Translator translator(table);
 		translator.visit(goal);
+
+		for(auto& codeFragment : translator.fragments) {
+            IRPrinter printer("output" + codeFragment.first + ".dot");
+            codeFragment.second.body->Accept(&printer);
+        }
 	} catch(...) {
 		fclose(myfile);
 		delete goal;

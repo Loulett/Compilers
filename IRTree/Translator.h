@@ -1,6 +1,7 @@
 #pragma once
 #include "../Visitor.h"
 #include "../SymbolTable/Table.h"
+#include "../SymbolTable/Symbol.h"
 #include "../ActivationRecords/IFrame.h"
 #include "../ActivationRecords/X86MiniJavaFrame.h"
 #include "IRStatement.h"
@@ -19,6 +20,9 @@ public:
     void AddClassFields(ClassInfo* class_info);
     void AddMethodFields(MethodInfo* method_info);
     void BuildFrame(Symbol* class_name, Symbol* method_name);
+    void AcceptStms(const std::vector<std::unique_ptr<IStatement>>* statements);
+    // std::map<std::string, CodeFragment> GetFragments() {return fragments;}
+
 
     void visit(const Goal* n) override;
     void visit(const MainClass* n) override;
@@ -57,13 +61,14 @@ public:
 
     void visit(const Identifier* n) override;
 
- private:
     std::map<std::string, CodeFragment> fragments;
+ private:
     IFrame* curFrame = nullptr;
-    ISubTreeWrapper* curWrapper = nullptr;
+    std::unique_ptr<ISubTreeWrapper> curWrapper = nullptr;
     ClassInfo* curClass = nullptr;
     MethodInfo* curMethod = nullptr;
     Table* table;
+    Symbol* callerClass;
     int ifCounter = 0;
     int whileCounter = 0;
 };

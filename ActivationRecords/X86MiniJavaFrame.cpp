@@ -1,8 +1,8 @@
 #include "X86MiniJavaFrame.h"
 
-std::string frame_pointer = "__frame__";
-std::string this_pointer = "__this__";
-std::string return_pointer = "__return__";
+const std::string X86MiniJavaFrame::frame_pointer = "__frame__";
+const std::string X86MiniJavaFrame::this_pointer = "__this__";
+const std::string X86MiniJavaFrame::return_pointer = "__return__";
 
 X86MiniJavaFrame::X86MiniJavaFrame(Symbol* class_name, Symbol* method_name):
     name(class_name->getString() + "::" + method_name->getString()),
@@ -26,7 +26,7 @@ void X86MiniJavaFrame::AddFormal(const std::string& formal_name) {
     frame_size += word_size;
 }
 
-IAccess* X86MiniJavaFrame::GetAccess(std::string& access_name) {
+IAccess* X86MiniJavaFrame::GetAccess(const std::string& access_name) {
     auto res = addresses.find(access_name);
     if (res != addresses.end()) {
         return res->second;

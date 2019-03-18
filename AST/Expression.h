@@ -1,4 +1,6 @@
-#pragma once
+#ifndef AST_Expression
+#define AST_Expression
+
 #include "INode.h"
 #include <vector>
 #include <memory>
@@ -170,3 +172,5 @@ public:
 public:
 	std::unique_ptr<IExpression> expr;
 };
+
+#endif  // AST_Expression
