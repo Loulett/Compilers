@@ -15,7 +15,7 @@ WARNINGS = -Reverything -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedanti
 		   \
 		   -Wno-padded -Wno-exit-time-destructors
 
-CXXFLAGS=-std=c++17 ${DEBUG_FLAGS}
+CXXFLAGS=-std=c++17 #${DEBUG_FLAGS}
 
 AST=AST/Identifier.cpp AST/Expression.cpp AST/Statement.cpp AST/Type.cpp AST/VarDeclaration.cpp AST/MethodDeclaration.cpp AST/ClassDeclaration.cpp AST/MainClass.cpp AST/Goal.cpp
 
@@ -45,4 +45,4 @@ parser: parser.lexer.o parser.tab.o TableBuilder.o Printer_graph.o main.cpp ${AS
 		 ${AST} ${PRINTER} ${SYMBOLTABLE} ${ACTIVATIONRECORDS} ${IRTREE} -o parser
 
 clean:
-	rm -f parser parser.lexer.c parser.lexer.h parser.tab.c parser.tab.h parser.output output.dot *.o
+	rm -f parser parser.lexer.c parser.lexer.h parser.tab.c parser.tab.h parser.output *.dot *.o

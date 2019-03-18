@@ -238,8 +238,8 @@ void Translator::visit(const AssignmentStatement* n) {
     curWrapper = std::unique_ptr<ISubTreeWrapper>(
         new StmWrapper(
             new MoveStatement(
-                expr,
-                var
+                var,
+                expr
             )
         )
     );
@@ -307,12 +307,10 @@ void Translator::visit(const LessExpression* n) {
     auto expr2 = std::move(curWrapper);
 
     curWrapper = std::unique_ptr<ISubTreeWrapper>(
-        new ExpWrapper(
-            new BinOpExpression(
-            BinOpExpression::BinOp::LESS,
+        new CondWrapper(
+            CJumpStatement::Relation::LESS,
             expr1->ToExp(),
             expr2->ToExp()
-            )
         )
     );
 }
