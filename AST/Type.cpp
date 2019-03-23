@@ -3,7 +3,6 @@
 #include <iostream>
 
 
-void Type::Accept(Visitor* v) const
-{
+void Type::Accept(Visitor *v) const {
     v->visit(this);
 }

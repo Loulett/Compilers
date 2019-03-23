@@ -1,7 +1,7 @@
 #include "InRegAccess.h"
 
-InRegAccess::InRegAccess(std::string name): name(name) {}
+InRegAccess::InRegAccess(std::string name) : name(name) {}
 
-IRExpression* InRegAccess::GetExp() {
+IRExpression *InRegAccess::GetExp() {
     return new TempExpression(name);
 }
