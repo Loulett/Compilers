@@ -145,7 +145,7 @@ std::string IRPrinter::getBinop(const BinOpExpression::BinOp rel) {
         return "<";
     } else if (rel == BinOpExpression::BinOp::AND) {
         return "&&";
-    } else if (rel == BinOpExpression::BinOp::OR) {
+    } else {
         return "||";
     }
 }
@@ -155,7 +155,7 @@ std::string IRPrinter::getRel(const CJumpStatement::Relation rel) {
         return "==";
     } else if (rel == CJumpStatement::Relation::NEQ) {
         return "!=";
-    } else if (rel == CJumpStatement::Relation::LESS) {
+    } else {
         return "<";
     }
 }

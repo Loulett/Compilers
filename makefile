@@ -13,7 +13,8 @@ WARNINGS = -Reverything -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedanti
 		   -Wno-missing-variable-declarations -Wno-shadow-field-in-constructor \
 		   -Wno-weak-vtables -Wno-return-std-move-in-c++11 \
 		   \
-		   -Wno-padded -Wno-exit-time-destructors
+		   -Wno-padded -Wno-exit-time-destructors -Wno-deprecated -Wno-sign-conversion \
+		   -Wno-shorten-64-to-32
 
 CXXFLAGS=-std=c++17 #${DEBUG_FLAGS}
 
@@ -46,3 +47,6 @@ parser: parser.lexer.o parser.tab.o TableBuilder.o Printer_graph.o main.cpp ${AS
 
 clean:
 	rm -f parser parser.lexer.c parser.lexer.h parser.tab.c parser.tab.h parser.output *.dot *.o
+
+static:
+	scan-build -o /tmp/compilers make

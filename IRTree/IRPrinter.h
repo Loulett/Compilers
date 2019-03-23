@@ -3,7 +3,7 @@
 class IRPrinter : public IRVisitor {
 public:
     IRPrinter(std::string filename);
-    ~IRPrinter();
+    ~IRPrinter() override;
 
     void visit(const ConstExpression* n) override;
     void visit(const NameExpression* n) override;
