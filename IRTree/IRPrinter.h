@@ -1,8 +1,7 @@
 #include "IRVisitor.h"
 
-class IRPrinter: public IRVisitor
-{
- public:
+class IRPrinter : public IRVisitor {
+public:
     IRPrinter(std::string filename);
     ~IRPrinter();
 
@@ -20,7 +19,8 @@ class IRPrinter: public IRVisitor
     void visit(const CJumpStatement* n) override;
     void visit(const SeqStatement* n) override;
     void visit(const LabelStatement* n) override;
- private:
+
+private:
     FILE* f;
     int nodeNumber;
 

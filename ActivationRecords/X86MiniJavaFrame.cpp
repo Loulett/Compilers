@@ -4,9 +4,8 @@ const std::string X86MiniJavaFrame::frame_pointer = "__frame__";
 const std::string X86MiniJavaFrame::this_pointer = "__this__";
 const std::string X86MiniJavaFrame::return_pointer = "__return__";
 
-X86MiniJavaFrame::X86MiniJavaFrame(Symbol *class_name, Symbol *method_name) :
-        name(class_name->getString() + "::" + method_name->getString()),
-        frame_size(0) {
+X86MiniJavaFrame::X86MiniJavaFrame(Symbol *class_name, Symbol *method_name)
+    : name(class_name->getString() + "::" + method_name->getString()), frame_size(0) {
     addresses[frame_pointer] = new InRegAccess(frame_pointer);
     frame_size += word_size;
     addresses[this_pointer] = new InRegAccess(this_pointer);

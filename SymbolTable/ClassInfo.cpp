@@ -1,7 +1,12 @@
 #include "ClassInfo.h"
 
-ClassInfo::ClassInfo(Symbol *name, Symbol *parent, int first_line, int first_column) :
-        name(name), parent(parent), parentInfo(nullptr), first_line(first_line), first_column(first_column) {}
+ClassInfo::ClassInfo(Symbol *name, Symbol *parent, int first_line, int first_column)
+    : name(name),
+      parent(parent),
+      parentInfo(nullptr),
+      first_line(first_line),
+      first_column(first_column) {
+}
 
 bool ClassInfo::HasField(Symbol *field_name) {
     if (vars.find(field_name) != vars.end()) {

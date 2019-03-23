@@ -20,7 +20,6 @@ void IRPrinter::visit(const ConstExpression *n) {
 void IRPrinter::visit(const NameExpression *n) {
     int cur = nodeNumber;
     fprintf(f, "%d [label=\"NAME\\n%s\"];\n", cur, n->name.c_str());
-
 }
 
 void IRPrinter::visit(const TempExpression *n) {
@@ -60,7 +59,6 @@ void IRPrinter::visit(const CallExpression *n) {
         fprintf(f, "%d -- %d;\n", cur, nodeNumber);
         arg->Accept(this);
     }
-
 }
 
 void IRPrinter::visit(const ESeqExpression *n) {

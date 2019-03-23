@@ -2,22 +2,22 @@
 #include "../Visitor.h"
 #include <iostream>
 
-Statement::Statement(int first_line, int first_column, std::vector <std::unique_ptr<IStatement>> *statements) {
+Statement::Statement(int first_line, int first_column,
+                     std::vector<std::unique_ptr<IStatement>> *statements) {
     if (statements == nullptr) {
         std::cout << "Statement is nullptr.\n";
     }
     this->first_line = first_line;
     this->first_column = first_column;
-    this->statements = std::unique_ptr < std::vector < std::unique_ptr < IStatement >> > (statements);
+    this->statements = std::unique_ptr<std::vector<std::unique_ptr<IStatement>>>(statements);
 }
 
 void Statement::Accept(Visitor *v) const {
     v->visit(this);
 }
 
-
-IfStatement::IfStatement(int first_line, int first_column, IExpression *clause, IStatement *true_statement,
-                         IStatement *false_statement) {
+IfStatement::IfStatement(int first_line, int first_column, IExpression *clause,
+                         IStatement *true_statement, IStatement *false_statement) {
     if (clause == nullptr || true_statement == nullptr || false_statement == nullptr) {
         std::cout << "Statement is nullptr.\n";
     }
@@ -32,7 +32,8 @@ void IfStatement::Accept(Visitor *v) const {
     v->visit(this);
 }
 
-WhileStatement::WhileStatement(int first_line, int first_column, IExpression *clause, IStatement *body) {
+WhileStatement::WhileStatement(int first_line, int first_column, IExpression *clause,
+                               IStatement *body) {
     if (clause == nullptr || body == nullptr) {
         std::cout << "Statement is nullptr.\n";
     }
@@ -56,7 +57,8 @@ void PrintStatement::Accept(Visitor *v) const {
     v->visit(this);
 }
 
-AssignmentStatement::AssignmentStatement(int first_line, int first_column, IIdentifier *var, IExpression *expr) {
+AssignmentStatement::AssignmentStatement(int first_line, int first_column, IIdentifier *var,
+                                         IExpression *expr) {
     this->first_line = first_line;
     this->first_column = first_column;
     this->var = std::unique_ptr<IIdentifier>(var);
@@ -67,8 +69,8 @@ void AssignmentStatement::Accept(Visitor *v) const {
     v->visit(this);
 }
 
-ArrAssignmentStatement::ArrAssignmentStatement(int first_line, int first_column, IIdentifier *var, IExpression *num,
-                                               IExpression *expr) {
+ArrAssignmentStatement::ArrAssignmentStatement(int first_line, int first_column, IIdentifier *var,
+                                               IExpression *num, IExpression *expr) {
     this->first_line = first_line;
     this->first_column = first_column;
     this->var = std::unique_ptr<IIdentifier>(var);

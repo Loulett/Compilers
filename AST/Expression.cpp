@@ -2,7 +2,8 @@
 #include "../Visitor.h"
 #include <iostream>
 
-AndExpression::AndExpression(int first_line, int first_column, IExpression *expr1, IExpression *expr2) {
+AndExpression::AndExpression(int first_line, int first_column, IExpression *expr1,
+                             IExpression *expr2) {
     if (expr1 == nullptr || expr2 == nullptr) {
         std::cout << "Expression is null.\n";
     }
@@ -16,8 +17,8 @@ void AndExpression::Accept(Visitor *v) const {
     v->visit(this);
 }
 
-
-LessExpression::LessExpression(int first_line, int first_column, IExpression *expr1, IExpression *expr2) {
+LessExpression::LessExpression(int first_line, int first_column, IExpression *expr1,
+                               IExpression *expr2) {
     if (expr1 == nullptr || expr2 == nullptr) {
         std::cout << "Expression is null.\n";
     }
@@ -31,7 +32,8 @@ void LessExpression::Accept(Visitor *v) const {
     v->visit(this);
 }
 
-PlusExpression::PlusExpression(int first_line, int first_column, IExpression *expr1, IExpression *expr2) {
+PlusExpression::PlusExpression(int first_line, int first_column, IExpression *expr1,
+                               IExpression *expr2) {
     if (expr1 == nullptr || expr2 == nullptr) {
         std::cout << "Expression is null.\n";
     }
@@ -45,7 +47,8 @@ void PlusExpression::Accept(Visitor *v) const {
     v->visit(this);
 }
 
-MinusExpression::MinusExpression(int first_line, int first_column, IExpression *expr1, IExpression *expr2) {
+MinusExpression::MinusExpression(int first_line, int first_column, IExpression *expr1,
+                                 IExpression *expr2) {
     if (expr1 == nullptr || expr2 == nullptr) {
         std::cout << "Expression is null.\n";
     }
@@ -59,7 +62,8 @@ void MinusExpression::Accept(Visitor *v) const {
     v->visit(this);
 }
 
-MultExpression::MultExpression(int first_line, int first_column, IExpression *expr1, IExpression *expr2) {
+MultExpression::MultExpression(int first_line, int first_column, IExpression *expr1,
+                               IExpression *expr2) {
     if (expr1 == nullptr || expr2 == nullptr) {
         std::cout << "Expression is null.\n";
     }
@@ -73,7 +77,8 @@ void MultExpression::Accept(Visitor *v) const {
     v->visit(this);
 }
 
-RemainExpression::RemainExpression(int first_line, int first_column, IExpression *expr1, IExpression *expr2) {
+RemainExpression::RemainExpression(int first_line, int first_column, IExpression *expr1,
+                                   IExpression *expr2) {
     if (expr1 == nullptr || expr2 == nullptr) {
         std::cout << "Expression is null.\n";
     }
@@ -87,7 +92,8 @@ void RemainExpression::Accept(Visitor *v) const {
     v->visit(this);
 }
 
-OrExpression::OrExpression(int first_line, int first_column, IExpression *expr1, IExpression *expr2) {
+OrExpression::OrExpression(int first_line, int first_column, IExpression *expr1,
+                           IExpression *expr2) {
     if (expr1 == nullptr || expr2 == nullptr) {
         std::cout << "Expression is null.\n";
     }
@@ -101,7 +107,8 @@ void OrExpression::Accept(Visitor *v) const {
     v->visit(this);
 }
 
-ArrayExpression::ArrayExpression(int first_line, int first_column, IExpression *expr1, IExpression *expr2) {
+ArrayExpression::ArrayExpression(int first_line, int first_column, IExpression *expr1,
+                                 IExpression *expr2) {
     if (expr1 == nullptr || expr2 == nullptr) {
         std::cout << "Expression is null.\n";
     }
@@ -128,8 +135,9 @@ void LengthExpression::Accept(Visitor *v) const {
     v->visit(this);
 }
 
-MethodExpression::MethodExpression(int first_line, int first_column, IExpression *class_name, IIdentifier *method,
-                                   std::vector <std::unique_ptr<IExpression>> *params) {
+MethodExpression::MethodExpression(int first_line, int first_column, IExpression *class_name,
+                                   IIdentifier *method,
+                                   std::vector<std::unique_ptr<IExpression>> *params) {
     if (class_name == nullptr || method == nullptr || params == nullptr) {
         std::cout << "While initializing MethodExpression, one of params is nullptr.\n";
     }
@@ -138,7 +146,7 @@ MethodExpression::MethodExpression(int first_line, int first_column, IExpression
     this->first_column = first_column;
     this->class_name = std::unique_ptr<IExpression>(class_name);
     this->method = std::unique_ptr<IIdentifier>(method);
-    this->params = std::unique_ptr < std::vector < std::unique_ptr < IExpression >> > (params);
+    this->params = std::unique_ptr<std::vector<std::unique_ptr<IExpression>>>(params);
 }
 
 void MethodExpression::Accept(Visitor *v) const {

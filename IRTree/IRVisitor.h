@@ -3,8 +3,7 @@
 #include "Expression.h"
 #include "Statement.h"
 
-struct IRVisitor
-{
+struct IRVisitor {
     virtual void visit(const ConstExpression* n) = 0;
     virtual void visit(const NameExpression* n) = 0;
     virtual void visit(const TempExpression* n) = 0;

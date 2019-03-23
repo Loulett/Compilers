@@ -11,15 +11,7 @@
 #include "AST/Type.h"
 #include "AST/VarDeclaration.h"
 
-/*
- * 1. Проверка аргументов на равенство нулю
- * 2. Заменить указатели на unique_ptr
- * 3. Плохие дефолтные инициализации
- * 4. explicit у конструкторов с 1 аргументов
- * */
-
-struct Visitor
-{
+struct Visitor {
     virtual void visit(const Goal* n) = 0;
     virtual void visit(const MainClass* n) = 0;
     virtual void visit(const ClassDeclaration* n) = 0;
@@ -40,7 +32,6 @@ struct Visitor
     virtual void visit(const AndExpression* n) = 0;
     virtual void visit(const LessExpression* n) = 0;
     virtual void visit(const MultExpression* n) = 0;
-
 
     virtual void visit(const RemainExpression* n) = 0;
     virtual void visit(const OrExpression* n) = 0;

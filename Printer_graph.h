@@ -2,11 +2,11 @@
 #include "Visitor.h"
 #include <string>
 
-class Printer_graph : public Visitor
-{
+class Printer_graph : public Visitor {
 private:
     FILE* f;
     int nodeNumber;
+
 public:
     Printer_graph(std::string filename);
     ~Printer_graph() override;
@@ -39,9 +39,6 @@ public:
     void visit(const OrExpression* n) override;
 
     void visit(const RemainExpression* n) override;
-
-
-
 
     void visit(const ArrayExpression* n) override;
 

@@ -12,8 +12,7 @@
 #include "SubTreeWrapper.h"
 #include <map>
 
-class Translator: public Visitor
-{
+class Translator : public Visitor {
 
 public:
     Translator(Table* table);
@@ -22,7 +21,6 @@ public:
     void BuildFrame(Symbol* class_name, Symbol* method_name);
     void AcceptStms(const std::vector<std::unique_ptr<IStatement>>* statements);
     // std::map<std::string, CodeFragment> GetFragments() {return fragments;}
-
 
     void visit(const Goal* n) override;
     void visit(const MainClass* n) override;
@@ -62,7 +60,8 @@ public:
     void visit(const Identifier* n) override;
 
     std::map<std::string, CodeFragment> fragments;
- private:
+
+private:
     IFrame* curFrame = nullptr;
     std::unique_ptr<ISubTreeWrapper> curWrapper = nullptr;
     ClassInfo* curClass = nullptr;

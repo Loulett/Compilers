@@ -3,10 +3,11 @@
 #include "../SymbolTable/Symbol.h"
 #include <string>
 
-class Identifier: public IIdentifier {
- public:
- 	Identifier(int first_line, int first_column, Symbol* name);
+class Identifier : public IIdentifier {
+public:
+    Identifier(int first_line, int first_column, Symbol* name);
     void Accept(Visitor* v) const;
- public:
- 	Symbol* name;
+
+public:
+    Symbol* name;
 };

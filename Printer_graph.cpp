@@ -14,7 +14,6 @@ Printer_graph::~Printer_graph() {
     fclose(f);
 }
 
-
 void Printer_graph::visit(const Goal *n) {
     int cur = nodeNumber;
     fprintf(f, "%d [label=\"Goal\"] [color=blue];\n", cur);
@@ -109,11 +108,11 @@ void Printer_graph::visit(const MethodDeclaration *n) {
         fprintf(f, "%d [label=\"Argument\"];\n", argNumber);
         nodeNumber++;
         fprintf(f, "%d -- %d;\n", argNumber, nodeNumber);
-        ((*(n->args))[i]).first->Accept(this);      //type
+        ((*(n->args))[i]).first->Accept(this);  // type
 
         nodeNumber++;
         fprintf(f, "%d -- %d;\n", argNumber, nodeNumber);
-        ((*(n->args))[i]).second->Accept(this);     //name
+        ((*(n->args))[i]).second->Accept(this);  // name
     }
 
     for (size_t i = 0; i < n->vars->size(); i++) {
@@ -246,7 +245,6 @@ void Printer_graph::visit(const ArrAssignmentStatement *n) {
     n->expr->Accept(this);
 }
 
-
 void Printer_graph::visit(const AndExpression *n) {
     int cur = nodeNumber;
     fprintf(f, "%d [label=\"AND\"];\n", cur);
@@ -268,7 +266,6 @@ void Printer_graph::visit(const LessExpression *n) {
     fprintf(f, "%d -- %d;\n", cur, nodeNumber);
     n->expr2->Accept(this);
 }
-
 
 void Printer_graph::visit(const PlusExpression *n) {
     int cur = nodeNumber;
@@ -381,7 +378,6 @@ void Printer_graph::visit(const Bool *n) {
     nodeNumber++;
     fprintf(f, "%d -- %d;\n", cur, nodeNumber);
     fprintf(f, "%d [label=\"%s\"];\n", nodeNumber, n->b ? "true" : "false");
-
 }
 
 void Printer_graph::visit(const IdentExpression *n) {
@@ -440,5 +436,3 @@ void Printer_graph::visit(const Expression *n) {
 void Printer_graph::visit(const Identifier *n) {
     fprintf(f, "%d [label=\"%s\"];\n", nodeNumber, n->name->getString().c_str());
 }
-
-

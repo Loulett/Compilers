@@ -1,6 +1,7 @@
 #include "Symbol.h"
 
-Symbol::Symbol(const std::string &str_) : str(str_) {}
+Symbol::Symbol(const std::string &str_) : str(str_) {
+}
 
 Symbol *InternTable::getIntern(const std::string &str) {
     auto find_str = table.find(str);
@@ -11,7 +12,6 @@ Symbol *InternTable::getIntern(const std::string &str) {
     auto val = new Symbol(allStrs.back());
     table.insert({allStrs.back(), val});
     return val;
-
 }
 
 const std::string &Symbol::getString() const {
@@ -19,4 +19,4 @@ const std::string &Symbol::getString() const {
 }
 
 std::unordered_map<std::string, Symbol *> InternTable::table;
-std::list <std::string> InternTable::allStrs;
+std::list<std::string> InternTable::allStrs;

@@ -9,7 +9,7 @@
 #include <string>
 
 class IRExpList {
- public:
+public:
     IRExpList() = default;
     IRExpList(IRExpression* exp);
     void Add(IRExpression* exp);
@@ -18,75 +18,63 @@ class IRExpList {
     std::vector<IRExpression*> list;
 };
 
-class ConstExpression: public IRExpression {
- public:
+class ConstExpression : public IRExpression {
+public:
     ConstExpression(int val);
-    void Accept( IRVisitor* v ) const override;
+    void Accept(IRVisitor* v) const override;
     int value;
 };
 
-class NameExpression: public IRExpression {
- public:
+class NameExpression : public IRExpression {
+public:
     NameExpression(std::string& name);
-    void Accept( IRVisitor* v ) const override;
+    void Accept(IRVisitor* v) const override;
     std::string name;
 };
 
-class TempExpression: public IRExpression {
- public:
+class TempExpression : public IRExpression {
+public:
     TempExpression(std::string& name);
-    void Accept( IRVisitor* v ) const override;
+    void Accept(IRVisitor* v) const override;
     std::string name;
 };
 
-class BinOpExpression: public IRExpression {
- public:
-    enum BinOp {
-        PLUS,
-        MINUS,
-        MULT,
-        DIV,
-        REM,
-        LESS,
-        AND,
-        OR
-    };
+class BinOpExpression : public IRExpression {
+public:
+    enum BinOp { PLUS, MINUS, MULT, DIV, REM, LESS, AND, OR };
 
     BinOpExpression(BinOp binop, IRExpression* left, IRExpression* right);
-    void Accept( IRVisitor* v ) const override;
+    void Accept(IRVisitor* v) const override;
 
     BinOp binop;
     IRExpression* left;
     IRExpression* right;
 };
 
-class MemExpression: public IRExpression {
- public:
+class MemExpression : public IRExpression {
+public:
     MemExpression(IRExpression* expr);
-    void Accept( IRVisitor* v ) const override;
+    void Accept(IRVisitor* v) const override;
 
     IRExpression* expr;
-
 };
 
-class CallExpression: public IRExpression {
- public:
+class CallExpression : public IRExpression {
+public:
     CallExpression(IRExpression* func, IRExpList* args);
-    void Accept( IRVisitor* v ) const override;
+    void Accept(IRVisitor* v) const override;
 
     IRExpression* func;
     IRExpList* args;
-
 };
 
-class ESeqExpression: public IRExpression {
- public:
+class ESeqExpression : public IRExpression {
+public:
     ESeqExpression(IRStatement* stm, IRExpression* expr);
-    void Accept( IRVisitor* v ) const override;
+    void Accept(IRVisitor* v) const override;
 
     IRStatement* stm;
     IRExpression* expr;
-
 };
 
 // #endif  // IRTree_Expression

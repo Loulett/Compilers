@@ -2,7 +2,7 @@
 #include "../IRTree/Expression.h"
 
 class IAccess {
- public:
+public:
     virtual ~IAccess() = default;
     virtual IRExpression* GetExp() = 0;
 };

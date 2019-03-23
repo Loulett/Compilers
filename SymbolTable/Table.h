@@ -4,6 +4,6 @@
 #include <unordered_map>
 
 class Table {
- public:
-	std::unordered_map<Symbol*, ClassInfo*> classes;
+public:
+    std::unordered_map<Symbol*, ClassInfo*> classes;
 };

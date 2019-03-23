@@ -7,30 +7,30 @@
 #include <vector>
 #include <string>
 
-class TableBuilder: Visitor {
+class TableBuilder : Visitor {
 
- private:
- 	Table* table;
- 	ClassInfo* curClass;
- 	MethodInfo* curMethod;
- 	VariableInfo* curVar;
+private:
+    Table* table;
+    ClassInfo* curClass;
+    MethodInfo* curMethod;
+    VariableInfo* curVar;
     Type curType;
     bool valExpr;
     std::vector<std::string> errors;
 
- public:
+public:
     TableBuilder();
 
- 	Table* buildTable(Goal* n) {
- 		visit(n);
- 		return table;
- 	}
+    Table* buildTable(Goal* n) {
+        visit(n);
+        return table;
+    }
 
     void printErrors();
 
     bool hasClass(Symbol* className);
 
- 	void visit(const Goal* n) override;
+    void visit(const Goal* n) override;
     void visit(const MainClass* n) override;
     void visit(const ClassDeclaration* n) override;
     void visit(const VarDeclaration* n) override;

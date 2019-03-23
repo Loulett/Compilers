@@ -7,5 +7,5 @@ public:
     IRStatement() = default;
     virtual ~IRStatement() = default;
 
-    virtual void Accept( IRVisitor* v ) const = 0;
+    virtual void Accept(IRVisitor* v) const = 0;
 };

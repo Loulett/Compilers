@@ -10,7 +10,6 @@
 #include <cstdio>
 #include <iostream>
 
-
 extern int yyparse(Goal *goal);
 
 extern void yyerror(Goal *goal, const char *msg);
@@ -20,13 +19,9 @@ extern FILE *yyin;
 int main(int argc, char **argv) {
     FILE *myfile;
 
-    // std::cout.
-
     if (argc == 1) {
-        //std::cout << "Reading data from file input.txt\n";
         myfile = fopen("input.txt", "r");
     } else {
-        //std::cout << "Reading data from file " << argv[1] << "\n";
         myfile = fopen(argv[1], "r");
     }
     yyin = myfile;

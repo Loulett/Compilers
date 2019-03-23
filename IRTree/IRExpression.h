@@ -7,5 +7,5 @@ public:
     IRExpression() = default;
     virtual ~IRExpression() = default;
 
-    virtual void Accept( IRVisitor* v ) const = 0;
+    virtual void Accept(IRVisitor* v) const = 0;
 };
