@@ -5,6 +5,7 @@
 #include "IRExpression.h"
 #include <vector>
 #include <string>
+#include <memory>
 
 class MoveStatement : public IRStatement {
 public:
@@ -19,25 +20,27 @@ public:
 
     std::unique_ptr<const IRStatement> GetCopy() const override;
 
-    IRExpression* dst;
-    IRExpression* src;
+    std::unique_ptr<const IRExpression> dst;
+    std::unique_ptr<const IRExpression> src;
 };
 
 class ExpStatement : public IRStatement {
 public:
+    //mb тут explicit
+    explicit ExpStatement( std::unique_ptr<const IRExpression> exp ) :
+            exp( std::move( exp ) )
+    {}  // mb move to .cpp
+
     explicit ExpStatement(IRExpression* exp);
 
-    //mb тут explicit
-    explicit ExpStatement( std::unique_ptr<const IRStatement> exp ) :
-    exp( std::move( exp ) )
-    {}  // mb move to .cpp
+
 
 
     void Accept(IRVisitor* v) const override;
 
     std::unique_ptr<const IRStatement> GetCopy() const override;
 
-    IRExpression* exp;
+    std::unique_ptr<const IRExpression> exp;
 };
 
 class JumpStatement : public IRStatement {
@@ -66,8 +69,8 @@ public:
     std::unique_ptr<const IRStatement> GetCopy() const override;
 
     CJumpStatement::Relation rel;
-    IRExpression* left;
-    IRExpression* right;
+    std::unique_ptr<const IRExpression> left;
+    std::unique_ptr<const IRExpression> right;
     std::string if_left;
     std::string if_right;
 };
@@ -87,8 +90,8 @@ public:
 
     std::unique_ptr<const IRStatement> GetCopy() const override;
 
-    IRStatement* left;
-    IRStatement* right;
+    std::unique_ptr<const IRStatement> left;
+    std::unique_ptr<const IRStatement> right;
 };
 
 class LabelStatement : public IRStatement {

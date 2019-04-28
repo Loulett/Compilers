@@ -14,7 +14,7 @@ std::unique_ptr<const IRStatement> JumpStatement::GetCopy() const
 
 std::unique_ptr<const IRStatement> CJumpStatement::GetCopy() const
 {
-    return std::move(std::make_unique<const CJumpStatement>( rel, left.get(), right.get(),
+    return std::move(std::make_unique<const CJumpStatement>( rel, left->GetCopy(), right->GetCopy(),
                                                    if_left, if_right ) );
 }
 
@@ -36,10 +36,10 @@ std::unique_ptr<const IRStatement> MoveStatement::GetCopy() const
 
 
 
-CJumpStatement(CJumpStatement::Relation rel, std::unique_ptr<const IRExpression> left,
+CJumpStatement::CJumpStatement(CJumpStatement::Relation rel, std::unique_ptr<const IRExpression> left,
         std::unique_ptr<const IRExpression> right, std::string& if_left, std::string& if_right) :
-        relationType( rel ), leftExp( std::move( left ) ), rightExp( std::move( right ) ),
-        if_left( ifTrue ), if_right( ifFalse )
+        rel( rel ), left( std::move( left ) ), right( std::move( right ) ),
+        if_left( if_left ), if_right( if_right )
 {
 }
 

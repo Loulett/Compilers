@@ -1,6 +1,15 @@
 #include "Expression.h"
 #include "IRVisitor.h"
 
+std::unique_ptr<const IRExpList> IRExpList::GetCopy() const
+{
+    std::unique_ptr<IRExpList> list_output = std::make_unique<IRExpList>();
+    for( const auto& expression : list ) {
+        list_output->Add( expression->GetCopy().release() );
+    }
+    return list_output;
+}
+
 
 std::unique_ptr<const IRExpression> ConstExpression::GetCopy() const
 {
@@ -43,17 +52,17 @@ std::unique_ptr<const IRExpression> ESeqExpression::GetCopy() const
 
 
 
-IRExpList::IRExpList(IRExpression *exp) {
-    Add(exp);
-}
+//IRExpList::IRExpList(IRExpression *exp) {
+//    Add(exp);
+//}
 
-void IRExpList::Add(IRExpression *exp) {
-    list.push_back(exp);
-}
+//void IRExpList::Add(IRExpression *exp) {
+//    list.push_back(exp);
+//}
 
-std::vector<IRExpression *> IRExpList::Get() {
-    return list;
-}
+//std::vector<IRExpression *> IRExpList::Get() {
+//    return list;
+//}
 
 ConstExpression::ConstExpression(int val) : value(val) {
 }

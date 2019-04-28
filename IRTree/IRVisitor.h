@@ -19,6 +19,8 @@ struct IRVisitor {
     virtual void visit(const SeqStatement* n) = 0;
     virtual void visit(const LabelStatement* n) = 0;
 
+    virtual void visit( const IRExpList* n) = 0;
+
     virtual ~IRVisitor() = default;
 };
 

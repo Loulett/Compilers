@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IRVisitor.h"
+#include "../IRVisitor.h"
 
 namespace IRT
 {
@@ -14,24 +14,24 @@ namespace IRT
         std::unique_ptr<const IRStatement> CanonicalStmTree();
         std::unique_ptr<const IRExpression> CanonicalExpTree();
 
-        void Visit( const ConstExpression* n ) override;
-        void Visit( const NameExpression* n ) override;
-        void Visit( const TempExpression* n ) override;
-        void Visit( const BinOpExpression* n ) override;
-        void Visit( const MemExpression* n ) override;
-        void Visit( const CallExpression* n ) override;
+        void visit( const ConstExpression* n ) override;
+        void visit( const NameExpression* n ) override;
+        void visit( const TempExpression* n ) override;
+        void visit( const BinOpExpression* n ) override;
+        void visit( const MemExpression* n ) override;
+        void visit( const CallExpression* n ) override;
 
-        void Visit( const ESeqExpression* n ) override;
+        void visit( const ESeqExpression* n ) override;
 
-        void Visit( const MoveStatement* n ) override;  //+
-        void Visit( const ExpStatement* n ) override;  //+
-        void Visit( const JumpStatement* n ) override;  //+
-        void Visit( const CJumpStatement* n ) override;  //+
-        void Visit( const SeqStatement* n ) override;  //+
-        void Visit( const LabelStatement* n ) override;  //+
+        void visit( const MoveStatement* n ) override;  //+
+        void visit( const ExpStatement* n ) override;  //+
+        void visit( const JumpStatement* n ) override;  //+
+        void visit( const CJumpStatement* n ) override;  //+
+        void visit( const SeqStatement* n ) override;  //+
+        void visit( const LabelStatement* n ) override;  //+
 
-        void Visit( const IRExpList* list ) override;  //+
-        //void Visit( const CStmList* list ) override;
+        void visit( const IRExpList* list ) override;  //+
+        //void visit( const CStmList* list ) override;
 
     private:
         void updateLastExp( const IRExpression* newLastExp );
@@ -46,7 +46,7 @@ namespace IRT
         std::unique_ptr<const IRStatement> canonizeStmSubtree( std::unique_ptr<const IRStatement> stm ) const;
 
         bool areCommuting( const IRStatement* stm, const IRExpression* exp );
-        const CESeqExp* castToESeqExp( const IRExpression* exp );
+        const ESeqExpression* castToESeqExp( const IRExpression* exp );
 
         std::unique_ptr<const IRExpression> prevExp;
         std::unique_ptr<const IRStatement> prevStm;

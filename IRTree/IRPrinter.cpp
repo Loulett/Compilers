@@ -11,6 +11,9 @@ IRPrinter::~IRPrinter() {
     fprintf(f, "%s", "}");
     fclose(f);
 }
+void visit( const IRExpList* n){
+    fprintf(f, " [label=\"IPLEMENT IRExpList! \\n\"];\n");
+}
 
 void IRPrinter::visit(const ConstExpression *n) {
     int cur = nodeNumber;
@@ -53,7 +56,8 @@ void IRPrinter::visit(const CallExpression *n) {
     nodeNumber++;
     fprintf(f, "%d -- %d;\n", cur, nodeNumber);
     n->func->Accept(this);
-    const auto &arguments = n->args->Get();
+//    const auto &arguments = n->args->Get();
+    const auto &arguments = n->args->GetCopy();
     for (auto &arg : arguments) {
         nodeNumber++;
         fprintf(f, "%d -- %d;\n", cur, nodeNumber);

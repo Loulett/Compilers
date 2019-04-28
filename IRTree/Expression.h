@@ -7,15 +7,38 @@
 #include "IRStatement.h"
 #include <vector>
 #include <string>
+#include <memory>
 
 class IRExpList {
 public:
     IRExpList() = default;
-    IRExpList(IRExpression* exp);
+//    IRExpList( std::unique_ptr<const IRExpression> exp);
     void Add(IRExpression* exp);
-    std::vector<IRExpression*> Get();
+//    std::vector< std::unique_ptr<const IRExpression> > Get();
+    std::unique_ptr<const IRExpList> GetCopy() const;
 
-    std::vector<IRExpression*> list;
+    std::vector< std::unique_ptr<const IRExpression> > list;
+
+    //std::unique_ptr<const IRExpression> GetCopy() const override;
+
+    explicit IRExpList( const IRExpression* expression )
+    {
+        Add( expression );
+    }
+
+    void Add( const IRExpression* expression )
+    {
+        list.emplace_back( expression );
+    }
+
+    void Add( std::unique_ptr<const IRExpression> expression )
+    {
+        list.emplace_back( std::move( expression ) );
+    }
+//
+//
+//
+//    std::unique_ptr<const IRExpList> GetCopy() const;
 
     bool is_commutative() {return false; }
     bool is_absolutely_commutative() {return false; }
@@ -84,15 +107,15 @@ public:
 
 
     BinOp binop;
-    IRExpression* left;
-    IRExpression* right;
+    std::unique_ptr<const IRExpression> left;
+    std::unique_ptr<const IRExpression> right;
 };
 
 class MemExpression : public IRExpression {
 public:
     explicit MemExpression(IRExpression* expr);
     void Accept(IRVisitor* v) const override;
-    IRExpression* expr;
+    std::unique_ptr<const IRExpression> expr;
 
     std::unique_ptr<const IRExpression> GetCopy() const override;
     //mb тут не нужен explicit
@@ -102,8 +125,8 @@ public:
     }
 
 
-    bool is_commutative() {return expr.is_absolutely_commutative(); }
-    bool is_absolutely_commutative() {return false; }
+//    bool is_commutative() {return expr.is_absolutely_commutative(); }
+//    bool is_absolutely_commutative() {return false; }
 };
 
 class CallExpression : public IRExpression {
@@ -122,8 +145,8 @@ public:
     bool is_commutative() {return false; }
     bool is_absolutely_commutative() {return false; }
 
-    IRExpression* func;
-    IRExpList* args;
+    std::unique_ptr<const IRExpression> func;
+    std::unique_ptr<const IRExpList> args;
 };
 
 class ESeqExpression : public IRExpression {
@@ -142,12 +165,12 @@ public:
     bool is_commutative() {return false; }
     bool is_absolutely_commutative() {return false; }
 
-    IRStatement* stm;
-    IRExpression* expr;
+    std::unique_ptr<const IRStatement> stm;
+    std::unique_ptr<const IRExpression> expr;
 
     // 123 mb bug
-    bool is_commutative() {return false; }
-    bool is_absolutely_commutative() {return false; }
+//    bool is_commutative() {return false; }
+//    bool is_absolutely_commutative() {return false; }
 };
 
 // #endif  // IRTree_Expression

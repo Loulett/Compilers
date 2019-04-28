@@ -54,7 +54,8 @@ int main(int argc, char **argv) {
 
 
         // Canonize IRT
-        codeFragments = std::move( translator.fragments)
+        std::map<std::string, CodeFragment> codeFragments;
+        codeFragments = std::move( translator.fragments);
         for (auto &codeFragment : codeFragments) {
             IRT::CallCanon callCanonizator;
             codeFragment.second.body->Accept( &callCanonizator );
