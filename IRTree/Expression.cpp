@@ -58,9 +58,9 @@ void IRExpList::Accept(IRVisitor *v) const {
 //    Add(exp);
 //}
 
-//void IRExpList::Add(IRExpression *exp) {
-//    list.push_back(exp);
-//}
+void IRExpList::Add(IRExpression *exp) {
+    list.emplace_back(exp);
+}
 
 //std::vector< std::unique_ptr<const IRExpression> > IRExpList::Get() const {
 //    std::vector< std::unique_ptr<const IRExpression> > copyList;
@@ -85,8 +85,8 @@ void NameExpression::Accept(IRVisitor *v) const {
     v->visit(this);
 }
 
-//TempExpression::TempExpression(std::string &name) : name(name) {
-//}
+TempExpression::TempExpression(const std::string &name) : name(name) {
+}
 
 void TempExpression::Accept(IRVisitor *v) const {
     v->visit(this);
@@ -100,8 +100,8 @@ void BinOpExpression::Accept(IRVisitor *v) const {
     v->visit(this);
 }
 
-//MemExpression::MemExpression(IRExpression *expr) : expr(expr) {
-//}
+MemExpression::MemExpression(const IRExpression *expr) : expr(expr) {
+}
 
 void MemExpression::Accept(IRVisitor *v) const {
     v->visit(this);
