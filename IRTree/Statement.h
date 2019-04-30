@@ -45,12 +45,12 @@ public:
 
 class JumpStatement : public IRStatement {
 public:
-    JumpStatement(std::string& label);
+    explicit JumpStatement(const std::string& label_) : label( label_ ) {}
     void Accept(IRVisitor* v) const override;
 
     std::unique_ptr<const IRStatement> GetCopy() const override;
 
-    std::string label;
+    const std::string label;
 };
 
 class CJumpStatement : public IRStatement {
@@ -62,7 +62,7 @@ public:
 
 
     CJumpStatement(CJumpStatement::Relation rel, std::unique_ptr<const IRExpression> left,
-            std::unique_ptr<const IRExpression> right, std::string& if_left, std::string& if_right);
+            std::unique_ptr<const IRExpression> right, const std::string& if_left, const std::string& if_right);
 
     void Accept(IRVisitor* v) const override;
 
@@ -71,8 +71,8 @@ public:
     CJumpStatement::Relation rel;
     std::unique_ptr<const IRExpression> left;
     std::unique_ptr<const IRExpression> right;
-    std::string if_left;
-    std::string if_right;
+    const std::string if_left;
+    const std::string if_right;
 };
 
 class SeqStatement : public IRStatement {
@@ -96,10 +96,13 @@ public:
 
 class LabelStatement : public IRStatement {
 public:
-    LabelStatement(std::string& label);
+//    LabelStatement(std::string& label);
+    explicit LabelStatement(const std::string& label) : label( label ) {}
     void Accept(IRVisitor* v) const override;
 
-    std::unique_ptr<const IRStatement> GetCopy() const override;
+    const std::string& GetLabel() const;
 
-    std::string label;
+
+    std::unique_ptr<const IRStatement> GetCopy() const override;
+    const std::string label;
 };

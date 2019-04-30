@@ -1,5 +1,12 @@
 #include "Statement.h"
 #include "IRVisitor.h"
+#include <string.h>
+
+const std::string& LabelStatement::GetLabel() const
+{
+    return label;
+}
+
 
 // 1
 std::unique_ptr<const IRStatement> ExpStatement::GetCopy() const
@@ -25,7 +32,7 @@ std::unique_ptr<const IRStatement> SeqStatement::GetCopy() const
 
 std::unique_ptr<const IRStatement> LabelStatement::GetCopy() const
 {
-    return std::move(std::make_unique<const LabelStatement>( label ) );
+    return std::move(std::make_unique<LabelStatement>( label ) );
 }
 
 // 2
@@ -36,12 +43,7 @@ std::unique_ptr<const IRStatement> MoveStatement::GetCopy() const
 
 
 
-CJumpStatement::CJumpStatement(CJumpStatement::Relation rel, std::unique_ptr<const IRExpression> left,
-        std::unique_ptr<const IRExpression> right, std::string& if_left, std::string& if_right) :
-        rel( rel ), left( std::move( left ) ), right( std::move( right ) ),
-        if_left( if_left ), if_right( if_right )
-{
-}
+
 
 //end
 
@@ -62,8 +64,8 @@ void ExpStatement::Accept(IRVisitor *v) const {
     v->visit(this);
 }
 
-JumpStatement::JumpStatement(std::string &label) : label(label) {
-}
+//JumpStatement::JumpStatement(std::string &label) : label(label) {
+//}
 
 void JumpStatement::Accept(IRVisitor *v) const {
     v->visit(this);
@@ -73,6 +75,18 @@ CJumpStatement::CJumpStatement(CJumpStatement::Relation rel, IRExpression *left,
                                IRExpression *right, std::string &if_left, std::string &if_right)
     : rel(rel), left(left), right(right), if_left(if_left), if_right(if_right) {
 }
+
+CJumpStatement::CJumpStatement(CJumpStatement::Relation rel, std::unique_ptr<const IRExpression> left,
+                               std::unique_ptr<const IRExpression> right,
+                               const std::string& if_left,
+                               const std::string& if_right) :
+        rel( rel ),
+        left( std::move( left ) ),
+        right( std::move( right ) ),
+        if_left( if_left ),
+        if_right( if_right )
+        {
+        }
 
 void CJumpStatement::Accept(IRVisitor *v) const {
     v->visit(this);
@@ -85,8 +99,8 @@ void SeqStatement::Accept(IRVisitor *v) const {
     v->visit(this);
 }
 
-LabelStatement::LabelStatement(std::string &label) : label(label) {
-}
+//LabelStatement::LabelStatement(std::string &label) : label(label) {
+//}
 
 void LabelStatement::Accept(IRVisitor *v) const {
     v->visit(this);

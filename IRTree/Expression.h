@@ -86,12 +86,12 @@ class BinOpExpression : public IRExpression {
 public:
     enum BinOp { PLUS, MINUS, MULT, DIV, REM, LESS, AND, OR };
 
-    BinOpExpression( BinOp binop, std::unique_ptr<const IRExpression> left, std::unique_ptr<const IRExpression> right ) :
+    explicit BinOpExpression( BinOp binop, std::unique_ptr<const IRExpression> left, std::unique_ptr<const IRExpression> right ) :
             binop( binop ), left( std::move( left ) ), right( std::move( right ) )
     {
     }
 
-    BinOpExpression(BinOp binop, IRExpression* left, IRExpression* right);
+    explicit BinOpExpression(BinOp binop, IRExpression* left, IRExpression* right);
 
 
 
