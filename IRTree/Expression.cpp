@@ -40,7 +40,9 @@ std::unique_ptr<const IRExpression> ESeqExpression::GetCopy() const
     return std::move(std::make_unique<const ESeqExpression>( stm->GetCopy(), expr->GetCopy() ) );
 }
 
-
+void IRExpList::Accept(IRVisitor *v) const {
+    v->visit( this );
+}
 
 
 
@@ -60,8 +62,13 @@ std::unique_ptr<const IRExpression> ESeqExpression::GetCopy() const
 //    list.push_back(exp);
 //}
 
-//std::vector<IRExpression *> IRExpList::Get() {
-//    return list;
+//std::vector< std::unique_ptr<const IRExpression> > IRExpList::Get() const {
+//    std::vector< std::unique_ptr<const IRExpression> > copyList;
+//    copyList.reserve(list.size());
+//    for (const auto& elem : list) {
+//        copyList.push_back(std::make_unique<const IRExpression>(*elem));
+//    }
+//    return copyList;
 //}
 
 ConstExpression::ConstExpression(int val) : value(val) {
@@ -71,21 +78,21 @@ void ConstExpression::Accept(IRVisitor *v) const {
     v->visit(this);
 }
 
-NameExpression::NameExpression(std::string &name) : name(name) {
-}
+//NameExpression::NameExpression(std::string &name) : name(name) {
+//}
 
 void NameExpression::Accept(IRVisitor *v) const {
     v->visit(this);
 }
 
-TempExpression::TempExpression(std::string &name) : name(name) {
-}
+//TempExpression::TempExpression(std::string &name) : name(name) {
+//}
 
 void TempExpression::Accept(IRVisitor *v) const {
     v->visit(this);
 }
 
-BinOpExpression::BinOpExpression(BinOp binop, IRExpression *left, IRExpression *right)
+BinOpExpression::BinOpExpression(BinOp binop, const IRExpression *left, const IRExpression *right)
     : binop(binop), left(left), right(right) {
 }
 
@@ -107,7 +114,7 @@ void CallExpression::Accept(IRVisitor *v) const {
     v->visit(this);
 }
 
-ESeqExpression::ESeqExpression(IRStatement *stm, IRExpression *expr) : stm(stm), expr(expr) {
+ESeqExpression::ESeqExpression(const IRStatement *stm, const IRExpression *expr) : stm(stm), expr(expr) {
 }
 
 void ESeqExpression::Accept(IRVisitor *v) const {

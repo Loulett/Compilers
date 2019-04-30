@@ -58,83 +58,83 @@ namespace IRT
     bool ESeqCanon::areCommuting( const IRStatement* stm, const IRExpression* exp )
     {
         assert( stm != nullptr && exp != nullptr );
-        auto expStm = dynamic_cast<const CExpStm*>( stm );
+        auto expStm = dynamic_cast<const ExpStatement* >( stm );
         bool isStmEmpty = expStm != nullptr &&
-                          dynamic_cast<const CConstExp*>( expStm->GetExp() ) != nullptr;
+                          dynamic_cast<const ConstExpression* >( expStm->exp.get() ) != nullptr;
         return isStmEmpty ||
-               dynamic_cast<const CConstExp*>( exp ) != nullptr ||
-               dynamic_cast<const CNameExp*>( exp ) != nullptr;
+               dynamic_cast<const ConstExpression*>( exp ) != nullptr ||
+               dynamic_cast<const NameExpression*>( exp ) != nullptr;
     }
 
-    const CESeqExp* ESeqCanon::castToESeqExp( const IRExpression* exp )
+    const ESeqExpression* ESeqCanon::castToESeqExp( const IRExpression* exp )
     {
-        return dynamic_cast<const CESeqExp*>( exp );
+        return dynamic_cast<const ESeqExpression*>( exp );
     }
 
-    void ESeqCanon::Visit( const CConstExp* n )
+    void ESeqCanon::visit( const ConstExpression* n )
     {
-        updateLastExp( std::make_unique<const CConstExp>( n->GetValue() ) );
+        updateLastExp( std::make_unique<const ConstExpression>( n->value ) );
     }
 
-    void ESeqCanon::Visit( const CNameExp* n )
+    void ESeqCanon::visit( const NameExpression* n )
     {
-        updateLastExp( std::make_unique<const CNameExp>( n->GetLabel() ) );
+        updateLastExp( std::make_unique<const NameExpression>( n->GetLabel() ) );
     }
 
-    void ESeqCanon::Visit( const CTempExp* n )
+    void ESeqCanon::visit( const TempExpression* n )
     {
         static int numEntries = 0;
         std::cout << numEntries << std::endl;
-        updateLastExp( std::move( std::make_unique<const CTempExp>( n->GetTemp() ) ) );
+        updateLastExp( std::move( std::make_unique<const TempExpression>( n->GetTemp() ) ) );
         numEntries++;
     }
 
-    void ESeqCanon::Visit( const CBinaryExp* n )
+    void ESeqCanon::visit( const BinOpExpression* n )
     {
-        n->GetLeft()->Accept( this );
+        n->left->Accept( this );
         std::unique_ptr<const IRExpression> canonLeft = std::move( prevExp );
-        n->GetRight()->Accept( this );
+        n->right->Accept( this );
         std::unique_ptr<const IRExpression> canonRight = std::move( prevExp );
 
-        const CESeqExp* eseqLeft = castToESeqExp( canonLeft.get() );
-        const CESeqExp* eseqRight = castToESeqExp( canonRight.get() );
+        const ESeqExpression* eseqLeft = castToESeqExp( canonLeft.get() );
+        const ESeqExpression* eseqRight = castToESeqExp( canonRight.get() );
 
         std::unique_ptr<const IRExpression> resultExp;
         if( eseqLeft ) {
-            resultExp = std::move( std::make_unique<const CESeqExp>(
-                    eseqLeft->GetStm()->GetCopy(),
-                    std::move( std::make_unique<const CBinaryExp>(
-                            n->GetType(),
-                            eseqLeft->GetExp()->GetCopy(),
+            resultExp = std::move( std::make_unique<const ESeqExpression>(
+                    eseqLeft->stm->GetCopy(),
+                    std::move( std::make_unique<const BinOpExpression>(
+                            n->binop,
+                            eseqLeft->expr->GetCopy(),
                             std::move( canonRight ) ) ) ) );
             if( eseqRight ) {
                 resultExp = canonizeExpSubtree( std::move( resultExp ) );
             }
         } else if( eseqRight ) {
-            if( areCommuting( eseqRight->GetStm(), canonLeft.get() ) ) {
-                resultExp = std::move( std::make_unique<const CESeqExp>(
-                        eseqRight->GetStm()->GetCopy(),
-                        std::move( std::make_unique<const CBinaryExp>(
-                                n->GetType(),
+            if( areCommuting( eseqRight->stm.get(), canonLeft.get() ) ) {
+                resultExp = std::move( std::make_unique<const ESeqExpression>(
+                        eseqRight->stm->GetCopy(),
+                        std::move( std::make_unique<const BinOpExpression>(
+                                n->binop,
                                 std::move( canonLeft ),
-                                eseqRight->GetExp()->GetCopy() ) ) ) );
+                                eseqRight->expr->GetCopy() ) ) ) );
             } else {
-                CTemp temp;
-                resultExp = std::move( std::make_unique<const CESeqExp>(
-                        std::move( std::make_unique<const CMoveStm>(
-                                std::move( std::make_unique<const CTempExp>( temp ) ),
+                std::string temp;
+                resultExp = std::move( std::make_unique<const ESeqExpression>(
+                        std::move( std::make_unique<const MoveStatement>(
+                                std::move( std::make_unique<const TempExpression>( temp ) ),
                                 std::move( canonLeft ) ) ),
-                        std::move( std::make_unique<const CESeqExp>(
-                                eseqRight->GetStm()->GetCopy(),
-                                std::move( std::make_unique<const CBinaryExp>(
-                                        n->GetType(),
-                                        std::move( std::make_unique<const CTempExp>( temp ) ),
-                                        eseqRight->GetExp()->GetCopy() ) ) ) ) ) );
+                        std::move( std::make_unique<const ESeqExpression>(
+                                eseqRight->stm->GetCopy(),
+                                std::move( std::make_unique<const BinOpExpression>(
+                                        n->binop,
+                                        std::move( std::make_unique<const TempExpression>( temp ) ),
+                                        eseqRight->expr->GetCopy() ) ) ) ) ) );
                 resultExp = std::move( canonizeExpSubtree( std::move( resultExp ) ) );
             }
         } else {
-            resultExp = std::move( std::make_unique<const CBinaryExp>(
-                    n->GetType(),
+            resultExp = std::move( std::make_unique<const BinOpExpression>(
+                    n->binop,
                     canonLeft.release(),
                     canonRight.release() ) );
         }
@@ -142,50 +142,50 @@ namespace IRT
         updateLastExp( resultExp.release() );
     }
 
-    void ESeqCanon::Visit( const CMemoryExp* n )
+    void ESeqCanon::visit( const MemExpression* n )
     {
-        n->GetMem()->Accept( this );
+        n->expr->Accept( this );
         std::unique_ptr<const IRExpression> canonAddr = std::move( prevExp );
 
-        const CESeqExp* eseqAddr = castToESeqExp( canonAddr.get() );
+        const ESeqExpression* eseqAddr = castToESeqExp( canonAddr.get() );
         std::unique_ptr<const IRExpression> resultExp = nullptr;
         if( eseqAddr ) {
-            resultExp = std::move( std::make_unique<const CESeqExp>(
-                    eseqAddr->GetStm()->GetCopy(),
-                    std::move( std::make_unique<CMemoryExp>( eseqAddr->GetExp()->GetCopy() ) ) ) );
+            resultExp = std::move( std::make_unique<const ESeqExpression>(
+                    eseqAddr->stm->GetCopy(),
+                    std::move( std::make_unique<MemExpression>( eseqAddr->expr->GetCopy() ) ) ) );
         } else {
-            resultExp = std::move( std::make_unique<const CMemoryExp>( canonAddr.release() ) );
+            resultExp = std::move( std::make_unique<const MemExpression>( canonAddr.release() ) );
         }
         updateLastExp( resultExp.release() );
     }
 
-    void ESeqCanon::Visit( const CCallExp* n )
+    void ESeqCanon::visit( const CallExpression* n )
     {
-        n->GetFuncExp()->Accept( this );
+        n->func->Accept( this );
         std::unique_ptr<const IRExpression> canonFunc = std::move( prevExp );
 
-        n->GetArgs()->Accept( this );
+        n->args->Accept( this );
         std::vector<std::unique_ptr<const IRStatement>> newStms;
 
         std::unique_ptr<IRExpList> newArgs = std::make_unique<IRExpList>();
         std::unique_ptr<const IRExpList> canonArgList = std::move( prevExpList );
-        for( auto& canonArg : canonArgList->GetExpressions() ) {
-            const CESeqExp* eseqArg = castToESeqExp( canonArg.get() );
+        for( auto& canonArg : canonArgList->list ) {
+            const ESeqExpression* eseqArg = castToESeqExp( canonArg.get() );
             if( eseqArg ) {
-                newStms.push_back( eseqArg->GetStm()->GetCopy() );
+                newStms.push_back( eseqArg->stm->GetCopy() );
             }
 
-            CTemp temp;
-            newArgs->Add( new CTempExp( temp ) );
+            std::string temp;
+            newArgs->Add( new TempExpression( temp ) );
 
             std::unique_ptr<const IRExpression> moveSrcExp;
             if( eseqArg ) {
-                moveSrcExp = eseqArg->GetExp()->GetCopy();
+                moveSrcExp = eseqArg->expr->GetCopy();
             } else {
                 moveSrcExp = canonArg->GetCopy();
             }
-            std::unique_ptr<const IRStatement> moveStm = std::move( std::make_unique<const CMoveStm>(
-                    std::move( std::make_unique<const CTempExp>( temp ) ),
+            std::unique_ptr<const IRStatement> moveStm = std::move( std::make_unique<const MoveStatement>(
+                    std::move( std::make_unique<const TempExpression>( temp ) ),
                     std::move( moveSrcExp ) ) );
             newStms.push_back( std::move( moveStm ) );
         }
@@ -195,18 +195,18 @@ namespace IRT
             std::unique_ptr<const IRStatement> suffStm = std::move( newStms.back() );
             newStms.pop_back();
             for( int i = newStms.size() - 1; i >= 0 ; i-- ) {
-                suffStm = std::move( std::make_unique<const CSeqStm>(
+                suffStm = std::move( std::make_unique<const SeqStatement>(
                         std::move( newStms[i] ) ,
                         std::move( suffStm )));
             }
 
-            resultExp = std::move( std::make_unique<const CESeqExp>(
+            resultExp = std::move( std::make_unique<const ESeqExpression>(
                     std::move( suffStm ),
-                    std::move( std::make_unique<const CCallExp>(
+                    std::move( std::make_unique<const CallExpression>(
                             std::move( canonFunc ),
                             std::move( newArgs ) ) ) ) );
         } else {
-            resultExp = std::move( std::make_unique<const CCallExp>(
+            resultExp = std::move( std::make_unique<const CallExpression>(
                     std::move( canonFunc ),
                     std::move( canonArgList ) ) );
         }
@@ -215,23 +215,23 @@ namespace IRT
 
     }
 
-    void ESeqCanon::Visit( const CESeqExp* n )
+    void ESeqCanon::visit( const ESeqExpression* n )
     {
-        n->GetStm()->Accept( this );
+        n->stm->Accept( this );
         std::unique_ptr<const IRStatement> canonStm = std::move( prevStm );
-        n->GetExp()->Accept( this );
+        n->expr->Accept( this );
         std::unique_ptr<const IRExpression> canonExp = std::move( prevExp );
 
-        const CESeqExp* eseqExp = castToESeqExp( canonExp.get() );
+        const ESeqExpression* eseqExp = castToESeqExp( canonExp.get() );
         std::unique_ptr<const IRExpression> resultExp;
         if( eseqExp ) {
-            resultExp = std::move( std::make_unique<const CESeqExp>(
-                    std::move( std::make_unique<const CSeqStm>(
+            resultExp = std::move( std::make_unique<const ESeqExpression>(
+                    std::move( std::make_unique<const SeqStatement>(
                             std::move( canonStm ),
-                            eseqExp->GetStm()->GetCopy() ) ),
-                    eseqExp->GetExp()->GetCopy() ) );
+                            eseqExp->stm->GetCopy() ) ),
+                    eseqExp->expr->GetCopy() ) );
         } else {
-            resultExp = std::move( std::make_unique<const CESeqExp>(
+            resultExp = std::move( std::make_unique<const ESeqExpression>(
                     std::move( canonStm ),
                     std::move( canonExp ) ) );
         }
@@ -240,144 +240,144 @@ namespace IRT
 
     }
 
-    void ESeqCanon::Visit( const CExpStm* n )
+    void ESeqCanon::visit( const ExpStatement* n )
     {
 
-        n->GetExp()->Accept( this );
+        n->exp->Accept( this );
         std::unique_ptr<const IRExpression> canonExp = std::move( prevExp );
 
-        const CESeqExp* eseqExp = castToESeqExp( canonExp.get() );
+        const ESeqExpression* eseqExp = castToESeqExp( canonExp.get() );
         std::unique_ptr<const IRStatement> resultStm;
         if( eseqExp ) {
-            resultStm = std::move( std::make_unique<const CSeqStm>(
-                    eseqExp->GetStm()->GetCopy(),
-                    std::move( std::make_unique<const CExpStm>( eseqExp->GetExp()->GetCopy() ) ) ) );
+            resultStm = std::move( std::make_unique<const SeqStatement>(
+                    eseqExp->stm->GetCopy(),
+                    std::move( std::make_unique<const ExpStatement>( eseqExp->expr->GetCopy() ) ) ) );
         } else {
-            resultStm = std::move( std::make_unique<const CExpStm>( std::move( canonExp ) ) );
+            resultStm = std::move( std::make_unique<const ExpStatement>( std::move( canonExp ) ) );
         }
 
         updateLastStm( std::move( resultStm ) );
 
     }
 
-    void ESeqCanon::Visit( const CCJumpStm* n )
+    void ESeqCanon::visit( const CJumpStatement* n )
     {
 
-        n->GetLeft()->Accept( this );
+        n->left->Accept( this );
         std::unique_ptr<const IRExpression> canonLeft = std::move( prevExp );
-        n->GetRight()->Accept( this );
+        n->right->Accept( this );
         std::unique_ptr<const IRExpression> canonRight = std::move( prevExp );
 
-        const CESeqExp* eseqLeft = castToESeqExp( canonLeft.get() );
-        const CESeqExp* eseqRight = castToESeqExp( canonRight.get() );
+        const ESeqExpression* eseqLeft = castToESeqExp( canonLeft.get() );
+        const ESeqExpression* eseqRight = castToESeqExp( canonRight.get() );
 
         std::unique_ptr<const IRStatement> resultStm;
 
         if( eseqLeft ) {
-            resultStm = std::move( std::make_unique<const CCJumpStm>(
-                    n->GetType(),
-                    eseqLeft->GetExp()->GetCopy(),
+            resultStm = std::move( std::make_unique<const CJumpStatement>(
+                    n->rel,
+                    eseqLeft->expr->GetCopy(),
                     std::move( canonRight ),
-                    n->GetTrueLabel(),
-                    n->GetFalseLabel() ) );
+                    n->if_left,
+                    n->if_right ) );
             if( eseqRight ) {
                 resultStm = std::move( canonizeStmSubtree( std::move( resultStm ) ) );
             }
 
-            resultStm = std::move( std::make_unique<const CSeqStm>(
-                    eseqLeft->GetStm()->GetCopy(),
+            resultStm = std::move( std::make_unique<const SeqStatement>(
+                    eseqLeft->stm->GetCopy(),
                     std::move( resultStm ) ) );
         } else if( eseqRight ) {
-            if( areCommuting( eseqRight->GetStm(), canonLeft.get() ) ) {
-                resultStm = std::move( std::make_unique<const CSeqStm>(
-                        eseqRight->GetStm()->GetCopy(),
-                        std::move( std::make_unique<const CCJumpStm>(
-                                n->GetType(),
+            if( areCommuting( eseqRight->stm.get(), canonLeft.get() ) ) {
+                resultStm = std::move( std::make_unique<const SeqStatement>(
+                        eseqRight->stm->GetCopy(),
+                        std::move( std::make_unique<const CJumpStatement>(
+                                n->rel,
                                 std::move( canonLeft ),
-                                eseqRight->GetExp()->GetCopy(),
-                                n->GetTrueLabel(),
-                                n->GetFalseLabel() ) ) ) );
+                                eseqRight->expr->GetCopy(),
+                                n->if_left,
+                                n->if_right ) ) ) );
             } else {
-                CTemp temp;
-                resultStm = std::move( std::make_unique<const CSeqStm>(
-                        std::move( std::make_unique<const CMoveStm>(
-                                std::move( std::make_unique<const CTempExp>( temp ) ),
+                std::string temp;
+                resultStm = std::move( std::make_unique<const SeqStatement>(
+                        std::move( std::make_unique<const MoveStatement>(
+                                std::move( std::make_unique<const TempExpression>( temp ) ),
                                 std::move( canonLeft ) ) ),
-                        std::move( std::make_unique<const CSeqStm>(
-                                eseqRight->GetStm()->GetCopy(),
-                                std::move( std::make_unique<const CCJumpStm>(
-                                        n->GetType(),
-                                        std::move( std::make_unique<const CTempExp>( temp ) ),
-                                        eseqRight->GetExp()->GetCopy(),
-                                        n->GetTrueLabel(),
-                                        n->GetFalseLabel() ) ) ) ) ) );
+                        std::move( std::make_unique<const SeqStatement>(
+                                eseqRight->stm->GetCopy(),
+                                std::move( std::make_unique<const CJumpStatement>(
+                                        n->rel,
+                                        std::move( std::make_unique<const TempExpression>( temp ) ),
+                                        eseqRight->expr->GetCopy(),
+                                        n->if_left,
+                                        n->if_right ) ) ) ) ) );
             }
         } else {
-            resultStm = std::move( std::make_unique<const CCJumpStm>(
-                    n->GetType(),
+            resultStm = std::move( std::make_unique<const CJumpStatement>(
+                    n->rel,
                     std::move( canonLeft ),
                     std::move( canonRight ),
-                    n->GetTrueLabel(),
-                    n->GetFalseLabel() ) );
+                    n->if_left,
+                    n->if_right ) );
         }
 
         updateLastStm( std::move( resultStm ) );
 
     }
 
-    void ESeqCanon::Visit( const CJumpStm* n )
+    void ESeqCanon::visit( const JumpStatement* n )
     {
         updateLastStm( n->GetCopy() );
     }
 
-    void ESeqCanon::Visit( const CLabelStm* n )
+    void ESeqCanon::visit( const LabelStatement* n )
     {
         updateLastStm( n->GetCopy() );
     }
 
-    void ESeqCanon::Visit( const CMoveStm* n )
+    void ESeqCanon::visit( const MoveStatement* n )
     {
-        n->GetDst()->Accept( this );
+        n->dst->Accept( this );
         std::unique_ptr<const IRExpression> canonDest = std::move( prevExp );
-        n->GetSrc()->Accept( this );
+        n->src->Accept( this );
         std::unique_ptr<const IRExpression> canonSrc = std::move( prevExp );
 
-        const CESeqExp* eseqDest = castToESeqExp( canonDest.get() );
-        const CESeqExp* eseqSrc = castToESeqExp( canonSrc.get() );
+        const ESeqExpression* eseqDest = castToESeqExp( canonDest.get() );
+        const ESeqExpression* eseqSrc = castToESeqExp( canonSrc.get() );
 
         std::unique_ptr<const IRStatement> resultStm;
         if( eseqDest ) {
-            resultStm = std::move( std::make_unique<const CMoveStm>(
-                    eseqDest->GetExp()->GetCopy(),
+            resultStm = std::move( std::make_unique<const MoveStatement>(
+                    eseqDest->expr->GetCopy(),
                     std::move( canonSrc ) ) );
             if( eseqSrc ) {
                 resultStm = std::move( canonizeStmSubtree( std::move( resultStm ) ) );
             }
-            resultStm = std::move( std::make_unique<const CSeqStm>(
-                    eseqDest->GetStm()->GetCopy(),
+            resultStm = std::move( std::make_unique<const SeqStatement>(
+                    eseqDest->stm->GetCopy(),
                     std::move( resultStm ) ) );
         } else if( eseqSrc ) {
-            if( areCommuting( eseqSrc->GetStm(), canonDest.get() ) ) {
-                resultStm = std::move( std::make_unique<const CSeqStm>(
-                        eseqSrc->GetStm()->GetCopy(),
-                        std::move( std::make_unique<const CMoveStm>(
+            if( areCommuting( eseqSrc->stm.get(), canonDest.get() ) ) {
+                resultStm = std::move( std::make_unique<const SeqStatement>(
+                        eseqSrc->stm->GetCopy(),
+                        std::move( std::make_unique<const MoveStatement>(
                                 std::move( canonDest ),
-                                eseqSrc->GetExp()->GetCopy() ) ) ) );
+                                eseqSrc->expr->GetCopy() ) ) ) );
             } else {
-                CTemp temp;
-                resultStm = std::move( std::make_unique<const CSeqStm>(
-                        std::move( std::make_unique<const CSeqStm>(
-                                eseqSrc->GetStm()->GetCopy(),
-                                std::move( std::make_unique<const CMoveStm>(
-                                        std::move( std::make_unique<const CTempExp>( temp ) ),
-                                        eseqSrc->GetExp()->GetCopy() ) ) ) ),
-                        std::move( std::make_unique<const CMoveStm>(
+                std::string temp;
+                resultStm = std::move( std::make_unique<const SeqStatement>(
+                        std::move( std::make_unique<const SeqStatement>(
+                                eseqSrc->stm->GetCopy(),
+                                std::move( std::make_unique<const MoveStatement>(
+                                        std::move( std::make_unique<const TempExpression>( temp ) ),
+                                        eseqSrc->expr->GetCopy() ) ) ) ),
+                        std::move( std::make_unique<const MoveStatement>(
                                 std::move( canonDest ),
-                                std::move( std::make_unique<const CTempExp>( temp ) ) ) ) ) );
+                                std::move( std::make_unique<const TempExpression>( temp ) ) ) ) ) );
             }
         } else {
-            resultStm = std::move( std::make_unique<const CMoveStm>(
-                    CMoveStm(
+            resultStm = std::move( std::make_unique<const MoveStatement>(
+                    MoveStatement(
                             std::move( canonDest ),
                             std::move( canonSrc ) ) ) );
         }
@@ -386,22 +386,22 @@ namespace IRT
 
     }
 
-    void ESeqCanon::Visit( const CSeqStm* n )
+    void ESeqCanon::visit( const SeqStatement* n )
     {
-        n->GetLeft()->Accept( this );
+        n->left->Accept( this );
         std::unique_ptr<const IRStatement> canonLeft = std::move( prevStm );
-        n->GetRight()->Accept( this );
+        n->right->Accept( this );
         std::unique_ptr<const IRStatement> canonRight = std::move( prevStm );
 
-        updateLastStm( std::move( std::make_unique<const CSeqStm>(
+        updateLastStm( std::move( std::make_unique<const SeqStatement>(
                 std::move( canonLeft ),
                 std::move( canonRight ) ) ) );
     }
 
-    void ESeqCanon::Visit( const IRExpList* expList )
+    void ESeqCanon::visit( const IRExpList* expList )
     {
         std::unique_ptr<IRExpList> newExpList( new IRExpList );
-        for( auto& expression : expList->GetExpressions() ) {
+        for( auto& expression : expList->list ) {
             expression->Accept( this );
             newExpList->Add( prevExp.release() );
         }
@@ -409,9 +409,9 @@ namespace IRT
         updateLastExpList( std::move( newExpList ) );
     }
 
-    void ESeqCanon::Visit( const CStmList* stmList )
-    {
-        assert( false );
-    }
+//    void ESeqCanon::visit( const CStmList* stmList )
+//    {
+//        assert( false );
+//    }
 
 }

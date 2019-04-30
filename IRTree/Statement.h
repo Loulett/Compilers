@@ -9,7 +9,7 @@
 
 class MoveStatement : public IRStatement {
 public:
-    MoveStatement(IRExpression* dst, IRExpression* src);
+    MoveStatement(const IRExpression* dst, const IRExpression* src);
 
     MoveStatement( std::unique_ptr<const IRExpression> dst, std::unique_ptr<const IRExpression> src ) :
     dst( std::move( dst ) ), src( std::move( src ) )
@@ -31,7 +31,7 @@ public:
             exp( std::move( exp ) )
     {}  // mb move to .cpp
 
-    explicit ExpStatement(IRExpression* exp);
+    explicit ExpStatement(const IRExpression* exp);
 
 
 
@@ -57,8 +57,8 @@ class CJumpStatement : public IRStatement {
 public:
     enum Relation { LESS, NEQ, EQ };
 
-    CJumpStatement(CJumpStatement::Relation rel, IRExpression* left, IRExpression* right,
-                   std::string& if_left, std::string& if_right);
+    CJumpStatement(CJumpStatement::Relation rel, const IRExpression* left, const IRExpression* right,
+                   const std::string& if_left, const std::string& if_right);
 
 
     CJumpStatement(CJumpStatement::Relation rel, std::unique_ptr<const IRExpression> left,
@@ -77,7 +77,7 @@ public:
 
 class SeqStatement : public IRStatement {
 public:
-    SeqStatement(IRStatement* left, IRStatement* right);
+    SeqStatement(const IRStatement* left, const IRStatement* right);
 
     SeqStatement( std::unique_ptr<const IRStatement> left, std::unique_ptr<const IRStatement> right ) :
     left( std::move( left ) ), right( std::move( right ) )

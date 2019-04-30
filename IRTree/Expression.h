@@ -13,8 +13,13 @@ class IRExpList {
 public:
     IRExpList() = default;
 //    IRExpList( std::unique_ptr<const IRExpression> exp);
+
+    void Accept(IRVisitor* v) const;
+
     void Add(IRExpression* exp);
-//    std::vector< std::unique_ptr<const IRExpression> > Get();
+
+//    std::vector< std::unique_ptr<const IRExpression> > Get() const ;
+
     std::unique_ptr<const IRExpList> GetCopy() const;
 
     std::vector< std::unique_ptr<const IRExpression> > list;
@@ -60,9 +65,12 @@ public:
 
 class NameExpression : public IRExpression {    //done
 public:
-    NameExpression(std::string& name);
+    explicit  NameExpression(const std::string& name) : name(name) {}
     void Accept(IRVisitor* v) const override;
-    std::string name;
+
+    const std::string& GetLabel() const { return name; }
+
+    const std::string name;
 
     std::unique_ptr<const IRExpression> GetCopy() const override;
 
@@ -72,9 +80,11 @@ public:
 
 class TempExpression : public IRExpression {
 public:
-    TempExpression(std::string& name);
+    TempExpression(const std::string& name);
     void Accept(IRVisitor* v) const override;
-    std::string name;
+    const std::string name;
+
+    const std::string& GetTemp() const { return name; }
 
     std::unique_ptr<const IRExpression> GetCopy() const override;
 
@@ -86,14 +96,12 @@ class BinOpExpression : public IRExpression {
 public:
     enum BinOp { PLUS, MINUS, MULT, DIV, REM, LESS, AND, OR };
 
-    explicit BinOpExpression( BinOp binop, std::unique_ptr<const IRExpression> left, std::unique_ptr<const IRExpression> right ) :
+    BinOpExpression(BinOpExpression::BinOp binop, const IRExpression* left, const IRExpression* right);
+
+    BinOpExpression( BinOpExpression::BinOp binop, std::unique_ptr<const IRExpression> left, std::unique_ptr<const IRExpression> right ) :
             binop( binop ), left( std::move( left ) ), right( std::move( right ) )
     {
     }
-
-    explicit BinOpExpression(BinOp binop, IRExpression* left, IRExpression* right);
-
-
 
 
 
@@ -106,23 +114,25 @@ public:
     bool is_absolutely_commutative() {return false; }
 
 
-    BinOp binop;
+    BinOpExpression::BinOp binop;
     std::unique_ptr<const IRExpression> left;
     std::unique_ptr<const IRExpression> right;
 };
 
 class MemExpression : public IRExpression {
 public:
-    explicit MemExpression(IRExpression* expr);
+    explicit MemExpression( std::unique_ptr<const IRExpression> exp_ ) :
+            expr( std::move( exp_ ) )
+    {}
+
+    explicit MemExpression( const IRExpression* expr);
+
     void Accept(IRVisitor* v) const override;
     std::unique_ptr<const IRExpression> expr;
 
     std::unique_ptr<const IRExpression> GetCopy() const override;
     //mb тут не нужен explicit
-    explicit MemExpression( std::unique_ptr<const IRExpression> exp_ ) :
-    expr( std::move( exp_ ) )
-    {
-    }
+
 
 
 //    bool is_commutative() {return expr.is_absolutely_commutative(); }
@@ -151,7 +161,7 @@ public:
 
 class ESeqExpression : public IRExpression {
 public:
-    ESeqExpression(IRStatement* stm, IRExpression* expr);
+    ESeqExpression(const IRStatement* stm, const IRExpression* expr);
     void Accept(IRVisitor* v) const override;
 
     std::unique_ptr<const IRExpression> GetCopy() const override;

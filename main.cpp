@@ -13,7 +13,7 @@
 //#include "IRTree_canonical/Translator.h"
 //#include "IRTree_canonical/IRPrinter.h"
 #include "IRTree/canonizers/CallCanon.h"
-#include "IRTree/canonizers/ESeqcanon.h"
+#include "IRTree/canonizers/ESeqCanon.h"
 
 extern int yyparse(Goal *goal);
 

@@ -41,51 +41,51 @@ namespace IRT
         prevStm = std::move( newLastStm );
     }
 
-    void CallCanon::updateLastStmList( const CStmList* newLastStmList )
+//    void CallCanon::updateLastStmList( const CStmList* newLastStmList )
+//    {
+//        prevStmList = std::move( std::unique_ptr<const CStmList>( newLastStmList ) );
+//    }
+//
+//    void CallCanon::updateLastStmList( std::unique_ptr<const CStmList> newLastStmList )
+//    {
+//        prevStmList = std::move( newLastStmList );
+//    }
+
+    void CallCanon::visit( const ConstExpression* n )
     {
-        prevStmList = std::move( std::unique_ptr<const CStmList>( newLastStmList ) );
+        updateLastExp( std::make_unique<const ConstExpression>( n->value ) );
     }
 
-    void CallCanon::updateLastStmList( std::unique_ptr<const CStmList> newLastStmList )
+    void CallCanon::visit( const NameExpression* n )
     {
-        prevStmList = std::move( newLastStmList );
+        updateLastExp( std::make_unique<const NameExpression>( n->name ) );
     }
 
-    void CallCanon::Visit( const ConstExpression* n )
+    void CallCanon::visit( const TempExpression* n )
     {
-        updateLastExp( std::make_unique<const ConstExpression>( n->GetValue() ) );
+        updateLastExp( std::make_unique<const TempExpression>( n->name ) );
     }
 
-    void CallCanon::Visit( const NameExpression* n )
+    void CallCanon::visit( const BinOpExpression* n )
     {
-        updateLastExp( std::make_unique<const NameExpression>( n->GetLabel() ) );
-    }
-
-    void CallCanon::Visit( const TempExpression* n )
-    {
-        updateLastExp( std::make_unique<const TempExpression>( n->GetTemp() ) );
-    }
-
-    void CallCanon::Visit( const BinOpExpression* n )
-    {
-        n->GetLeft()->Accept( this );
+        n->left->Accept( this );
         std::unique_ptr<const IRExpression> nLeft = std::move( prevExp );
 
-        n->GetRight()->Accept( this );
+        n->right->Accept( this );
         std::unique_ptr<const IRExpression> nRight = std::move( prevExp );
 
         updateLastExp(
                 std::make_unique<const BinOpExpression>(
-                        n->GetType(),
+                        n->binop,
                         nLeft.release(),
                         nRight.release()
                 )
         );
     }
 
-    void CallCanon::Visit( const MemExpression* n )
+    void CallCanon::visit( const MemExpression* n )
     {
-        n->GetMem()->Accept( this );
+        n->expr->Accept( this );
         std::unique_ptr<const IRExpression> addressExp = std::move( prevExp );
 
         updateLastExp(
@@ -93,15 +93,15 @@ namespace IRT
         );
     }
 
-    void CallCanon::Visit( const CallExpression* n )
+    void CallCanon::visit( const CallExpression* n )
     {
-        n->GetFuncExp()->Accept( this );
+        n->func->Accept( this );
         std::unique_ptr<const IRExpression> functionExp = std::move( prevExp );
 
-        n->GetArgs()->Accept(this);
+        n->args->Accept(this);
         std::unique_ptr<const IRExpList> argumentsList = std::move( prevExpList );
 
-        CTemp temp;
+        std::string temp;
         updateLastExp(
                 std::make_unique<const ESeqExpression>(
                         std::make_unique<const MoveStatement>(
@@ -115,10 +115,10 @@ namespace IRT
                 ) );
     }
 
-    void CallCanon::Visit( const ESeqExpression* n )
+    void CallCanon::visit( const ESeqExpression* n )
     {
-        n->GetStm()->Accept( this );
-        n->GetExp()->Accept( this );
+        n->stm->Accept( this );
+        n->expr->Accept( this );
 
         updateLastExp(
                 std::make_unique<const ESeqExpression>(
@@ -128,9 +128,9 @@ namespace IRT
         );
     }
 
-    void CallCanon::Visit( const ExpStatement* n )
+    void CallCanon::visit( const ExpStatement* n )
     {
-        n->GetExp()->Accept( this );
+        n->exp->Accept( this );
         std::unique_ptr<const IRExpression> exp = std::move( prevExp );
 
         updateLastStm(
@@ -138,45 +138,45 @@ namespace IRT
         );
     }
 
-    void CallCanon::Visit( const CJumpStatement* n )
+    void CallCanon::visit( const CJumpStatement* n )
     {
-        n->GetLeft()->Accept( this );
+        n->left->Accept( this );
         std::unique_ptr<const IRExpression> nLeft = std::move( prevExp );
 
-        n->GetRight()->Accept( this );
+        n->right->Accept( this );
         std::unique_ptr<const IRExpression> nRight = std::move( prevExp );
 
         updateLastStm(
                 std::make_unique<const CJumpStatement>(
-                        n->GetType(),
+                        n->rel,
                         nLeft.release(),
                         nRight.release(),
-                        n->GetTrueLabel(),
-                        n->GetFalseLabel()
+                        n->if_left,
+                        n->if_right
                 )
         );
     }
 
-    void CallCanon::Visit( const JumpStatement* n )
+    void CallCanon::visit( const JumpStatement* n )
     {
         updateLastStm(
-                std::make_unique<const JumpStatement>( n->GetLabel() )
+                std::make_unique<const JumpStatement>( n->label )
         );
     }
 
-    void CallCanon::Visit( const LabelStatement* n )
+    void CallCanon::visit( const LabelStatement* n )
     {
         updateLastStm(
                 std::make_unique<const LabelStatement>( n->GetLabel() )
         );
     }
 
-    void CallCanon::Visit( const MoveStatement* n )
+    void CallCanon::visit( const MoveStatement* n )
     {
-        n->GetDst()->Accept( this );
+        n->dst->Accept( this );
         std::unique_ptr<const IRExpression> destination = std::move( prevExp );
 
-        n->GetSrc()->Accept( this );
+        n->src->Accept( this );
         std::unique_ptr<const IRExpression> source = std::move( prevExp );
 
         updateLastStm(
@@ -187,12 +187,12 @@ namespace IRT
         );
     }
 
-    void CallCanon::Visit( const SeqStatement* n )
+    void CallCanon::visit( const SeqStatement* n )
     {
-        n->GetLeft()->Accept( this );
+        n->left->Accept( this );
         std::unique_ptr<const IRStatement> nLeft = std::move( prevStm );
 
-        n->GetRight()->Accept( this );
+        n->right->Accept( this );
         std::unique_ptr<const IRStatement> nRight = std::move( prevStm );
 
         updateLastStm(
@@ -203,10 +203,10 @@ namespace IRT
         );
     }
 
-    void CallCanon::Visit( const IRExpList* list )
+    void CallCanon::visit( const IRExpList* Explist )
     {
         auto newList = std::make_unique<IRExpList>();
-        const auto& arguments = list->GetExpressions();
+        const auto& arguments = Explist->list;
         for( const auto& arg : arguments ) {
             arg->Accept( this );
             newList->Add( std::move( prevExp ) );
@@ -215,16 +215,16 @@ namespace IRT
         updateLastExpList( std::move( newList ) );
     }
 
-    void CallCanon::Visit( const CStmList* list )
-    {
-        auto newList = std::make_unique<CStmList>();
-        const auto& arguments = list->GetStatements();
-        for( const auto& arg : arguments ) {
-            arg->Accept( this );
-            newList->Add( std::move( prevStm ) );
-        }
-
-        updateLastStmList( std::move( newList ) );
-    }
+//    void CallCanon::visit( const CStmList* list )
+//    {
+//        auto newList = std::make_unique<CStmList>();
+//        const auto& arguments = list->GetStatements();
+//        for( const auto& arg : arguments ) {
+//            arg->Accept( this );
+//            newList->Add( std::move( prevStm ) );
+//        }
+//
+//        updateLastStmList( std::move( newList ) );
+//    }
 
 }

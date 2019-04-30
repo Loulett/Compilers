@@ -50,14 +50,14 @@ std::unique_ptr<const IRStatement> MoveStatement::GetCopy() const
 
 
 
-MoveStatement::MoveStatement(IRExpression *dst, IRExpression *src) : dst(dst), src(src) {
+MoveStatement::MoveStatement(const IRExpression *dst, const IRExpression *src) : dst(dst), src(src) {
 }
 
 void MoveStatement::Accept(IRVisitor *v) const {
     v->visit(this);
 }
 
-ExpStatement::ExpStatement(IRExpression *exp) : exp(exp) {
+ExpStatement::ExpStatement(const IRExpression *exp) : exp(exp) {
 }
 
 void ExpStatement::Accept(IRVisitor *v) const {
@@ -71,8 +71,8 @@ void JumpStatement::Accept(IRVisitor *v) const {
     v->visit(this);
 }
 
-CJumpStatement::CJumpStatement(CJumpStatement::Relation rel, IRExpression *left,
-                               IRExpression *right, std::string &if_left, std::string &if_right)
+CJumpStatement::CJumpStatement(CJumpStatement::Relation rel, const IRExpression *left,
+                               const IRExpression *right, const std::string &if_left, const std::string &if_right)
     : rel(rel), left(left), right(right), if_left(if_left), if_right(if_right) {
 }
 
@@ -92,7 +92,7 @@ void CJumpStatement::Accept(IRVisitor *v) const {
     v->visit(this);
 }
 
-SeqStatement::SeqStatement(IRStatement *left, IRStatement *right) : left(left), right(right) {
+SeqStatement::SeqStatement(const IRStatement *left, const IRStatement *right) : left(left), right(right) {
 }
 
 void SeqStatement::Accept(IRVisitor *v) const {

@@ -11,7 +11,8 @@ IRPrinter::~IRPrinter() {
     fprintf(f, "%s", "}");
     fclose(f);
 }
-void visit( const IRExpList* n){
+
+void IRPrinter::visit( const IRExpList* n){
     fprintf(f, " [label=\"IPLEMENT IRExpList! \\n\"];\n");
 }
 
@@ -50,20 +51,40 @@ void IRPrinter::visit(const MemExpression *n) {
     n->expr->Accept(this);
 }
 
+//void IRPrinter::visit(const CallExpression *n) {
+//    int cur = nodeNumber;
+//    fprintf(f, "%d [label=\"CALL\"];\n", cur);
+//    nodeNumber++;
+//    fprintf(f, "%d -- %d;\n", cur, nodeNumber);
+//    n->func->Accept(this);
+////    const auto &arguments = n->args->Get();
+//    const auto &arguments = n->args->GetCopy();
+//
+//    for (auto &arg : arguments) {
+//        nodeNumber++;
+//        fprintf(f, "%d -- %d;\n", cur, nodeNumber);
+//        arg->Accept(this);
+//    }
+//}
+
 void IRPrinter::visit(const CallExpression *n) {
     int cur = nodeNumber;
     fprintf(f, "%d [label=\"CALL\"];\n", cur);
     nodeNumber++;
     fprintf(f, "%d -- %d;\n", cur, nodeNumber);
     n->func->Accept(this);
-//    const auto &arguments = n->args->Get();
-    const auto &arguments = n->args->GetCopy();
-    for (auto &arg : arguments) {
+    //std::vector< std::unique_ptr<const IRExpression> > copyList = n->args->Get(); //->Get();
+
+
+
+    for (auto &arg : n->args->list) {
         nodeNumber++;
         fprintf(f, "%d -- %d;\n", cur, nodeNumber);
         arg->Accept(this);
     }
 }
+
+
 
 void IRPrinter::visit(const ESeqExpression *n) {
     int cur = nodeNumber;
