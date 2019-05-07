@@ -23,12 +23,12 @@ void IRPrinter::visit(const ConstExpression *n) {
 
 void IRPrinter::visit(const NameExpression *n) {
     int cur = nodeNumber;
-    fprintf(f, "%d [label=\"NAME\\n%s\"];\n", cur, n->name.c_str());
+    fprintf(f, "%d [label=\"NAME\\n%s\"];\n", cur, n->name.String().c_str());
 }
 
 void IRPrinter::visit(const TempExpression *n) {
     int cur = nodeNumber;
-    fprintf(f, "%d [label=\"TEMP\\n%s\"];\n", cur, n->name.c_str());
+    fprintf(f, "%d [label=\"TEMP\\n%s\"];\n", cur, n->name.String().c_str());
 }
 
 void IRPrinter::visit(const BinOpExpression *n) {
@@ -118,7 +118,7 @@ void IRPrinter::visit(const ExpStatement *n) {
 
 void IRPrinter::visit(const JumpStatement *n) {
     int cur = nodeNumber;
-    fprintf(f, "%d [label=\"JUMP\\n%s\"];\n", cur, n->label.c_str());
+    fprintf(f, "%d [label=\"JUMP\\n%s\"];\n", cur, n->label.String().c_str());
 }
 
 void IRPrinter::visit(const CJumpStatement *n) {
@@ -133,10 +133,10 @@ void IRPrinter::visit(const CJumpStatement *n) {
     n->right->Accept(this);
     nodeNumber++;
     fprintf(f, "%d -- %d;\n", cur, nodeNumber);
-    fprintf(f, "%d [label=\"iftrue\\n%s\"];\n", nodeNumber, n->if_left.c_str());
+    fprintf(f, "%d [label=\"iftrue\\n%s\"];\n", nodeNumber, n->if_left.String().c_str());
     nodeNumber++;
     fprintf(f, "%d -- %d;\n", cur, nodeNumber);
-    fprintf(f, "%d [label=\"iffalse\\n%s\"];\n", nodeNumber, n->if_right.c_str());
+    fprintf(f, "%d [label=\"iffalse\\n%s\"];\n", nodeNumber, n->if_right.String().c_str());
 }
 
 void IRPrinter::visit(const SeqStatement *n) {
@@ -152,7 +152,7 @@ void IRPrinter::visit(const SeqStatement *n) {
 
 void IRPrinter::visit(const LabelStatement *n) {
     int cur = nodeNumber;
-    fprintf(f, "%d [label=\"LABEL\\n%s\"];\n", cur, n->label.c_str());
+    fprintf(f, "%d [label=\"LABEL\\n%s\"];\n", cur, n->label.String().c_str());
 }
 
 std::string IRPrinter::getBinop(const BinOpExpression::BinOp rel) {

@@ -54,22 +54,30 @@ int main(int argc, char **argv) {
 
 
         // Canonize IRT
-        std::map<std::string, CodeFragment> codeFragments;
-        codeFragments = std::move( translator.fragments);
-        for (auto &codeFragment : codeFragments) {
+        //std::map<std::string, CodeFragment> codeFragments;
+        //codeFragments = std::move( translator.fragments);
+
+        for (auto &codeFragment : translator.fragments) {
+            std::cout << "new code fragment!\n";
             IRT::CallCanon callCanonizator;
             codeFragment.second.body->Accept( &callCanonizator );
+            std::cout << "Start canonize call!\n";
             codeFragment.second.rootCanonIRT = callCanonizator.CanonicalTree();
+            std::cout << "Finish canonize call!\n";
+
 
             IRT::ESeqCanon eseqCanonizator;
+            std::cout << "ESeqCanon inited!\n";
             codeFragment.second.rootCanonIRT->Accept( &eseqCanonizator );
+            std::cout << "Start canonize ESeq!\n";
             codeFragment.second.rootCanonIRT = eseqCanonizator.CanonicalTree();
+            std::cout << "Finish canonize ESeq!\n";
         }
-
+//
         //draw Canonized IRT
-        for (auto &codeFragment : codeFragments) {
+        for (auto &codeFragment : translator.fragments) {
             IRPrinter printer("output" + codeFragment.first + "_canonized.dot");
-            codeFragment.second.body->Accept(&printer);
+            codeFragment.second.rootCanonIRT->Accept(&printer);
         }
 
     } catch (...) {

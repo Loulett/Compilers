@@ -1,5 +1,6 @@
 #include "Expression.h"
 #include "IRVisitor.h"
+#include <iostream>
 
 std::unique_ptr<const IRExpList> IRExpList::GetCopy() const
 {
@@ -13,27 +14,28 @@ std::unique_ptr<const IRExpList> IRExpList::GetCopy() const
 
 std::unique_ptr<const IRExpression> ConstExpression::GetCopy() const
 {
-    return std::move(std::make_unique<ConstExpression>( value ) );
+    return std::move(std::make_unique<const ConstExpression>( value ) );
 }
 std::unique_ptr<const IRExpression> NameExpression::GetCopy() const
 {
-    return std::move(std::make_unique<NameExpression>( name ) );
+    return std::move(std::make_unique<const NameExpression>( name ) );
 }
 std::unique_ptr<const IRExpression> TempExpression::GetCopy() const
 {
-    return std::move(std::make_unique<TempExpression>( name ) );
+    return std::move(std::make_unique<const TempExpression>( name ) );
 }
 std::unique_ptr<const IRExpression> BinOpExpression::GetCopy() const
-{
-    return std::move(std::make_unique<BinOpExpression>( binop, left.get(), right.get() ) );
+{  // !!!!!!! no get()!
+    return std::move(std::make_unique<const BinOpExpression>( binop, left.get(), right.get() ) );
 }
 std::unique_ptr<const IRExpression> MemExpression::GetCopy() const
-{
-    return std::move(std::make_unique<MemExpression>( expr->GetCopy().get() ) );
+{   // !!!!
+//    return std::move(std::make_unique<MemExpression>( expr->GetCopy().get() ) );
+    return std::move( std::unique_ptr< const IRExpression>(new MemExpression(expr->GetCopy())));
 }
 std::unique_ptr<const IRExpression> CallExpression::GetCopy() const
 {
-    return std::move(std::make_unique<CallExpression>( func->GetCopy(), args->GetCopy() ) );
+    return std::move(std::make_unique<const CallExpression>( func->GetCopy(), args->GetCopy() ) );
 }
 std::unique_ptr<const IRExpression> ESeqExpression::GetCopy() const
 {
@@ -85,8 +87,8 @@ void NameExpression::Accept(IRVisitor *v) const {
     v->visit(this);
 }
 
-TempExpression::TempExpression(const std::string &name) : name(name) {
-}
+//TempExpression::TempExpression(const std::string &name) : name(name) {
+//}
 
 void TempExpression::Accept(IRVisitor *v) const {
     v->visit(this);
@@ -118,5 +120,6 @@ ESeqExpression::ESeqExpression(const IRStatement *stm, const IRExpression *expr)
 }
 
 void ESeqExpression::Accept(IRVisitor *v) const {
+    std::cout << "ESeqExpression accept \n";
     v->visit(this);
 }

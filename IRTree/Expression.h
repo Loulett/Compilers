@@ -8,6 +8,8 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include "Label.h"
+
 
 class IRExpList {
 public:
@@ -60,17 +62,19 @@ public:
     bool is_commutative() {return true; }
     bool is_absolutely_commutative() {return true; }
 
-    int value;
+    const int value;
 };
 
-class NameExpression : public IRExpression {    //done
+class NameExpression : public IRExpression {    //done   // после 3 конец, шаг 5. (деструктор)
 public:
+    explicit  NameExpression(const Label& name) : name(name) {}
     explicit  NameExpression(const std::string& name) : name(name) {}
     void Accept(IRVisitor* v) const override;
 
-    const std::string& GetLabel() const { return name; }
+    const Label&  GetLabel() const { return name; }
 
-    const std::string name;
+//    std::string name;
+    Label name;
 
     std::unique_ptr<const IRExpression> GetCopy() const override;
 
@@ -78,13 +82,16 @@ public:
     bool is_absolutely_commutative() {return true; }
 };
 
-class TempExpression : public IRExpression {
-public:
-    TempExpression(const std::string& name);
-    void Accept(IRVisitor* v) const override;
-    const std::string name;
 
-    const std::string& GetTemp() const { return name; }
+
+class TempExpression : public IRExpression {        // после 3конец шаг 3 (деструктор, как и раньше)
+public:
+    explicit  TempExpression(const std::string& name) : name(name) {}
+    explicit  TempExpression(const Temp& name) : name(name) {}
+    void Accept(IRVisitor* v) const override;
+    const Temp GetTemp() const { return name; }
+    Temp name;
+
 
     std::unique_ptr<const IRExpression> GetCopy() const override;
 
@@ -92,7 +99,7 @@ public:
     bool is_absolutely_commutative() {return false; }   // 123 mb bug
 };
 
-class BinOpExpression : public IRExpression {
+class BinOpExpression : public IRExpression {   //8+ шаг, 2 раза подр
 public:
     enum BinOp { PLUS, MINUS, MULT, DIV, REM, LESS, AND, OR };
 
@@ -114,7 +121,7 @@ public:
     bool is_absolutely_commutative() {return false; }
 
 
-    BinOpExpression::BinOp binop;
+    const BinOpExpression::BinOp binop;
     std::unique_ptr<const IRExpression> left;
     std::unique_ptr<const IRExpression> right;
 };
@@ -139,7 +146,7 @@ public:
 //    bool is_absolutely_commutative() {return false; }
 };
 
-class CallExpression : public IRExpression {
+class CallExpression : public IRExpression {    // после 3end, потом тут(деструктор)
 public:
     CallExpression(IRExpression* func, IRExpList* args);
     void Accept(IRVisitor* v) const override;
@@ -159,17 +166,19 @@ public:
     std::unique_ptr<const IRExpList> args;
 };
 
-class ESeqExpression : public IRExpression {
+class ESeqExpression : public IRExpression {    //после 3end, вначале тут
 public:
     ESeqExpression(const IRStatement* stm, const IRExpression* expr);
-    void Accept(IRVisitor* v) const override;
-
-    std::unique_ptr<const IRExpression> GetCopy() const override;
 
     ESeqExpression( std::unique_ptr<const IRStatement> stm, std::unique_ptr<const IRExpression> exp ) :
     stm( std::move( stm ) ), expr( std::move( exp ) )
     {
     }
+    void Accept(IRVisitor* v) const override;
+    const IRStatement* GetStm() const { return stm.get();}
+    const IRExpression* GetExp() const { return expr.get();}
+
+    std::unique_ptr<const IRExpression> GetCopy() const override;
 
 
     bool is_commutative() {return false; }

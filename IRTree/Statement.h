@@ -3,11 +3,12 @@
 
 #include "IRStatement.h"
 #include "IRExpression.h"
+#include "Label.h"
 #include <vector>
 #include <string>
 #include <memory>
 
-class MoveStatement : public IRStatement {
+class MoveStatement : public IRStatement {   // 3конец, 7+ шаг,2 раза подряд
 public:
     MoveStatement(const IRExpression* dst, const IRExpression* src);
 
@@ -37,6 +38,7 @@ public:
 
 
     void Accept(IRVisitor* v) const override;
+    const IRExpression* GetExp() const { return exp.get(); }
 
     std::unique_ptr<const IRStatement> GetCopy() const override;
 
@@ -46,11 +48,13 @@ public:
 class JumpStatement : public IRStatement {
 public:
     explicit JumpStatement(const std::string& label_) : label( label_ ) {}
+    explicit JumpStatement(const Label& label_) : label( label_ ) {}
+
     void Accept(IRVisitor* v) const override;
 
     std::unique_ptr<const IRStatement> GetCopy() const override;
 
-    const std::string label;
+    Label label;
 };
 
 class CJumpStatement : public IRStatement {
@@ -64,6 +68,14 @@ public:
     CJumpStatement(CJumpStatement::Relation rel, std::unique_ptr<const IRExpression> left,
             std::unique_ptr<const IRExpression> right, const std::string& if_left, const std::string& if_right);
 
+    CJumpStatement(CJumpStatement::Relation rel, const IRExpression* left, const IRExpression* right,
+                   const Label& if_left, const Label& if_right);
+
+
+    CJumpStatement(CJumpStatement::Relation rel, std::unique_ptr<const IRExpression> left,
+                   std::unique_ptr<const IRExpression> right, const Label& if_left, const Label& if_right);
+
+
     void Accept(IRVisitor* v) const override;
 
     std::unique_ptr<const IRStatement> GetCopy() const override;
@@ -71,8 +83,8 @@ public:
     CJumpStatement::Relation rel;
     std::unique_ptr<const IRExpression> left;
     std::unique_ptr<const IRExpression> right;
-    const std::string if_left;
-    const std::string if_right;
+    Label if_left;
+    Label if_right;
 };
 
 class SeqStatement : public IRStatement {
@@ -98,11 +110,13 @@ class LabelStatement : public IRStatement {
 public:
 //    LabelStatement(std::string& label);
     explicit LabelStatement(const std::string& label) : label( label ) {}
+    explicit LabelStatement(const Label& label) : label( label ) {}
+
     void Accept(IRVisitor* v) const override;
 
-    const std::string& GetLabel() const;
+    const Label& GetLabel() const;
 
 
     std::unique_ptr<const IRStatement> GetCopy() const override;
-    const std::string label;
+    Label label;
 };
