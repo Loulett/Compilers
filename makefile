@@ -44,7 +44,7 @@ Printer_graph.o: Printer_graph.cpp
 parser: parser.lexer.o parser.tab.o TableBuilder.o Printer_graph.o main.cpp ${AST} ${PRINTER} ${SYMBOLTABLE} ${ACTIVATIONRECORDS} ${IRTREE}
 	clang++ ${CXXFLAGS} ${WARNINGS} main.cpp \
 		parser.tab.o parser.lexer.o TableBuilder.o Printer_graph.o \
-		 ${AST} ${PRINTER} ${SYMBOLTABLE} ${ACTIVATIONRECORDS} ${IRTREE} -o parser
+		 ${AST} ${PRINTER} ${SYMBOLTABLE} ${ACTIVATIONRECORDS} ${IRTREE} ${DEBUG_FLAGS} -o parser
 
 clean:
 	rm -f parser parser.lexer.c parser.lexer.h parser.tab.c parser.tab.h parser.output *.dot *.o

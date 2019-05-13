@@ -18,15 +18,10 @@ public:
 
     void Accept(IRVisitor* v) const;
 
-    void Add(IRExpression* exp);
-
-//    std::vector< std::unique_ptr<const IRExpression> > Get() const ;
+    void Add( IRExpression* exp);
 
     std::unique_ptr<const IRExpList> GetCopy() const;
 
-    std::vector< std::unique_ptr<const IRExpression> > list;
-
-    //std::unique_ptr<const IRExpression> GetCopy() const override;
 
     explicit IRExpList( const IRExpression* expression )
     {
@@ -44,8 +39,13 @@ public:
     }
 //
 //
-//
-//    std::unique_ptr<const IRExpList> GetCopy() const;
+
+    const std::vector<std::unique_ptr<const IRExpression>>& GetExpressions() const
+    {
+        return list;
+    }
+
+    std::vector< std::unique_ptr<const IRExpression> > list;
 
     bool is_commutative() {return false; }
     bool is_absolutely_commutative() {return false; }
@@ -55,6 +55,8 @@ class ConstExpression : public IRExpression {  //done
 public:
     ConstExpression(int val);
     void Accept(IRVisitor* v) const override;
+
+    int GetValue() const { return value; }
 
     std::unique_ptr<const IRExpression> GetCopy() const override;
 
@@ -110,7 +112,9 @@ public:
     {
     }
 
-
+    const IRExpression* GetLeft() const { return left.get(); }
+    const IRExpression* GetRight() const { return right.get(); }
+    const BinOp GetType() const { return binop; }
 
 
     void Accept(IRVisitor* v) const override;
@@ -134,6 +138,8 @@ public:
 
     explicit MemExpression( const IRExpression* expr);
 
+    const IRExpression* GetMem() const { return expr.get(); }
+
     void Accept(IRVisitor* v) const override;
     std::unique_ptr<const IRExpression> expr;
 
@@ -150,6 +156,11 @@ class CallExpression : public IRExpression {    // после 3end, потом �
 public:
     CallExpression(IRExpression* func, IRExpList* args);
     void Accept(IRVisitor* v) const override;
+
+
+    const IRExpression* GetFuncExp() const { return func.get(); }
+    const IRExpList* GetArgs() const { return args.get(); }
+
 
     std::unique_ptr<const IRExpression> GetCopy() const override;
 

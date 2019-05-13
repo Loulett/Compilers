@@ -16,6 +16,8 @@ public:
     dst( std::move( dst ) ), src( std::move( src ) )
     {}  // mb move to .cpp
 
+    const IRExpression* GetDst() const { return dst.get(); }
+    const IRExpression* GetSrc() const { return src.get(); }
 
     void Accept(IRVisitor* v) const override;
 
@@ -78,6 +80,12 @@ public:
 
     void Accept(IRVisitor* v) const override;
 
+    const IRExpression* GetLeft() const { return left.get(); }
+    const IRExpression* GetRight() const { return right.get(); }
+    const Label& GetTrueLabel() const { return if_left; }
+    const Label& GetFalseLabel() const { return if_right; }
+    const Relation GetType() const {return rel; }
+
     std::unique_ptr<const IRStatement> GetCopy() const override;
 
     CJumpStatement::Relation rel;
@@ -96,7 +104,8 @@ public:
     {
     }
 
-
+    const IRStatement* GetLeft() const { return left.get(); }
+    const IRStatement* GetRight() const { return right.get(); }
 
     void Accept(IRVisitor* v) const override;
 
