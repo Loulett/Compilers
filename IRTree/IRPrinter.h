@@ -20,7 +20,8 @@ public:
     void visit(const SeqStatement* n) override;
     void visit(const LabelStatement* n) override;
 
-    void visit( const IRExpList* n) override;
+    void visit(const IRExpList* n) override;
+    void visit(const IRStatementList* n) override;
 
 private:
     FILE* f;

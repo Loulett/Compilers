@@ -1,5 +1,6 @@
 #include "IRPrinter.h"
 #include <cstdio>
+#include <cassert>
 
 IRPrinter::IRPrinter(std::string filename) {
     f = fopen(filename.c_str(), "w");
@@ -182,5 +183,15 @@ std::string IRPrinter::getRel(const CJumpStatement::Relation rel) {
         return "!=";
     } else {
         return "<";
+    }
+}
+
+void IRPrinter::visit(const IRStatementList* n) {
+    int cur = nodeNumber;
+    fprintf( f, "%d [label=\"STM_LIST\"];\n", cur );
+    for( auto& expression : n->GetStatements() ) {
+        nodeNumber++;
+        fprintf( f, "%d -- %d;\n", cur, nodeNumber );
+        expression->Accept( this );
     }
 }

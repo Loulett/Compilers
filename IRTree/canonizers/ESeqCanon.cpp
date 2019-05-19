@@ -401,9 +401,9 @@ namespace IRT
         updateLastExpList( std::move( newExpList ) );
     }
 
-//    void ESeqCanon::visit( const CStmList* stmList )
-//    {
-//        assert( false );
-//    }
+   void ESeqCanon::visit( const IRStatementList* stmList )
+   {
+       assert( false );
+   }
 
 }

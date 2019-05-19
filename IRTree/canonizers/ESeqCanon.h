@@ -31,7 +31,7 @@ namespace IRT
         void visit( const LabelStatement* n ) override;  //+
 
         void visit( const IRExpList* list ) override;  //+
-        //void visit( const CStmList* list ) override;
+        void visit( const IRStatementList* list ) override;
 
     private:
         void updateLastExp( const IRExpression* newLastExp );

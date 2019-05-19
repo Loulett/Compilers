@@ -43,6 +43,11 @@ std::unique_ptr<const IRStatement> MoveStatement::GetCopy() const
     return std::move(std::make_unique<const MoveStatement>( dst->GetCopy(), src->GetCopy() ) );
 }
 
+std::unique_ptr<const IRStatement> IRStatementList::GetCopy() const
+{
+  return std::move(std::make_unique<const IRStatementList>());
+}
+
 
 
 
@@ -126,5 +131,9 @@ void SeqStatement::Accept(IRVisitor *v) const {
 //}
 
 void LabelStatement::Accept(IRVisitor *v) const {
+    v->visit(this);
+}
+
+void IRStatementList::Accept(IRVisitor* v) const {
     v->visit(this);
 }

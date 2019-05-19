@@ -5,11 +5,11 @@
 
 namespace IRT
 {
-    class CallCanon : public IRVisitor
+    class Linearizer : public IRVisitor
     {
 
     public:
-        CallCanon() = default;
+        Linearizer();
 
         std::unique_ptr<const IRStatement> CanonicalTree();
 
@@ -22,14 +22,14 @@ namespace IRT
 
         void visit( const ESeqExpression* n ) override;
 
-        void visit( const MoveStatement* n ) override;  //+
-        void visit( const ExpStatement* n ) override;  //+
-        void visit( const JumpStatement* n ) override;  //+
-        void visit( const CJumpStatement* n ) override;  //+
-        void visit( const SeqStatement* n ) override;  //+
-        void visit( const LabelStatement* n ) override;  //+
+        void visit( const MoveStatement* n ) override;
+        void visit( const ExpStatement* n ) override;
+        void visit( const JumpStatement* n ) override;
+        void visit( const CJumpStatement* n ) override;
+        void visit( const SeqStatement* n ) override;
+        void visit( const LabelStatement* n ) override;
 
-        void visit( const IRExpList* list ) override;  //+
+        void visit( const IRExpList* list ) override;
         void visit( const IRStatementList* list ) override;
 
     private:
@@ -42,13 +42,14 @@ namespace IRT
         void updateLastStm( const IRStatement* newLastStm );
         void updateLastStm( std::unique_ptr<const IRStatement> newLastStm );
 
-//        void updateLastStmList( const CStmList* newLastStmList );
-//        void updateLastStmList( std::unique_ptr<const CStmList> newLastStmList );
+        void saveCreatedStm( std::unique_ptr<const IRStatement> result );
+
+        std::vector<std::vector<std::unique_ptr<const IRStatement>>> stackOfSeqChildren;
+        std::vector<int> stackDepthCounter;
 
         std::unique_ptr<const IRExpList> prevExpList;
         std::unique_ptr<const IRExpression> prevExp;
         std::unique_ptr<const IRStatement> prevStm;
-//        std::unique_ptr<const CStmList> prevStmList;
     };
 
 }

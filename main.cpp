@@ -7,13 +7,11 @@
 #include "SymbolTable/Symbol.h"
 #include "IRTree/Translator.h"
 #include "IRTree/IRPrinter.h"
-#include <cstdio>
-#include <iostream>
-
-//#include "IRTree_canonical/Translator.h"
-//#include "IRTree_canonical/IRPrinter.h"
 #include "IRTree/canonizers/CallCanon.h"
 #include "IRTree/canonizers/ESeqCanon.h"
+#include "IRTree/canonizers/Linearizer.h"
+#include <cstdio>
+#include <iostream>
 
 extern int yyparse(Goal *goal);
 
@@ -44,19 +42,10 @@ int main(int argc, char **argv) {
         // Build IRT
         Translator translator(table);
         translator.visit(goal);
-
-        // Print IRT
         for (auto &codeFragment : translator.fragments) {
             IRPrinter printer("output" + codeFragment.first + ".dot");
             codeFragment.second.body->Accept(&printer);
         }
-
-
-
-        // Canonize IRT
-        //std::map<std::string, CodeFragment> codeFragments;
-        //codeFragments = std::move( translator.fragments);
-
         for (auto &codeFragment : translator.fragments) {
             IRT::CallCanon callCanonizator;
             codeFragment.second.body->Accept( &callCanonizator );
@@ -66,10 +55,17 @@ int main(int argc, char **argv) {
             codeFragment.second.rootCanonIRT->Accept( &eseqCanonizator );
             codeFragment.second.rootCanonIRT = eseqCanonizator.CanonicalTree();
         }
-//
-        //draw Canonized IRT
         for (auto &codeFragment : translator.fragments) {
             IRPrinter printer("output" + codeFragment.first + "_canonized.dot");
+            codeFragment.second.rootCanonIRT->Accept(&printer);
+        }
+        for (auto &codeFragment : translator.fragments) {
+            IRT::Linearizer liniarizer;
+            codeFragment.second.rootCanonIRT->Accept( &liniarizer );
+            codeFragment.second.rootCanonIRT = liniarizer.CanonicalTree();
+        }
+        for (auto &codeFragment : translator.fragments) {
+            IRPrinter printer("output" + codeFragment.first + "_liniarized.dot");
             codeFragment.second.rootCanonIRT->Accept(&printer);
         }
 

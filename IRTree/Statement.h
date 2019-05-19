@@ -129,3 +129,30 @@ public:
     std::unique_ptr<const IRStatement> GetCopy() const override;
     Label label;
 };
+
+
+class IRStatementList: public IRStatement {
+public:
+    IRStatementList() = default;
+    void Accept(IRVisitor* v) const override;
+    std::unique_ptr<const IRStatement> GetCopy() const override;
+    explicit IRStatementList( const IRStatement* statement)
+    {
+        Add(statement);
+    }
+
+    void Add( const IRStatement* statement)
+    {
+        list.emplace_back(statement);
+    }
+
+    void Add( std::unique_ptr<const IRStatement> statement )
+    {
+        list.emplace_back( std::move(statement) );
+    }
+    const std::vector<std::unique_ptr<const IRStatement>>& GetStatements() const
+    {
+        return list;
+    }
+    std::vector<std::unique_ptr<const IRStatement>> list;
+};

@@ -1,5 +1,5 @@
 #include <memory>
-
+#include <cassert>
 #include "CallCanon.h"
 
 
@@ -215,16 +215,9 @@ namespace IRT
         updateLastExpList( std::move( newList ) );
     }
 
-//    void CallCanon::visit( const CStmList* list )
-//    {
-//        auto newList = std::make_unique<CStmList>();
-//        const auto& arguments = list->GetStatements();
-//        for( const auto& arg : arguments ) {
-//            arg->Accept( this );
-//            newList->Add( std::move( prevStm ) );
-//        }
-//
-//        updateLastStmList( std::move( newList ) );
-//    }
+    void CallCanon::visit (const IRStatementList* list)
+    {
+        assert(false);
+    }
 
 }
