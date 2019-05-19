@@ -56,7 +56,6 @@ MoveStatement::MoveStatement(const IRExpression *dst, const IRExpression *src) :
 }
 
 void MoveStatement::Accept(IRVisitor *v) const {
-    std::cout << "accept movestm\n";
     v->visit(this);
 }
 
@@ -64,7 +63,6 @@ ExpStatement::ExpStatement(const IRExpression *exp) : exp(exp) {
 }
 
 void ExpStatement::Accept(IRVisitor *v) const {
-    std::cout << "accept expstm\n";
     v->visit(this);
 }
 
@@ -72,7 +70,6 @@ void ExpStatement::Accept(IRVisitor *v) const {
 //}
 
 void JumpStatement::Accept(IRVisitor *v) const {
-    std::cout << "accept jumpstm\n";
     v->visit(this);
 }
 
@@ -115,7 +112,6 @@ CJumpStatement::CJumpStatement(CJumpStatement::Relation rel, std::unique_ptr<con
 
 
 void CJumpStatement::Accept(IRVisitor *v) const {
-    std::cout << "accept Cjumpstm\n";
     v->visit(this);
 }
 
@@ -123,7 +119,6 @@ SeqStatement::SeqStatement(const IRStatement *left, const IRStatement *right) : 
 }
 
 void SeqStatement::Accept(IRVisitor *v) const {
-    std::cout << "accept SeqStm\n";
     v->visit(this);
 }
 
@@ -131,6 +126,5 @@ void SeqStatement::Accept(IRVisitor *v) const {
 //}
 
 void LabelStatement::Accept(IRVisitor *v) const {
-    std::cout << "accept labelstm\n";
     v->visit(this);
 }

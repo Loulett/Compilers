@@ -101,7 +101,7 @@ namespace IRT
         n->args->Accept(this);
         std::unique_ptr<const IRExpList> argumentsList = std::move( prevExpList );
 
-        std::string temp;
+        Temp temp;
         updateLastExp(
                 std::make_unique<const ESeqExpression>(
                         std::make_unique<const MoveStatement>(

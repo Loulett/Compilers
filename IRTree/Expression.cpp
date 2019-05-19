@@ -26,7 +26,7 @@ std::unique_ptr<const IRExpression> TempExpression::GetCopy() const
 }
 std::unique_ptr<const IRExpression> BinOpExpression::GetCopy() const
 {  // !!!!!!! no get()!
-    return std::move(std::make_unique<const BinOpExpression>( binop, left.get(), right.get() ) );
+    return std::move(std::make_unique<const BinOpExpression>( binop, left->GetCopy(), right->GetCopy() ) );
 }
 std::unique_ptr<const IRExpression> MemExpression::GetCopy() const
 {   // !!!!
@@ -120,6 +120,5 @@ ESeqExpression::ESeqExpression(const IRStatement *stm, const IRExpression *expr)
 }
 
 void ESeqExpression::Accept(IRVisitor *v) const {
-    std::cout << "ESeqExpression accept \n";
     v->visit(this);
 }

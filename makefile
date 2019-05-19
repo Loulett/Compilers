@@ -16,7 +16,7 @@ WARNINGS = -Reverything -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedanti
 		   -Wno-padded -Wno-exit-time-destructors -Wno-deprecated -Wno-sign-conversion \
 		   -Wno-shorten-64-to-32
 
-CXXFLAGS=-std=c++17 ${DEBUG_FLAGS}
+CXXFLAGS=-std=c++17 #${DEBUG_FLAGS}
 
 AST=AST/Identifier.cpp AST/Expression.cpp AST/Statement.cpp AST/Type.cpp AST/VarDeclaration.cpp AST/MethodDeclaration.cpp AST/ClassDeclaration.cpp AST/MainClass.cpp AST/Goal.cpp
 
@@ -27,10 +27,6 @@ SYMBOLTABLE=SymbolTable/Symbol.cpp SymbolTable/ClassInfo.cpp SymbolTable/MethodI
 ACTIVATIONRECORDS=ActivationRecords/InFrameAccess.cpp ActivationRecords/InRegAccess.cpp ActivationRecords/X86MiniJavaFrame.cpp
 
 IRTREE=IRTree/Expression.cpp IRTree/Statement.cpp IRTree/SubTreeWrapper.cpp IRTree/Translator.cpp IRTree/IRPrinter.cpp IRTree/canonizers/CallCanon.cpp IRTree/canonizers/ESeqCanon.cpp IRTree/Label.cpp
-
-# CANONICAL=IRTree/canonizers/CallCanon.cpp IRTree/canonizers/ESeqCanon.cpp
-
-#IRTREE=IRTree_canonical/Expression.cpp IRTree_canonical/Statement.cpp IRTree_canonical/SubTreeWrapper.cpp IRTree_canonical/Translator.cpp IRTree_canonical/IRPrinter.cpp
 
 parser.tab.o: parser.tab.c parser.tab.h
 	clang++ ${CXXFLAGS} -Wno-deprecated -c parser.tab.c -o parser.tab.o

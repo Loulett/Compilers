@@ -58,20 +58,13 @@ int main(int argc, char **argv) {
         //codeFragments = std::move( translator.fragments);
 
         for (auto &codeFragment : translator.fragments) {
-            std::cout << "new code fragment: "<< codeFragment.first << "!\n";
             IRT::CallCanon callCanonizator;
             codeFragment.second.body->Accept( &callCanonizator );
-            std::cout << "Start canonize call!\n";
             codeFragment.second.rootCanonIRT = callCanonizator.CanonicalTree();
-            std::cout << "Finish canonize call!\n";
-
 
             IRT::ESeqCanon eseqCanonizator;
-            std::cout << "ESeqCanon inited!\n";
             codeFragment.second.rootCanonIRT->Accept( &eseqCanonizator );
-            std::cout << "Start canonize ESeq!\n";
             codeFragment.second.rootCanonIRT = eseqCanonizator.CanonicalTree();
-            std::cout << "Finish canonize ESeq!\n";
         }
 //
         //draw Canonized IRT
