@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
         //codeFragments = std::move( translator.fragments);
 
         for (auto &codeFragment : translator.fragments) {
-            std::cout << "new code fragment!\n";
+            std::cout << "new code fragment: "<< codeFragment.first << "!\n";
             IRT::CallCanon callCanonizator;
             codeFragment.second.body->Accept( &callCanonizator );
             std::cout << "Start canonize call!\n";
